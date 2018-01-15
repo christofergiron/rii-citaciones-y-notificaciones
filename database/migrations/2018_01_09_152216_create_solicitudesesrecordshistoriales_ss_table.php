@@ -13,7 +13,7 @@ class CreateSolicitudesesrecordshistorialesSsTable extends Migration
      */
     public function up()
     {
-        Schema::create('solicitudesesrecordshistoriales_ss', function (Blueprint $table) {
+        Schema::create('solicitudesrecordhistoriales_ss', function (Blueprint $table) {
             $table->increments('id');
             $table->string('workflow_state')->nullable();
             $table->boolean('deleted')->default(false);
@@ -28,6 +28,6 @@ class CreateSolicitudesesrecordshistorialesSsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('solicitudesesrecordshistoriales_ss');
+        Schema::dropIfExists('solicitudesrecordhistoriales_ss');
     }
 }
