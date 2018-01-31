@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSolicitudsTable extends Migration
+class CreateInformesescenadelitosSsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,9 @@ class CreateSolicitudsTable extends Migration
      */
     public function up()
     {
-        Schema::create('solicitudes', function (Blueprint $table) {
+        Schema::create('informesescenadelitos_ss', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('solicitable_type')->nullable();
-            $table->integer('solicitable_id')->nullable();
-            $table->DateTime('fecha_solicitud');
-            $table->integer('id_solicitante');
-            $table->integer('id_hito')->nullable();
+            $table->string('workflow_state')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });
@@ -32,6 +28,6 @@ class CreateSolicitudsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('solicitudes');
+        Schema::dropIfExists('informesescenadelitos_ss');
     }
 }

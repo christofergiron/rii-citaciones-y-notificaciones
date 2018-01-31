@@ -31,6 +31,7 @@ class CreateReportesTable extends Migration
           $table->string('observaciones')->nullable();
           $table->integer('remitido_A');
           $table->DateTime('fecha_envio');
+          $table->integer('id_hito')->nullable();
           $table->boolean('deleted')->default(false);
           $table->timestamps();
         });

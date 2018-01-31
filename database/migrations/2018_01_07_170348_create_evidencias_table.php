@@ -33,6 +33,11 @@ class CreateEvidenciasTable extends Migration
             $table->integer('perito_analisis')->nullable();
             $table->DateTime('fecha_remision')->nullable();
             $table->integer('lugar_remision')->nullable();
+            $table->string('embalaje');
+            $table->string('rotulaje');
+            $table->integer('numero_caso');
+            $table->integer('numero_noticia_criminal');
+            $table->string('cadena_custodia');
             //no se si se almacenaria la foto de la evidencia?
             $table->boolean('deleted')->default(false);
             $table->timestamps();

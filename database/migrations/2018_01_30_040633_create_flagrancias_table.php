@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateInformeshomicidiosSsTable extends Migration
+class CreateFlagranciasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class CreateInformeshomicidiosSsTable extends Migration
      */
     public function up()
     {
-        Schema::create('informeshomicidios_ss', function (Blueprint $table) {
+        Schema::create('captura_flagrancia', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('id_denuncia')->nullable();
+            $table->integer('id_captura')->nullable();
             $table->string('workflow_state')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();
@@ -28,6 +30,6 @@ class CreateInformeshomicidiosSsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('informeshomicidios_ss');
+        Schema::dropIfExists('captura_flagrancia');
     }
 }

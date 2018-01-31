@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class InformeHomicidioSS extends Model
+class InformeDelitoContraVidaSS extends Model
 {
-    protected $table = "informeshomicidios_ss";
+    protected $table = "informesdelitoscontravida_ss";
 
     public function informe(){
         return $this->morphOne(Informe::class, 'tipoable');
