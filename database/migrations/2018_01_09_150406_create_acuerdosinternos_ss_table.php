@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateNotificacionesinternasSsTable extends Migration
+class CreateAcuerdosinternosSsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateNotificacionesinternasSsTable extends Migration
      */
     public function up()
     {
-        Schema::create('notificacionesinternas_ss', function (Blueprint $table) {
+        Schema::create('acuerdosinternos_ss', function (Blueprint $table) {
             $table->increments('id');
             $table->string('workflow_state')->nullable();
             $table->boolean('deleted')->default(false);
@@ -28,6 +28,6 @@ class CreateNotificacionesinternasSsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('notificacionesinternas_ss');
+        Schema::dropIfExists('acuerdosinternos_ss');
     }
 }

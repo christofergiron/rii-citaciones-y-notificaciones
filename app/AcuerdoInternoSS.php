@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class NotificacionInternaSS extends Model
+class AcuerdoInternoSS extends Model
 {
-    protected $table = "notificacionesinternas_ss";
+    protected $table = "acuerdosinternos_ss";
 
     public function solicitud(){
         return $this->morphOne(Solicitud::class, 'solicitable');
