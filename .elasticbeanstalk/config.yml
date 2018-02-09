@@ -1,0 +1,13 @@
+branch-defaults:
+  develop:
+    environment: rii-ss-dev
+    group_suffix: null
+global:
+  application_name: rii-ss
+  branch: null
+  default_ec2_keyname: rii
+  default_platform: PHP 7.1
+  default_region: us-west-2
+  profile: null
+  repository: null
+  sc: git
