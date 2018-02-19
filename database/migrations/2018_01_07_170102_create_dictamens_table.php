@@ -29,11 +29,10 @@ class CreateDictamensTable extends Migration
           $table->string('depto_policia_id');
           //$table->integer('depto_policial');
           $table->DateTime('fecha_solicitud_reporte')->nullable();
-          $table->string('descripcion')->nullable();
+          $table->longText('descripcion')->nullable();
           $table->string('observaciones')->nullable();
           $table->integer('remitido_A');
           $table->DateTime('fecha_envio');
-          $table->integer('id_hito')->nullable();
           $table->boolean('deleted')->default(false);
           $table->timestamps();
         });

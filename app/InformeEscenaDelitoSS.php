@@ -11,4 +11,8 @@ class InformeEscenaDelitoSS extends Model
     public function informe(){
         return $this->morphOne(Informe::class, 'tipoable');
     }
+
+    public function evidencias(){
+        return $this->hasMany(Evidencia::class, 'id_escena_delito');
+    }
 }

@@ -15,7 +15,7 @@ class CreateSeguimientosTable extends Migration
     {
         Schema::create('seguimientos', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('id_denuncia')->nullable();
+            $table->integer('id_expediente');
             $table->string('workflow_state')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();

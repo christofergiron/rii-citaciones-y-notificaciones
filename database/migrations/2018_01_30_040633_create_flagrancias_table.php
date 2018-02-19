@@ -13,7 +13,7 @@ class CreateFlagranciasTable extends Migration
      */
     public function up()
     {
-        Schema::create('captura_flagrancia', function (Blueprint $table) {
+        Schema::create('flagrancias', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('id_denuncia')->nullable();
             $table->integer('id_captura')->nullable();
@@ -30,6 +30,6 @@ class CreateFlagranciasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('captura_flagrancia');
+        Schema::dropIfExists('flagrancias');
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSolicitudAnalisesTable extends Migration
+class CreateCapturaFlagranciasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateSolicitudAnalisesTable extends Migration
      */
     public function up()
     {
-        Schema::create('solicitudes_analisis', function (Blueprint $table) {
-          $table->increments('id');
-          $table->string('workflow_state')->nullable();
-          $table->boolean('deleted')->default(false);
-          $table->timestamps();
+        Schema::create('capturas_flagrancias', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('id_flagrancia');
+            $table->boolean('deleted')->default(false);
+            $table->timestamps();
         });
     }
 
@@ -28,6 +28,6 @@ class CreateSolicitudAnalisesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('solicitudes_analisis');
+        Schema::dropIfExists('capturas_flagrancias');
     }
 }

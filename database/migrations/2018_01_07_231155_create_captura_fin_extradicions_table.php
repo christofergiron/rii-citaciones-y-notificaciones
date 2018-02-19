@@ -15,8 +15,7 @@ class CreateCapturaFinExtradicionsTable extends Migration
     {
         Schema::create('captura_fines_extradicion', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('id_orden_captura');
-            $table->integer('id_nota_rota');
+            $table->integer('id_nota_roja');
             $table->string('workflow_state')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();

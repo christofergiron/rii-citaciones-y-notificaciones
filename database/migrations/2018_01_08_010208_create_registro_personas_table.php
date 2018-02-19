@@ -17,6 +17,7 @@ class CreateRegistroPersonasTable extends Migration
             $table->increments('id');
             $table->string('workflow_state')->nullable();
             $table->integer('id_denuncia')->nullable();
+            $table->integer('id_sospechoso')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });

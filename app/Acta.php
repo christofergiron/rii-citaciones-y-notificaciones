@@ -10,12 +10,16 @@ class Acta extends Model
        return $this->morphOne(Anexo::class, 'anexable');
    }
 
+   public function funcionarios() {
+        return $this->belongsTo(FuncionarioSS::class, 'id_autor');
+   }
+
    public function hitos_ss()
    {
-       return $this->hasMany(HitoSS::class, 'id_hito');
+       return $this->hasMany(HitoSS::class, 'id_documento');
    }
-   
-   public function funcionarioss() {
-        return $this->belongsTo(FuncionarioSS::class, 'id_autor');
+
+   public function actable(){
+      return $this->morphTo();
    }
 }

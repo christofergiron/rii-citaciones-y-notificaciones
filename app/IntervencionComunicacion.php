@@ -3,15 +3,18 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Brexis\LaravelWorkflow\Traits\WorkflowTrait;
 
 class IntervencionComunicacion extends Model
 {
 
+use WorkflowTrait;
+
 protected $table = "intervenciones_comunicaciones";
 
-  public function denuncia()
+  public function orden()
   {
-      return $this->belongsTo(Denuncia::class, 'id_denuncia');
+      return $this->belongsTo(Orden::class, 'id_orden');
   }
 
   public function expediente()

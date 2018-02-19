@@ -15,25 +15,14 @@ class CreateInformesTable extends Migration
     {
         Schema::create('informes', function (Blueprint $table) {
             $table->increments('id');
+            $table->DateTime('fecha')->nullable();
+            $table->string('titulo')->nullable();
+            $table->string('numero_oficio')->nullable();
+            $table->string('institucion')->nullable();
+            $table->string('solicitado_por')->nullable();
             $table->string('tipoable_type')->nullable();
             $table->integer('tipoable_id')->nullable();
-            $table->string('titulo');
-            //$table->string('tipo_informe');
-            $table->integer('id_tipo_informe');
-            $table->integer('id_autor');
-            //$table->string('autor');
-            $table->integer('placa_autor')->nullable();
-            $table->string('id_expediente')->nullable();
-            $table->DateTime('fecha_creacion');
-            $table->string('Fiscal')->nullable();
-            $table->string('depto_policia_id');
-            //$table->integer('depto_policial');
-            $table->DateTime('fecha_solicitud_informe')->nullable();
-            $table->string('descripcion')->nullable();
-            $table->string('observaciones')->nullable();
-            $table->integer('remitido_A');
-            $table->DateTime('fecha_envio');
-            $table->integer('id_hito')->nullable();
+            $table->longText('descripcion')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });

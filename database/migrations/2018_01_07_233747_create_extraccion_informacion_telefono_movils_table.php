@@ -17,6 +17,15 @@ class CreateExtraccionInformacionTelefonoMovilsTable extends Migration
             $table->increments('id');
             $table->integer('id_orden');
             $table->string('workflow_state')->nullable();
+            $table->string('descripcion')->nullable();
+            $table->string('tipo');
+            $table->string('marca');
+            $table->string('modelo');
+            $table->string('numero');
+            $table->DateTime('fecha_aprobacion')->nullable();
+            $table->DateTime('fecha_extraccion')->nullable();
+            $table->integer('lugar_extraccion')->nullable();
+            $table->integer('ejecutor');
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });

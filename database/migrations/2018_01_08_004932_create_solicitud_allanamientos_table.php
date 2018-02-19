@@ -16,6 +16,9 @@ class CreateSolicitudAllanamientosTable extends Migration
         Schema::create('solicitud_allanamientos', function (Blueprint $table) {
             $table->increments('id');
             $table->string('workflow_state')->nullable();
+            $table->string('descripcion')->nullable();
+            $table->integer('numero_evidencias_encontradas')->nullable();
+            $table->string('descripcion_evidencias')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });

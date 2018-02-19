@@ -12,10 +12,14 @@ class Reporte extends Model
 
    public function hitos_ss()
    {
-       return $this->hasMany(HitoSS::class, 'id_hito');
+       return $this->hasMany(HitoSS::class, 'id_documento');
    }
 
    public function funcionarioss() {
         return $this->belongsTo(FuncionarioSS::class, 'id_autor');
+   }
+
+   public function reportable(){
+      return $this->morphTo();
    }
 }

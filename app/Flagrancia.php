@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Flagrancia extends Model
 {
 
-protected $table = "captura_flagrancia";
+protected $table = "flagrancias";
 
-  public function captura()
+  public function captura_flagrancia()
   {
-      return $this->hasMany(Captura::class, 'id_captura');
+      return $this->hasMany(CapturaFlagrancia::class, 'id_captura');
   }
 
   public function denuncia()

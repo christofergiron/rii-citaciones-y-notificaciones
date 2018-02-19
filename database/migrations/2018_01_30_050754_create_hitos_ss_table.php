@@ -18,7 +18,8 @@ class CreateHitosSsTable extends Migration
             $table->string('nombre')->nullable();
             $table->text('descripcion')->nullable();
             $table->date('fecha_inicio')->nullable();
-            $table->date('fecha_fin')->nullable();            
+            $table->date('fecha_fin')->nullable();
+            $table->integer('id_documento')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });

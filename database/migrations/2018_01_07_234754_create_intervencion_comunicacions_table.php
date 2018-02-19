@@ -15,8 +15,8 @@ class CreateIntervencionComunicacionsTable extends Migration
     {
         Schema::create('intervenciones_comunicaciones', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('id_denuncia')->nullable();
-            $table->integer('id_expediente')->nullable();
+            $table->integer('id_expediente');
+            $table->integer('id_orden');
             $table->string('workflow_state')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();

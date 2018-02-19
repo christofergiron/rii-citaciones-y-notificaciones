@@ -15,11 +15,14 @@ class CreateSolicitudsTable extends Migration
     {
         Schema::create('solicitudes', function (Blueprint $table) {
             $table->increments('id');
+            $table->DateTime('fecha')->nullable();
+            $table->string('titulo')->nullable();
+            $table->string('numero_oficio')->nullable();
+            $table->string('institucion')->nullable();
+            $table->string('solicitado_por')->nullable();
             $table->string('solicitable_type')->nullable();
             $table->integer('solicitable_id')->nullable();
-            $table->DateTime('fecha_solicitud');
-            $table->integer('id_solicitante');
-            $table->integer('id_hito')->nullable();
+            $table->longText('descripcion')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });

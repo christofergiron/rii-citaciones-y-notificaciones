@@ -16,6 +16,12 @@ class CreateDictamenVehicularsTable extends Migration
         Schema::create('dictamen_vehiculares', function (Blueprint $table) {
             $table->increments('id');
             $table->string('workflow_state')->nullable();
+            $table->string('tipo_vehiculo');
+            $table->string('marca_vehiculo');
+            $table->string('modelo_vehiculo');
+            $table->string('placa')->nullable();
+            $table->string('numero_motor')->nullable();
+            $table->integer('dueño')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });

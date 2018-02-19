@@ -16,6 +16,7 @@ class CreateReconocimientoRuedaPersonasTable extends Migration
         Schema::create('reconocimiento_rueda_personas', function (Blueprint $table) {
             $table->increments('id');
             $table->string('workflow_state')->nullable();
+            $table->integer('id_persona')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });

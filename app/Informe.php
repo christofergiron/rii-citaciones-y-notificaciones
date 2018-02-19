@@ -16,6 +16,11 @@ class Informe extends Model
 
    public function hitos_ss()
    {
-       return $this->hasMany(HitoSS::class, 'id_hito');
+       return $this->hasMany(HitoSS::class, 'id_documento');
    }
+
+   public function tipoable(){
+      return $this->morphTo();
+   }
+
 }

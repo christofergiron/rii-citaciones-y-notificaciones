@@ -17,6 +17,10 @@ class CreateInfiltrarOrganizacionCriminalsTable extends Migration
             $table->increments('id');
             $table->integer('id_orden');
             $table->string('workflow_state')->nullable();
+            $table->integer('id_agente')->nullable();
+            $table->string('nombre_organizacion')->nullable();
+            $table->DateTime('fecha_infiltracion')->nullable();
+            $table->DateTime('fecha_finalizacion')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });

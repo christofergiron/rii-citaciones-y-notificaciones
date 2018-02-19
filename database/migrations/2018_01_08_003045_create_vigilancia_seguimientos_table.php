@@ -16,6 +16,10 @@ class CreateVigilanciaSeguimientosTable extends Migration
         Schema::create('vigilancias_seguimientos', function (Blueprint $table) {
             $table->increments('id');
             $table->string('workflow_state')->nullable();
+            $table->integer('id_sospechoso')->nullable();
+            $table->integer('id_agente')->nullable();
+            $table->DateTime('fecha_inicio')->nullable();
+            $table->DateTime('fecha_fin')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });
