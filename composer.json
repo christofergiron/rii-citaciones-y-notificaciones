@@ -6,16 +6,26 @@
     "type": "project",
     "require": {
         "php": ">=7.0.0",
+        "barryvdh/laravel-debugbar": "^3.1",
+        "barryvdh/laravel-ide-helper": "^2.4",
+        "brexis/laravel-workflow": "^1.0",
+        "doctrine/dbal": "^2.6",
+        "dunglas/php-to-json-schema": "^0.1.0",
+        "evaisse/php-json-schema-generator": "^2.0",
         "fideloper/proxy": "~3.3",
+        "guzzlehttp/guzzle": "^6.3",
+        "justinrainbow/json-schema": "^5.2",
         "laravel/framework": "5.5.*",
-        "laravel/tinker": "~1.0"
+        "laravel/tinker": "~1.0",
+        "prettus/laravel-request-logger": "^1.0",
+        "solvire/php-json-schema-generator": "dev-master",
+        "symfony/yaml": "^3.3"
     },
     "require-dev": {
         "filp/whoops": "~2.0",
         "fzaninotto/faker": "~1.4",
-        "mockery/mockery": "~1.0",
-        "phpunit/phpunit": "~6.0",
-        "symfony/thanks": "^1.0"
+        "mockery/mockery": "0.9.*",
+        "phpunit/phpunit": "~6.0"
     },
     "autoload": {
         "classmap": [

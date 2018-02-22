@@ -19,7 +19,7 @@ Route::resource('InformeDelitoContraVidaSS', 'API\InformeDelitoContraVidaSSContr
 Route::resource('InformeDelitoComunSS', 'API\InformeDelitoComunSSController');
 Route::resource('InformeEscenaDelitoSS', 'API\InformeEscenaDelitoSSController');
 
-Route::post('/prueba_servicio', 'API\SolicitudRecordHistorialController@store');
+Route::post('/ss/new/solicitud_record_historial', 'API\SolicitudRecordHistorialController@store');
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

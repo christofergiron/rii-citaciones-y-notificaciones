@@ -37,7 +37,7 @@ use App\DefaultActionSS;
 use App\NumeroExpediente;
 use App\DefaultSSNUE;
 
-class StoreDenunciaSS //extends FormRequest
+class StoreSolicitudRecordHistorial //extends FormRequest
 {
 
     private $response;
@@ -102,23 +102,23 @@ class StoreDenunciaSS //extends FormRequest
     public function rules($arr)
     {
        $validator = Validator::make($arr   , [
-        "token" => "required",
-        "anexos" => "present|array",
-        "anexos.*.documento_id" => "present|numeric|nullable|exists:documentos,id"
-
-        "solicitud_record_historial" => "required",
-        "solicitud_record_historial.solicitud.fecha_solicitud" => "required|date_format:Y/m/d",
-        "solicitud_record_historial.solicitud.titulo" => "required",
-        "solicitud_record_historial.solicitud.oficio" => "required",
-        "solicitud_record_historial.solicitud.institucion" => "required",
-        "solicitud_record_historial.solicitud.solicitado_por" => "required",
-        "solicitud_record_historial.solicitud.descripcion" => "nullable",
-
-        "solicitud_record_historial.hitos_ss.nombre" => "required",
-        "solicitud_record_historial.hitos_ss.descripcion" => "required",
-        "solicitud_record_historial.hitos_ss.fecha_inicio" => "required|date_format:Y/m/d",
-        "solicitud_record_historial.hitos_ss.fecha_fin" => "required|date_format:Y/m/d",
-        "solicitud_record_historial.hitos_ss.id_documento" => "present|numeric|nullable|exists:solicitud,id"
+        // "token" => "required",
+        // "anexos" => "present|array",
+        // "anexos.*.documento_id" => "present|numeric|nullable|exists:documentos,id",
+        //
+        // "solicitud_record_historial" => "required",
+        // "solicitud_record_historial.*.solicitud.fecha_solicitud" => "required|date_format:Y/m/d",
+        // "solicitud_record_historial.*.solicitud.titulo" => "required",
+        // "solicitud_record_historial.*.solicitud.oficio" => "required",
+        // "solicitud_record_historial.*.solicitud.institucion" => "required",
+        // "solicitud_record_historial.*.solicitud.solicitado_por" => "required",
+        // "solicitud_record_historial.*.solicitud.descripcion" => "nullable",
+        //
+        // "solicitud_record_historial.*.hitos_ss.nombre" => "required",
+        // "solicitud_record_historial.*.hitos_ss.descripcion" => "required",
+        // "solicitud_record_historial.*.hitos_ss.fecha_inicio" => "required|date_format:Y/m/d",
+        // "solicitud_record_historial.*.hitos_ss.fecha_fin" => "required|date_format:Y/m/d",
+        // "solicitud_record_historial.*.hitos_ss.id_documento" => "present|numeric|nullable|exists:solicitud,id"
      ]);
 
        if ($validator->fails()) {
@@ -132,19 +132,19 @@ class StoreDenunciaSS //extends FormRequest
 
     public function persist($arr) {
         $user_details = $this->get_user($arr["token"]);
-        $user = $this->get_institucion_dependencia($user_details->funcionario_id);
-        $lugar = $this->get_lugar($user_details->funcionario_id);
+        //$user = $this->get_institucion_dependencia($user_details->funcionario_id);
+        //$lugar = $this->get_lugar($user_details->funcionario_id);
         // $this->log::alert(json_encode($res));
 
         // save expedientes
         try {
-            $expediente = $this->set_expediente($arr, $user);
-            $this->log::alert(json_encode($expediente));
-            $doc = $this->set_documento($arr, $expediente, $lugar);
-            $this->log::alert(json_encode($doc));
-            $denuncia = $this->set_denuncia($arr, $doc, $user_details, $user);
-            $this->log::alert(json_encode($denuncia));
-            $anexos = $this->set_anexos($arr, $denuncia);
+            //$expediente = $this->set_expediente($arr, $user);
+            //$this->log::alert(json_encode($expediente));
+            //$doc = $this->set_documento($arr, $expediente, $lugar);
+            //$this->log::alert(json_encode($doc));
+            //$denuncia = $this->set_denuncia($arr, $doc, $user_details, $user);
+            //$this->log::alert(json_encode($denuncia));
+            $anexos = $this->set_anexos($arr);
             $this->log::alert(json_encode($anexos));
             $solicitud = $this->set_solicitud($arr, $anexos);
             $this->log::alert(json_encode($solicitud));
@@ -366,7 +366,7 @@ class StoreDenunciaSS //extends FormRequest
         return $sujeto;
     }
 
-    public function set_anexos($arr, $denuncia, $doc) {
+    public function set_anexos($arr) {
         $anexos_arr = [];
         foreach($arr["anexos"] as $d) {
             if (is_null($d["documento_id"])) { continue; }
@@ -375,14 +375,14 @@ class StoreDenunciaSS //extends FormRequest
             $this->log::alert(json_encode($doc));
 
             $anexo = new Anexo;
-            $anexo->denuncia()->associate($denuncia);
+            //$anexo->denuncia()->associate($denuncia);
             $anexo->documento()->save($doc);
             $anexos_arr[] = $anexo;
         }
         return $anexos_arr;
     }
 
-    public function set_solicitud($arr, $anexos) {
+    public function set_solicitud($arr) {
 
         $solicitud_record_historial_arr = [
           "workflow_state" => "pendiente_revision",
@@ -390,9 +390,9 @@ class StoreDenunciaSS //extends FormRequest
         $solicitud_record_historial = SolicitudRecordHistorial::create($solicitud_record_historial_arr);
 
         $solicitud_arr = [
-          "fecha" => $arr["solicitud_record_historial"]["solicitud"]["fecha_solicitud"],
+          "fecha" => $arr["solicitud_record_historial"]["solicitud"]["fecha"],
           "titulo" => $arr["solicitud_record_historial"]["solicitud"]["titulo"],
-          'numero_oficio' => $arr["solicitud_record_historial"]["solicitud"]["oficio"],
+          'numero_oficio' => $arr["solicitud_record_historial"]["solicitud"]["numero_oficio"],
           'institucion' => $arr["solicitud_record_historial"]["solicitud"]["institucion"],
           'solicitado_por' => $arr["solicitud_record_historial"]["solicitud"]["solicitado_por"],
           'descripcion' => $arr["solicitud_record_historial"]["solicitud"]["descripcion"]
@@ -401,7 +401,7 @@ class StoreDenunciaSS //extends FormRequest
         $solicitud_record_historial->solicitud()->save($solicitud);
 
         // associate anexo
-        $solicitud->anexo()->save($anexo);
+        //$solicitud->anexo()->save($anexos);
         return $solicitud;
     }
 

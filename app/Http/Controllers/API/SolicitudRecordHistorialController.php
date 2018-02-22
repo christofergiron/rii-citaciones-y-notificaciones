@@ -7,12 +7,12 @@ use App\DenunciaMPEscrita;
 use App\DenunciaMPVerbal;
 use App\DenunciaMPMaie;
 use App\DenunciaMPTools;
+use App\Http\Requests\StoreSolicitudRecordHistorial;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Validator;
-use App\Http\Requests\StoreSolicitudRecordHistorial;
 
 class SolicitudRecordHistorialController extends Controller
 {
