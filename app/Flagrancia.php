@@ -9,7 +9,11 @@ class Flagrancia extends Model
 
 protected $table = "flagrancias";
 
-  public function captura_flagrancia()
+public function captura(){
+    return $this->morphOne(Captura::class, 'capturable');
+}
+
+  public function flagrancia()
   {
       return $this->hasMany(CapturaFlagrancia::class, 'id_captura');
   }

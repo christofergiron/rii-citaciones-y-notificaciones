@@ -6,6 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class HitoSS extends Model
 {
+    protected $fillable = [
+      "nombre",
+      "descripcion",
+      "fecha_inicio",
+      "fecha_fin",
+      "id_documento"      
+    ];
     protected $table = "informesdelitoscomunes_ss";
 
     public function dictamen() {

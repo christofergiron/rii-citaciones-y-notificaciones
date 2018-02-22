@@ -25,7 +25,7 @@ class CreateCapturasTable extends Migration
             $table->integer('id_lugar');
             $table->integer('id_funcionario');
             $table->string('descripcion_captura');
-            $table->string('observaciones');
+            $table->string('observaciones')->nullable();
             $table->DateTime('fecha_captura');
             $table->boolean('deleted')->default(false);
             $table->timestamps();

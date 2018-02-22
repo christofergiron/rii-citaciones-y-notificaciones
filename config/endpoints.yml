@@ -1,0 +1,61 @@
+passport-api-alternative:
+  login: http://ec2-35-163-158-159.us-west-2.compute.amazonaws.com/api/login
+  register: http://ec2-35-163-158-159.us-west-2.compute.amazonaws.com/api/user
+  update_user: http://ec2-35-163-158-159.us-west-2.compute.amazonaws.com/api/user
+  users: http://ec2-35-163-158-159.us-west-2.compute.amazonaws.com/api/user
+  details: http://ec2-35-163-158-159.us-west-2.compute.amazonaws.com/api/details
+  create_rol: http://ec2-35-163-158-159.us-west-2.compute.amazonaws.com/api/rol
+  update_rol: http://ec2-35-163-158-159.us-west-2.compute.amazonaws.com/api/update_rol
+  assign_rol: http://ec2-35-163-158-159.us-west-2.compute.amazonaws.com/api/assign_rol
+  change_password: http://ec2-35-163-158-159.us-west-2.compute.amazonaws.com/api/change_password
+  auth_workflow_action: http://ec2-35-163-158-159.us-west-2.compute.amazonaws.com/api/auth_workflow_action
+  user_workflow_actions: http://ec2-35-163-158-159.us-west-2.compute.amazonaws.com/api/user_workflow_actions
+  emails: http://ec2-35-163-158-159.us-west-2.compute.amazonaws.com/api/emails
+
+passport-api:
+  login: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/login
+  register: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/user
+  update_user: http://passport-api-dev.us-west-2.elasticbeanstalk.comm/api/user
+  users: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/user
+  list_users: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/list_users  
+  details: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/details
+  create_rol: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/create_rol
+  update_rol: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/update_rol
+  assign_rol: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/assign_rol
+  change_password: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/change_password
+  auth_workflow_action: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/auth_workflow_action
+  user_workflow_actions: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/user_workflow_actions
+  emails: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/emails
+  list_roles: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/list_roles
+  show_rol: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/show_rol
+  assign_rol: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/assign_rol
+
+passport-api-test:
+  login: http://localhost:8000/api/login
+  register: http://localhost:8000/api/user
+  update_user: http://localhost:8000/api/user
+  users: http://localhost:8000/api/user
+  users: http://localhost:8000/api/list_users  
+  details: http://localhost:8000/api/details
+  create_rol: http://localhost:8000/api/create_rol
+  update_rol: http://localhost:8000/api/update_rol
+  assign_rol: http://localhost:8000/api/assign_rol
+  change_password: http://localhost:8000/api/change_password
+  auth_workflow_action: http://localhost:8000/api/auth_workflow_action
+  user_workflow_actions: http://localhost:8000/api/user_workflow_actions
+  emails: http://localhost:8000/api/emails
+  list_roles: http://localhost:8000/api/list_roles
+  show_rol: http://localhost:8000/api/show_rol
+  assign_rol: http://passport-api-dev.us-west-2.elasticbeanstalk.com/api/assign_rol
+
+workflow-api-test:
+  apply_transition: http://localhost:8100/api/apply_transition
+  user_actions: http://localhost:8100/api/user_actions
+  workflow_actions: http://localhost:8100/api/workflow_actions
+  workflow_transition_owners: http://localhost:8100/api/workflow_transition_owners
+
+workflow-api:
+  apply_transition: http://workflow-api-dev.us-west-2.elasticbeanstalk.com/api/apply_transition
+  user_actions: http://workflow-api-dev.us-west-2.elasticbeanstalk.com/api/user_actions
+  workflow_actions: http://lworkflow-api-dev.us-west-2.elasticbeanstalk.com/api/workflow_actions
+  workflow_transition_owners: http://workflow-api-dev.us-west-2.elasticbeanstalk.com/api/workflow_transition_owners

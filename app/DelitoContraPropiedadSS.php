@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class DelitoContraPropiedadSS extends Model
 {
+    protected $fillable = [    
+      "workflow_state"
+    ];
     protected $table = "delitoscontrapropiedades_ss";
 
     public function solicitud(){

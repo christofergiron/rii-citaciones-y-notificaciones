@@ -15,7 +15,10 @@ class CreateMenorDetenidosTable extends Migration
     {
         Schema::create('menores_detenidos', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('fiscal_niñez')->nullable();
+            $table->integer('fiscal_niñez')->nullable();
+            $table->integer('apoderado')->nullable();
+            $table->DateTime('fecha_remision_centro_especializado')->nullable();
+            $table->integer('centro_especializado')->nullable();
             $table->string('workflow_state')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();

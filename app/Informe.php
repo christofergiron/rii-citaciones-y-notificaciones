@@ -6,6 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Informe extends Model
 {
+  protected $fillable = [
+    "fecha",
+    "titulo",
+    "numero_oficio",
+    "institucion",
+    "solicitado_por",
+    "descripcion"
+  ];
+
+  protected $table = "solicitudes";
+  
   public function anexo(){
        return $this->morphOne(Anexo::class, 'anexable');
    }
