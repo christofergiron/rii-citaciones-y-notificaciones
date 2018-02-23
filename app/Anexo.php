@@ -10,6 +10,10 @@ class Anexo extends Model
   //     return $this->morphTo();
   // }
 
+  protected $fillable = [
+    "denuncia_id"
+  ];
+
   public function anexable(){
      return $this->morphTo();
   }

@@ -64,22 +64,6 @@ class StoreSolicitudRecordHistorial //extends FormRequest
         $this->response->payload->id = null;
     }
 
-    public function mapDenunciaToDocumento($d){
-        $doc = new \stdClass;
-        $doc->documento = new \stdClass;
-        $doc->documento->numero_documento = $d["ss_denuncia"]["generales"]["encabezado"]["numero_denuncia"];
-        $doc->documento->clase_documento = "digital";
-        $doc->documento->numero_expediente_referencia = $d["ss_denuncia"]["generales"]["encabezado"]["numero_expediente"];
-        $doc->documento->titulo_documento = "Denuncia Recibida de Secretaría Seguridad";
-        $doc->documento->descripcion = "Denuncia Recibida de la Secretaría de Seguridad";
-        $doc->documento->fecha_recepcion = $d["ss_denuncia"]["generales"]["encabezado"]["fecha_denuncia"];
-        $doc->documento->institucion_id = 2;
-        $doc->documento->dependencia_id = 32;
-        $doc->documento->funcionario_id = null;
-        $doc->documento->otra_procedencia = null;
-        return $doc;
-    }
-
     public function workflow_rules(Array $arr)
     {
 
@@ -102,23 +86,24 @@ class StoreSolicitudRecordHistorial //extends FormRequest
     public function rules($arr)
     {
        $validator = Validator::make($arr   , [
-        // "token" => "required",
-        // "anexos" => "present|array",
-        // "anexos.*.documento_id" => "present|numeric|nullable|exists:documentos,id",
-        //
-        // "solicitud_record_historial" => "required",
-        // "solicitud_record_historial.*.solicitud.fecha_solicitud" => "required|date_format:Y/m/d",
-        // "solicitud_record_historial.*.solicitud.titulo" => "required",
-        // "solicitud_record_historial.*.solicitud.oficio" => "required",
-        // "solicitud_record_historial.*.solicitud.institucion" => "required",
-        // "solicitud_record_historial.*.solicitud.solicitado_por" => "required",
-        // "solicitud_record_historial.*.solicitud.descripcion" => "nullable",
-        //
-        // "solicitud_record_historial.*.hitos_ss.nombre" => "required",
-        // "solicitud_record_historial.*.hitos_ss.descripcion" => "required",
-        // "solicitud_record_historial.*.hitos_ss.fecha_inicio" => "required|date_format:Y/m/d",
-        // "solicitud_record_historial.*.hitos_ss.fecha_fin" => "required|date_format:Y/m/d",
-        // "solicitud_record_historial.*.hitos_ss.id_documento" => "present|numeric|nullable|exists:solicitud,id"
+        "token" => "required",
+        "anexos" => "required",
+        "anexos.documento_id" => "required",
+
+        "solicitud_record_historial" => "required",
+        "solicitud_record_historial.solicitud" => "required",
+        "solicitud_record_historial.solicitud.fecha" => "required|date_format:Y/m/d",
+        "solicitud_record_historial.solicitud.titulo" => "required",
+        "solicitud_record_historial.solicitud.numero_oficio" => "required",
+        "solicitud_record_historial.solicitud.institucion" => "required",
+        "solicitud_record_historial.solicitud.solicitado_por" => "required",
+        "solicitud_record_historial.solicitud.descripcion" => "nullable",
+
+        "solicitud_record_historial.hitos_ss" => "required|array|min:1",
+        "solicitud_record_historial.hitos_ss.*.nombre" => "required",
+        "solicitud_record_historial.hitos_ss.*.descripcion" => "required",
+        "solicitud_record_historial.hitos_ss.*.fecha_inicio" => "required|date_format:Y/m/d",
+        "solicitud_record_historial.hitos_ss.*.fecha_fin" => "required|date_format:Y/m/d"
      ]);
 
        if ($validator->fails()) {
@@ -136,16 +121,7 @@ class StoreSolicitudRecordHistorial //extends FormRequest
         //$lugar = $this->get_lugar($user_details->funcionario_id);
         // $this->log::alert(json_encode($res));
 
-        // save expedientes
         try {
-            //$expediente = $this->set_expediente($arr, $user);
-            //$this->log::alert(json_encode($expediente));
-            //$doc = $this->set_documento($arr, $expediente, $lugar);
-            //$this->log::alert(json_encode($doc));
-            //$denuncia = $this->set_denuncia($arr, $doc, $user_details, $user);
-            //$this->log::alert(json_encode($denuncia));
-            // $anexos = $this->set_anexos($arr);
-            // $this->log::alert(json_encode($anexos));
             $solicitud = $this->set_solicitud($arr);
             $this->log::alert(json_encode($solicitud));
             $hitos = $this->set_hitos($arr, $solicitud);
@@ -166,27 +142,13 @@ class StoreSolicitudRecordHistorial //extends FormRequest
         return $this->response;
     }
 
-
-    // public function set_anexos($arr) {
-    //   $_arr = [];
-    //   foreach($arr["anexos"] as $d) {
-    //       $anexos_arr = [
-    //           "denuncia_id" => $d["documento_id"]
-    //         ];
-    //       $anexos = new Anexo($anexos_arr);
-    //       $anexos->save();
-    //       $_arr[] = $anexos;
-    //   }
-    //   return $_arr;
-    // }
-
     public function set_solicitud($arr) {
-
+      //Solicitud Hijo
         $solicitud_record_historial_arr = [
           "workflow_state" => "nueva_solicitud",
         ];
         $solicitud_record_historial = SolicitudRecordHistorial::create($solicitud_record_historial_arr);
-
+      //Solicitud Padre
         $solicitud_arr = [
           "fecha" => $arr["solicitud_record_historial"]["solicitud"]["fecha"],
           "titulo" => $arr["solicitud_record_historial"]["solicitud"]["titulo"],
@@ -197,9 +159,13 @@ class StoreSolicitudRecordHistorial //extends FormRequest
         ];
         $solicitud = new Solicitud($solicitud_arr);
         $solicitud_record_historial->solicitud()->save($solicitud);
+      //Anexo
+        $anexos_arr = [
+            "denuncia_id" => $arr["anexos"]["documento_id"]
+          ];
+        $anexos = new Anexo($anexos_arr);
+        $solicitud->anexo()->save($anexos);
 
-        // associate anexo
-        //$solicitud->anexo()->save($anexos);
         return $solicitud_record_historial;
     }
 
@@ -211,7 +177,7 @@ class StoreSolicitudRecordHistorial //extends FormRequest
               "descripcion" => $d["descripcion"],
               "fecha_inicio" => $d["fecha_inicio"],
               "fecha_fin" => $d["fecha_fin"],
-              "id_documento" => $solicitud->id
+              "id_solicitud" => $solicitud->id //cambiar
             ];
           $hitos = new HitoSolicitudSS($hitos_arr);
           $hitos->save();
