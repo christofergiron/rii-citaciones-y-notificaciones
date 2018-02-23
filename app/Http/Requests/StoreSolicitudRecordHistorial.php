@@ -27,7 +27,7 @@ use App\Sospechoso;
 use App\Testigo;
 use App\SolicitudRecordHistorial;
 use App\Solicitud;
-use App\HitoSS;
+use App\HitoSolicitudSS;
 use App\Victima;
 use App\Http\Requests\StorePersona;
 use App\Workflow;
@@ -144,16 +144,16 @@ class StoreSolicitudRecordHistorial //extends FormRequest
             //$this->log::alert(json_encode($doc));
             //$denuncia = $this->set_denuncia($arr, $doc, $user_details, $user);
             //$this->log::alert(json_encode($denuncia));
-            $anexos = $this->set_anexos($arr);
-            $this->log::alert(json_encode($anexos));
-            $solicitud = $this->set_solicitud($arr, $anexos);
+            // $anexos = $this->set_anexos($arr);
+            // $this->log::alert(json_encode($anexos));
+            $solicitud = $this->set_solicitud($arr);
             $this->log::alert(json_encode($solicitud));
             $hitos = $this->set_hitos($arr, $solicitud);
             $this->log::alert(json_encode($hitos));
 
             $this->init();
             $this->response->message = "Solicitud Creada Exitosamente";
-            $this->response->payload->id = $anexos->id;//$denuncia->id;
+            $this->response->payload->id = $solicitud->id;//$denuncia->id;
         } catch (Exception $e) {
             $this->log::error($e);
             $this->init();
@@ -166,263 +166,58 @@ class StoreSolicitudRecordHistorial //extends FormRequest
         return $this->response;
     }
 
-    private function get_lugar($funcionario_id) {
 
-        $res = new \stdClass;
-        $res->departamento_id = null;
-        $res->municipio_id = null;
-        $res->ciudad_id = null;
-        $res->aldea_id = null;
-        $res->zona_id = null;
-        $res->sector_id = null;
-        $res->regional_id = null;
-        $res->colonia_id = null;
-
-        $result = json_decode(json_encode($res),true);
-
-        $funcionario = Funcionario::whereId($funcionario_id)->with('dependencia.lugar')->first();
-
-        if (is_null($funcionario)) {
-            return $result;
-        }
-
-        if (is_null($funcionario->dependencia)) {
-            return $result;
-        }
-
-        if (is_null($funcionario->dependencia->lugar)) {
-            return $result;
-        }
-
-        if (is_null($funcionario->dependencia->lugar->institucionable)) {
-            return $result;
-        }
-
-        $lugar = $funcionario->dependencia->lugar->institucionable;
-        $res->departamento_id = $lugar->departamento_id;
-        $res->municipio_id = $lugar->municipio_id;
-        $res->ciudad_id = $lugar->ciudad_ss_id;
-        $res->aldea_id = $lugar->aldea_ss_id;
-        $res->zona_id = $lugar->zona_ss_id;
-        $res->sector_id = $lugar->sector_ss_id;
-        $res->regional_id = $lugar->regional_id;
-        $res->colonia_id = $lugar->colonia_ss_id;
-
-        $result = json_decode(json_encode($res),true);
-        return $result;
-    }
-
-    public function generar_numero_expediente($nue_type)
-    {
-
-       $this->log::alert('inside generar numero expediente denuncia ss ....');
-
-       $numero_expediente = new NumeroExpediente();
-       try {
-            $numero_expediente_type = PolyBaseFactory::getNUE($nue_type);
-       }
-       catch (\Exception $e) {
-            $numero_expediente_type = new DefaultSSNUE();
-       }
-
-       $this->response = $numero_expediente->generate($numero_expediente_type);
-
-       return $this->response;
-    }
-
-    public function set_expediente($arr, $user) {
-        // expediente MP
-        $arr_ss = [
-            "numero_expediente" => $this->generar_numero_expediente($this->nue_type),
-
-        ];
-        $exp_ss = ExpedienteSS::create($arr_ss);
-
-        // expediente RII
-        $arr = [
-            "numero_expediente" => $this->generar_numero_expediente($this->rii_nue_type),
-            "fecha_expediente" => $arr["ss_denuncia"]["generales"]["encabezado"]["fecha_denuncia"],
-            "institucion_id" => $user->institucion_id,
-            "dependencia_id" => $user->dependencia_id,
-        ];
-        $exp = new Expediente($arr);
-
-        // associate father & child
-        $exp_ss->institucion()->save($exp);
-
-        return $exp;
-    }
-
-    public function set_documento($arr, $expediente, $_lugar) {
-        // lugar
-        //$lugar = $this->set_lugar($arr["ss_denuncia"]["generales"]["encabezado"]);
-        $lugar = $this->set_lugar($_lugar);
-
-        // documento digital
-        $doc_digital = DocumentoDigital::create();
-        // documento
-        $doc_arr= [
-            "expediente_id"=> $expediente->id,
-            "institucion_id"=> $expediente->institucion_id,
-            "dependencia_id" =>$expediente->dependencia_id,
-            "titulo" => $arr["ss_denuncia"]["tipo"],
-            "descripcion" => $arr["ss_denuncia"]["tipo"],
-            "tags" => Array($arr["ss_denuncia"]["tipo"]),
-            "fecha_documento" => $arr["ss_denuncia"]["generales"]["encabezado"]["fecha_denuncia"],
-            "hora_recepcion" => $arr["ss_denuncia"]["generales"]["encabezado"]["hora_denuncia"],
-            "workflow_state" => "nuevo"
-          ];
-        $doc = new Documento($doc_arr);
-
-        //associate
-        $doc_digital->documento()->save($doc);
-
-        // associate lugar
-        $doc->lugares()->save($lugar);
-
-        return $doc;
-    }
-
-    private function set_actividades($d, $arr) {
-
-        if (is_null($arr["ss_denuncia"]["generales"]["actividades_confirmacion"])) {
-            return true;
-        }
-        foreach($arr["ss_denuncia"]["generales"]["actividades_confirmacion"] as $a) {
-            $actividad_arr = [
-                    "descripcion" => $a["nombre_actividad"],
-                    "denuncia_fuente_no_formal_id" => $d->id,
-            ];
-
-            $actividad = ActividadConfirmacion::create($actividad_arr);
-        }
-        return true;
-    }
-
-    private function get_dependencia($dependencia_id) {
-        $res = null;
-        $dependencia = Dependencia::find($dependencia_id);
-
-        if (is_null($dependencia)) {
-            return $res;
-        }
-
-        return $dependencia->nombre;
-    }
-
-    public function set_denuncia($arr, $doc, $user_details, $funcionario) {
-        $nombre_dependencia = $this->get_dependencia($doc->dependencia_id);
-        // denuncia MP escrita|verbal|maie
-        switch ($arr["ss_denuncia"]["tipo"]) {
-            case "denuncia_fuente_no_formal":
-                $denuncia_tipo = DenunciaFuenteNoFormal::create(['fuente_informacion' => $arr["ss_denuncia"]["generales"]["encabezado"]["fuente_informacion"]]);
-                $actividades = $this->set_actividades($denuncia_tipo, $arr);
-                break;
-            default:
-                $denuncia_fuente_formal_arr = [
-                        'dependencia_id' => $doc->dependencia_id,
-                        'delito_id' => $arr["ss_denuncia"]["generales"]["encabezado"]["delito_id"],
-                        'unidad_competente' => $nombre_dependencia,//$arr["ss_denuncia"]["generales"]["encabezado"]["unidad_competente"],
-                        'entidad' => $funcionario->entidad,//$arr["ss_denuncia"]["generales"]["receptor"]["entidad"],
-                        'unidad_competente_receptor' => $nombre_dependencia,//$arr["ss_denuncia"]["generales"]["receptor"]["unidad_competente"],
-                        'numero_placa_receptor' => $funcionario->placa,//$arr["ss_denuncia"]["generales"]["receptor"]["numero_placa"]
-                ];
-
-                if (!is_null( $arr["ss_denuncia"]["generales"]["encabezado"]["delito_id"])) {
-                    $denuncia_fuente_formal_arr["delito_id"] = $arr["ss_denuncia"]["generales"]["encabezado"]["delito_id"];
-                }
-
-                $denuncia_tipo = DenunciaFuenteFormal::create($denuncia_fuente_formal_arr);
-                break;
-        }
-
-        // denuncia SS
-        $denuncia_ss_arr = [
-            "numero_denuncia" => $this->generar_numero_expediente($this->denuncia_type),
-            "workflow_state" => "pendiente_revision",
-            'recepcionada_en' => $doc->dependencia_id,//$arr["ss_denuncia"]["generales"]["encabezado"]["recepcionada_en"],
-            'funcionario_id' => $user_details->funcionario_id//$arr["ss_denuncia"]["generales"]["receptor"]["funcionario_id"]
-          ];
-        $denuncia_ss = new DenunciaSS($denuncia_ss_arr);
-        $denuncia_tipo->denuncia()->save($denuncia_ss);
-
-        // denuncia
-        $denuncia_arr = [
-            "fecha_denuncia" => $arr["ss_denuncia"]["generales"]["encabezado"]["fecha_denuncia"],
-            "observaciones" => $arr["ss_denuncia"]["generales"]["observaciones"],
-            "hora_denuncia" => $arr["ss_denuncia"]["generales"]["encabezado"]["hora_denuncia"],
-          ];
-        $denuncia = new Denuncia($denuncia_arr);
-        $denuncia_ss->institucion()->save($denuncia);
-
-        // associate documento
-        $denuncia->documento()->save($doc);
-
-        return $denuncia;
-    }
-
-    public function get_sujeto($sujeto,$denuncia_id, $persona_natural_id){
-        $sujeto = $sujeto::where('denuncia_id',$denuncia_id)->whereHas('rol', function($r) use($persona_natural_id) {$r->   where('persona_natural_id',$persona_natural_id);})->first();
-        return $sujeto;
-    }
-
-    public function set_anexos($arr) {
-        $anexos_arr = [];
-        foreach($arr["anexos"] as $d) {
-            if (is_null($d["documento_id"])) { continue; }
-
-            $doc = Documento::find($d["documento_id"]);
-            $this->log::alert(json_encode($doc));
-
-            $anexo = new Anexo;
-            //$anexo->denuncia()->associate($denuncia);
-            $anexo->documento()->save($doc);
-            $anexos_arr[] = $anexo;
-        }
-        return $anexos_arr;
-    }
+    // public function set_anexos($arr) {
+    //   $_arr = [];
+    //   foreach($arr["anexos"] as $d) {
+    //       $anexos_arr = [
+    //           "denuncia_id" => $d["documento_id"]
+    //         ];
+    //       $anexos = new Anexo($anexos_arr);
+    //       $anexos->save();
+    //       $_arr[] = $anexos;
+    //   }
+    //   return $_arr;
+    // }
 
     public function set_solicitud($arr) {
 
         $solicitud_record_historial_arr = [
-          "workflow_state" => "pendiente_revision",
+          "workflow_state" => "nueva_solicitud",
         ];
         $solicitud_record_historial = SolicitudRecordHistorial::create($solicitud_record_historial_arr);
 
         $solicitud_arr = [
           "fecha" => $arr["solicitud_record_historial"]["solicitud"]["fecha"],
           "titulo" => $arr["solicitud_record_historial"]["solicitud"]["titulo"],
-          'numero_oficio' => $arr["solicitud_record_historial"]["solicitud"]["numero_oficio"],
-          'institucion' => $arr["solicitud_record_historial"]["solicitud"]["institucion"],
-          'solicitado_por' => $arr["solicitud_record_historial"]["solicitud"]["solicitado_por"],
-          'descripcion' => $arr["solicitud_record_historial"]["solicitud"]["descripcion"]
+          "numero_oficio" => $arr["solicitud_record_historial"]["solicitud"]["numero_oficio"],
+          "institucion" => $arr["solicitud_record_historial"]["solicitud"]["institucion"],
+          "solicitado_por" => $arr["solicitud_record_historial"]["solicitud"]["solicitado_por"],
+          "descripcion" => $arr["solicitud_record_historial"]["solicitud"]["descripcion"]
         ];
         $solicitud = new Solicitud($solicitud_arr);
         $solicitud_record_historial->solicitud()->save($solicitud);
 
         // associate anexo
         //$solicitud->anexo()->save($anexos);
-        return $solicitud;
+        return $solicitud_record_historial;
     }
 
     public function set_hitos($arr, $solicitud) {
-        $hitos_arr = [
-          'nombre' => $arr["solicitud_record_historial"]["hitos_ss"]["nombre"],
-          'descripcion' => $arr["solicitud_record_historial"]["hitos_ss"]["descripcion"],
-          'fecha_inicio' => $arr["solicitud_record_historial"]["hitos_ss"]["fecha_inicio"],
-          'fecha_fin' => $arr["solicitud_record_historial"]["hitos_ss"]["fecha_fin"]
-        ];
-        foreach($arr["solicitud_record_historial"]["hitos_ss"]["id_documento"] as $solicitud) {
-            if (is_null($d["id_documento"])) { continue; }
-
-            $solicitud = Solicitud::find($d["id_documento"]);
-            $this->log::alert(json_encode($solicitud));
-
-            $hitos = new HitoSS;
-            $hitos->solicitud()->associate($denuncia);
-            $hitos_arr[] = $hitos;
-        }
-        return $hitos_arr;
+      $_arr = [];
+      foreach($arr["solicitud_record_historial"]["hitos_ss"] as $d) {
+          $hitos_arr = [
+              "nombre" => $d["nombre"],
+              "descripcion" => $d["descripcion"],
+              "fecha_inicio" => $d["fecha_inicio"],
+              "fecha_fin" => $d["fecha_fin"],
+              "id_documento" => $solicitud->id
+            ];
+          $hitos = new HitoSolicitudSS($hitos_arr);
+          $hitos->save();
+          $_arr[] = $hitos;
+      }
+      return $_arr;
     }
 
     public function set_lugar($arr) {

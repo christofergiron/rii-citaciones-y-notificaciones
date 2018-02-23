@@ -10,6 +10,10 @@ class Anexo extends Model
   //     return $this->morphTo();
   // }
 
+  public function anexable(){
+     return $this->morphTo();
+  }
+
   public function documento(){
       return $this->morphOne(Documento::class, 'documentable');
   }

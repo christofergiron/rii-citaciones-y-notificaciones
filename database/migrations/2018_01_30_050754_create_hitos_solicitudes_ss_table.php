@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateHitosSsTable extends Migration
+class CreateHitosSolicitudesSsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreateHitosSsTable extends Migration
      */
     public function up()
     {
-        Schema::create('hitos_ss', function (Blueprint $table) {
+        Schema::create('hitos_solicitudes_ss', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nombre')->nullable();
             $table->text('descripcion')->nullable();
             $table->date('fecha_inicio')->nullable();
             $table->date('fecha_fin')->nullable();
-            $table->integer('id_documento')->nullable();
+            $table->integer('id_solicitud')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });
@@ -32,6 +32,6 @@ class CreateHitosSsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('hitos_ss');
+        Schema::dropIfExists('hitos_solicitudes_ss');
     }
 }
