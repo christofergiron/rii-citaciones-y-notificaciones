@@ -21,6 +21,12 @@ Route::resource('InformeEscenaDelitoSS', 'API\InformeEscenaDelitoSSController');
 
 Route::post('/ss/new/solicitud_record_historial', 'API\SolicitudRecordHistorialController@store');
 
+
+Route::post('/ss/new/captura', 'API\RealizarCapturaController@store');
+Route::post('/ss/captura/{id}', 'API\RealizarCapturaController@show');
+Route::post('/ss/tabla_capturas', 'API\RealizarCapturaController@index');
+Route::post('/ss/new/flagrancia', "API\FlagranciaController@store");
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

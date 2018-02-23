@@ -21,7 +21,6 @@ class CreateCapturasTable extends Migration
             $table->integer('id_orden')->nullable();
             $table->integer('id_requerimiento')->nullable();
             $table->integer('id_expediente')->nullable();
-            $table->integer('id_persona');
             $table->integer('id_lugar');
             $table->integer('id_funcionario');
             $table->string('descripcion_captura');

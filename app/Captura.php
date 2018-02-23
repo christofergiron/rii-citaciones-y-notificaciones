@@ -3,9 +3,25 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Brexis\LaravelWorkflow\Traits\WorkflowTrait;
 
 class Captura extends Model
 {
+  use WorkflowTrait;
+
+    protected $fillable = [
+      "workflow_state",
+      "id_orden",
+      "id_requerimiento",
+      "id_expediente",
+      "id_persona",
+      "id_lugar",
+      "id_funcionario",
+      "descripcion_captura",
+      "observaciones",
+      "fecha_captura"
+    ];
+
     public function capturable(){
        return $this->morphTo();
     }

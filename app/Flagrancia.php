@@ -9,6 +9,12 @@ class Flagrancia extends Model
 
 protected $table = "flagrancias";
 
+protected $fillable = [
+    "id_denuncia",
+    "workflow_state"
+  ];
+
+
 public function captura(){
     return $this->morphOne(Captura::class, 'capturable');
 }
