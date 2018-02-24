@@ -99,11 +99,11 @@ class StoreSolicitudRecordHistorial //extends FormRequest
         "solicitud_record_historial.solicitud.solicitado_por" => "required",
         "solicitud_record_historial.solicitud.descripcion" => "nullable",
 
-        "solicitud_record_historial.hitos_ss" => "required|array|min:1",
-        "solicitud_record_historial.hitos_ss.*.nombre" => "required",
-        "solicitud_record_historial.hitos_ss.*.descripcion" => "required",
-        "solicitud_record_historial.hitos_ss.*.fecha_inicio" => "required|date_format:Y/m/d",
-        "solicitud_record_historial.hitos_ss.*.fecha_fin" => "required|date_format:Y/m/d"
+        "solicitud_record_historial.procesos_investigativos" => "required|array|min:1",
+        "solicitud_record_historial.procesos_investigativos.*.nombre" => "required",
+        "solicitud_record_historial.procesos_investigativos.*.descripcion" => "required",
+        "solicitud_record_historial.procesos_investigativos.*.fecha_inicio" => "required|date_format:Y/m/d",
+        "solicitud_record_historial.procesos_investigativos.*.fecha_fin" => "required|date_format:Y/m/d"
      ]);
 
        if ($validator->fails()) {
@@ -171,7 +171,7 @@ class StoreSolicitudRecordHistorial //extends FormRequest
 
     public function set_hitos($arr, $solicitud) {
       $_arr = [];
-      foreach($arr["solicitud_record_historial"]["hitos_ss"] as $d) {
+      foreach($arr["solicitud_record_historial"]["procesos_investigativos"] as $d) {
           $hitos_arr = [
               "nombre" => $d["nombre"],
               "descripcion" => $d["descripcion"],

@@ -20,7 +20,8 @@ Route::resource('InformeDelitoComunSS', 'API\InformeDelitoComunSSController');
 Route::resource('InformeEscenaDelitoSS', 'API\InformeEscenaDelitoSSController');
 
 Route::post('/ss/new/solicitud_record_historial', 'API\SolicitudRecordHistorialController@store');
-Route::post('/ss/solicitud_record_historial/{id}', 'API\SolicitudRecordHistorialController@show');
+Route::post('/ss/show/solicitud_record_historial/{id}', 'API\SolicitudRecordHistorialController@show');
+Route::post('/ss/tabla_solicitud_record_historial', "API\SolicitudRecordHistorialController@index");
 
 Route::post('/ss/new/captura', 'API\RealizarCapturaController@store');
 Route::post('/ss/captura/{id}', 'API\RealizarCapturaController@show');

@@ -42,7 +42,7 @@ class SolicitudRecordHistorialController extends Controller
        }
 
        #get denuncia_mp
-       $res = $this->solicitud_record_historial_tools->mp_list_denuncias($arr["token"]);
+       $res = $this->solicitud_record_historial_tools->ss_list_solicitudes($arr["token"]);
 
        # chek for nulls
        if (is_null($res)) {
@@ -50,7 +50,7 @@ class SolicitudRecordHistorialController extends Controller
        }
 
        # return success response
-       return response()->json(['documentsTable'=>$res], $this->successStatus);
+       return response()->json(['solicitudTable'=>$res], $this->successStatus);
     }
 
     public function show(Request $request, $id) {

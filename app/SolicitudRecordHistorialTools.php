@@ -32,7 +32,7 @@ class SolicitudRecordHistorialTools
       if (!isset($user_email)) { return $acciones; }
       if (empty($user_email)) {return $acciones; }
       $acciones = $this->workflow_actions($solicitud_record_historial, $user_email);
-      $acciones[] = 'Expediente';
+      $acciones[] = 'Solicitud';
       return $acciones;
   }
 
@@ -61,25 +61,21 @@ class SolicitudRecordHistorialTools
       return $res->headers;
   }
   private function rows($token) {
-      $res = new \stdClass;
-      $pn_pj = PersonaNaturalPJ::where('personable_type','App/Juez')->select('id')->get()->toArray();
-      $iteracion = PersonaNatural::whereIn('institucionable_id', $pn_pj)->where('institucionable_type','App\PersonaNaturalPJ')->get();
-
-      foreach ($iteracion as $persona) {
-            $row = new \stdClass;
-            $row->persona_natural_id = $persona->id;
-            $row->nombres = $persona->nombres;
-            $row->persona = $persona->nombres;
-            $row->apellidos = $persona->primer_apellido.', '.$persona->segundo_apellido;
-            $row->tipo_persona = "Natural";
-            $row->sexo = $persona->sexo;
-            $row->nacionalidad = $persona->nacionalidad;
-            $row->estado_civil = $persona->estado_civil;
-            $row->fecha_nacimiento = date('Y/m/d',strtotime($persona->fecha_nacimiento));
-            $res->rows[] = $row;
-
-      }
-      return $res->rows;
+    $res = new \stdClass;
+    //$res->rows[]=[]; this fails is no data is returned...
+    foreach (Solicitud::All() as $solicitud) {
+      $row = new \stdClass;
+      $row->fecha = $solicitud->id;
+      $row->titulo = $solicitud->titulo;
+      $row->numero_oficio = $solicitud->numero_oficio;
+      $row->institucion = $solicitud->institucion;
+      $row->solicitado_por = $solicitud->solicitado_por;
+      //$row->actions = $this->acciones($token, $solicitud);
+      //$row->updated_at = date('Y/m/d',strtotime($solicitud->updated_at));
+      //$row->workflow_state = $solicitud->solicitable()->get();
+      $res->rows[] = $row;
+    }
+    return $res->rows;
   }
   private function obtener_solicitud($solicitud, $token) {
       $solicitud_arr = [];
@@ -131,7 +127,7 @@ class SolicitudRecordHistorialTools
       $json_result = json_encode($res);
       return $json_result;
   }
-  public function pj_list_juez($token) {
+  public function ss_list_solicitudes($token) {
       $res = new \stdClass;
       $res->headers = $this->headers();
       $res->rows = $this->rows($token);
