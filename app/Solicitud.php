@@ -29,8 +29,28 @@ class Solicitud extends Model
       return $this->belongsTo(Funcionario::class, 'id_solicitante');
   }
 
-  public function hitos_ss()
+  public function hitos_ss() //solicitud
   {
       return $this->hasMany(HitoSolicitudSS::class, 'id_solicitud');
+  }
+
+  public function hitos_informe_ss()
+  {
+      return $this->hasMany(HitoInformeSS::class, 'id_informe');
+  }
+
+  public function hitos_dictamen_ss()
+  {
+      return $this->hasMany(HitoDictamenSS::class, 'id_dictamen');
+  }
+
+  public function hitos_actas_ss()
+  {
+      return $this->hasMany(HitoActaSS::class, 'id_acta');
+  }
+
+  public function hitos_reporte_ss()
+  {
+      return $this->hasMany(HitoReporteSS::class, 'id_reporte');
   }
 }

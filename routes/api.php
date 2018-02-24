@@ -22,6 +22,8 @@ Route::resource('InformeEscenaDelitoSS', 'API\InformeEscenaDelitoSSController');
 Route::post('/ss/new/solicitud_record_historial', 'API\SolicitudRecordHistorialController@store');
 Route::post('/ss/show/solicitud_record_historial/{id}', 'API\SolicitudRecordHistorialController@show');
 Route::post('/ss/tabla_solicitud_record_historial', "API\SolicitudRecordHistorialController@index");
+Route::post('/ss/new/delito_contra_propiedad_ss', 'API\DelitoContraPropiedadSSController@store');
+Route::post('/ss/show/delito_contra_propiedad_ss/{id}', 'API\DelitoContraPropiedadSSController@show');
 
 Route::post('/ss/new/captura', 'API\RealizarCapturaController@store');
 Route::post('/ss/captura/{id}', 'API\RealizarCapturaController@show');

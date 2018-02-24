@@ -11,7 +11,7 @@ class HitoInformeSS extends Model
       "descripcion",
       "fecha_inicio",
       "fecha_fin",
-      "id_solicitud"
+      "id_informe"
     ];
 
     protected $table = "hitos_informes_ss";
