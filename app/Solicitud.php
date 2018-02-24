@@ -31,6 +31,6 @@ class Solicitud extends Model
 
   public function hitos_ss()
   {
-      return $this->hasMany(HitoSS::class, 'id_documento');
+      return $this->hasMany(HitoSolicitudSS::class, 'id_solicitud');
   }
 }

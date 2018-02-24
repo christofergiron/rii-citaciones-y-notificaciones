@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Tools;
-use App\DenunciaMPEscrita;
-use App\DenunciaMPVerbal;
-use App\DenunciaMPMaie;
-use App\DenunciaMPTools;
+use App\SolicitudRecordHistorial;
+use App\SolicitudRecordHistorialTools;
 use App\Http\Requests\StoreSolicitudRecordHistorial;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Request;
@@ -19,7 +17,7 @@ class SolicitudRecordHistorialController extends Controller
 
     public  $successStatus = 200;
     private $root;
-    private $denuncia_mp_tools;
+    private $solicitud_record_historial_tools;
     private $StoreSolicitudRecordHistorial;
 
     public function __construct(LoggerInterface $logger)
@@ -27,7 +25,7 @@ class SolicitudRecordHistorialController extends Controller
         $this->log = new \Log;
         $this->logger = $logger;
         $this->tools = new Tools($this->logger);
-        $this->denuncia_mp_tools = new DenunciaMPTools;
+        $this->solicitud_record_historial_tools = new SolicitudRecordHistorialTools;
         $this->root = false;
         $this->StoreSolicitudRecordHistorial = new StoreSolicitudRecordHistorial;
     }
@@ -44,7 +42,7 @@ class SolicitudRecordHistorialController extends Controller
        }
 
        #get denuncia_mp
-       $res = $this->denuncia_mp_tools->mp_list_denuncias($arr["token"]);
+       $res = $this->solicitud_record_historial_tools->mp_list_denuncias($arr["token"]);
 
        # chek for nulls
        if (is_null($res)) {
@@ -72,7 +70,7 @@ class SolicitudRecordHistorialController extends Controller
        }
 
        #get denuncia_mp
-       $res = $this->denuncia_mp_tools->mp_denuncia($id, $arr["token"]);
+       $res = $this->solicitud_record_historial_tools->get_solicitud($id, $arr["token"]);
 
        # chek for nulls
        if (is_null($res)) {
