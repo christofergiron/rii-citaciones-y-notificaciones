@@ -7,20 +7,19 @@ use Brexis\LaravelWorkflow\Traits\WorkflowTrait;
 
 class Captura extends Model
 {
-  use WorkflowTrait;
+use WorkflowTrait;
 
-    protected $fillable = [
-      "workflow_state",
-      "id_orden",
-      "id_requerimiento",
-      "id_expediente",
-      "id_persona",
-      "id_lugar",
-      "id_funcionario",
-      "descripcion_captura",
-      "observaciones",
-      "fecha_captura"
-    ];
+  protected $fillable = [
+    "workflow_state",
+    "id_orden",
+    "id_requerimiento",
+    "id_expediente",
+    "id_lugar",
+    "id_funcionario",
+    "descripcion_captura",
+    "observaciones",
+    "fecha_captura"
+  ];
 
     public function capturable(){
        return $this->morphTo();
@@ -41,9 +40,9 @@ class Captura extends Model
       return $this->hasOne(Expediente::class, 'id_expediente');
   }
 
-  public function Detenido()
+  public function detenidos()
   {
-      return $this->hasMany(PersonaNatural::class, 'id_persona');
+      return $this->hasMany(Detenido::class, 'id_captura');
   }
 
   public function LugarSS()

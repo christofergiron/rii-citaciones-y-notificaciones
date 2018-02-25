@@ -163,7 +163,6 @@ class StoreRealizarCaptura //extends FormRequest
       }
         $captura->workflow_state = $arr["captura"]["workflow_state"];
 
-        $captura->id_persona = 22;
         $captura->id_lugar = $idcaptura;
         $captura->id_funcionario = $arr["funcionario"]["id_funcionario"];
         $captura->descripcion_captura = $arr["captura"]["descripcion_captura"];

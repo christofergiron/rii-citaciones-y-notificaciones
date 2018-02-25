@@ -3,10 +3,22 @@
 namespace App;
 
 use App\Captura;
+use App\Flagrancia;
+use App\CapturaFinExtradicion;
+use App\Detenido;
+use App\MenorDetenido;
 use App\Workflow;
 use Validator;
 use App\Passport;
 use App\Funcionario;
+use App\FuncionarioSS;
+use App\Lugar;
+use App\LugarSS;
+use App\Rol;
+use App\PersonaNatural;
+use App\Persona;
+use App\Dependencia;
+use App\Institucion;
 
 class RealizarCapturaTools
 {
@@ -18,13 +30,219 @@ class RealizarCapturaTools
   public function __construct()
   {
       $this->log = new  \Log;
-      $this->workflow_type = "realizar_captura";
-      $this->captura_required =  Array("nombres", "primer_apellido", "segundo_apellido", "fecha_nacimiento", "sexo", "genero", "id_lugar", "id_funcionario", "id_unidad", "descripcion_captura", "fecha_captura");
+      $this->workflow_type = "captura_realizada";
+      //$this->captura_required =  Array("nombres", "primer_apellido", "segundo_apellido", "fecha_nacimiento", "sexo", "genero", "id_lugar", "id_funcionario", "id_unidad", "descripcion_captura", "fecha_captura");
   }
 
   private function get_persona_natural($id) {
     $persona_natural = PersonaNatural::find($id);
     return $persona_natural;
+  }
+
+  private function detenido($id) {
+    $detenidos_arr = [] ;
+    $captura = Captura::find($id) ;
+    $detenido = new \stdClass;
+    $detenidos = $captura->detenidos()->get();
+    if (is_null($detenidos)) {return $detenidos_arr;}
+
+    foreach($detenidos as $d) {
+      $persona_natural_id = $d->rol()->first()->persona_natural_id;
+
+      $persona = $this->get_persona_natural($persona_natural_id);
+
+      $detenido->numero_detenido = $d->id;
+       //cambio, eliminar estos datos de detenido, no los necesita porque estan en la orden de captura
+      //$detenido->id_orden = $d->id_orden;
+      //$detenido->id_requerimiento = $d->id_requerimiento;
+      //$detenido->id_expediente = $d->id_expediente;
+      $detenido->numero_captura = $d->id_captura;
+
+      $detenido->identidad = $persona->id;
+
+      if (isset($persona)) {
+        $detenido->nombres = $persona->nombres;
+        $detenido->apellidos = $persona->primer_apellido.', '.$persona->segundo_apellido;
+        //$detenido->segundo_apellido = $persona_natural_id;
+      }
+
+      $detenido->fecha_nacimiento = $d->fecha_nacimiento;
+      $detenido->nacionalidad = $d->nacionalidad;
+      $detenido->genero = $d->genero;
+      $detenido->sexo = $d->sexo;
+      $detenido->edad = $d->edad;
+
+      $menordetenidos = $d->tipoable()->first();
+
+       if (is_null($menordetenidos)) {
+         $detenidos_arr[] = $detenido;
+         //return $detenido;
+       }
+      $menor = $menordetenidos;
+      //$detenido->apoderado_id = $persona->nombres;
+      $detenido->apoderado = $this->apoderado($menor->apoderado);
+
+      $detenidos_arr[] = $detenido;
+
+
+      $idunidad = $d->lugar_retencion;
+      $detenido->lugar_retencion = $this->unidad($idunidad);
+    }
+    return $detenidos_arr;
+  }
+
+  private function lugar_captura($id) {
+      $lugarss_arr = [] ;
+      $captura = Captura::find($id);
+      $lugar_captura = new \stdClass;
+      $idlugar = $captura->id_lugar;
+      $lugar_ss = LugarSS::find($idlugar);
+      //$s = Lugar::institucionable($lugar_ss);
+
+      if (is_null($lugar_ss)) {return $lugarss_arr;}
+        //$temp = $lugar_ss->id;
+        //Lugar::institucionable($temp);
+        //$lugar = Lugar::find($temp);
+      //$menordetenidos = $d->tipoable()->first();
+      //$lugar = $lugar_ss->institucionable()->first();
+      //$lugar = $lugar_ss->institucion();
+
+      //$lugar = $captura->lugar()->first();
+      //if (is_null($lugar)) {break;}
+      //$lugar_ss = $lugar->institucionable()->first();
+
+
+        $lugar_captura->regional_id = $lugar_ss->regional_id;
+        $lugar_captura->departamento_id = $lugar_ss->departamento_id;
+        $lugar_captura->municipio_id = $lugar_ss->municipio_id;
+        $lugar_captura->aldea_id = $lugar_ss->aldea_ss_id;
+        $lugar_captura->colonia_id = $lugar_ss->colonia_ss_id;
+        $lugar_captura->ciudad_id = $lugar_ss->ciudad_ss_id;
+        $lugar_captura->sector_id = $lugar_ss->sector_ss_id;
+        //$lugar_captura->descripcion = $lugar->descripcion;
+        //$lugar_captura->caracteristicas = $lugar->caracteristicas;
+
+        $lugarss_arr[] = $lugar_captura;
+        return $lugarss_arr;
+  }
+
+  private function funcionario($id) {
+      $funcionarios_arr = [];
+      $captura = Captura::find($id);
+      $detenidos = $captura->detenidos()->get()->first();
+      $responsable = new \stdClass;
+      $funcionarioss = $captura->id_funcionario;
+      //$investigadores = $captura->id_funcionario;
+
+      //funcionarios
+      $funcionarios_ss = FuncionarioSS::find($funcionarioss);
+      if (is_null($funcionarios_ss)) {return $lugarss_arr;}
+        $funcionario = $funcionarios_ss->institucion()->first();
+        $funcionarioid = $funcionario->id;
+        $funcionario_policia = Funcionario::find($funcionarioid);
+        $rol_funcionario = $funcionario_policia->rol()->first();
+        $persona_natural_id = $rol_funcionario->persona_natural_id;
+        $persona = $this->get_persona_natural(50);
+
+        //funcionario
+        $responsable->nombres = $persona->nombres;
+        $responsable->apellidos = $persona->primer_apellido.', '.$persona->segundo_apellido;
+        $responsable->placa = $funcionarios_ss->placa;
+        $funcionarios_arr[] = $responsable;
+        return $funcionarios_arr;
+  }
+
+  private function unidad($id) {
+      $unidad_arr = [];
+      $unidad = Dependencia::find($id);
+      $unidades = new \stdClass;
+      $unidades->id_unidad = $unidad->institucion_id;
+      $unidades->nombre = $unidad->nombre;
+
+        $unidad_arr[] = $unidades;
+        return $unidad_arr;
+  }
+
+  private function apoderado($id) {
+      $apoderado_arr = [];
+      $apoderado = new \stdClass;
+      if (is_null($id)) {
+        $apoderado_arr[] = $apoderado;
+        return $apoderado_arr;
+      }
+      $persona = $this->get_persona_natural($id);
+      if (is_null($persona)) {
+        $apoderado_arr[] = $apoderado;
+        return $apoderado_arr;
+      }
+      $apoderado->identidad = $persona->id;
+      $apoderado->nombres = $persona->nombres;
+      $apoderado->apellidos = $persona->primer_apellido.', '.$persona->segundo_apellido;
+
+
+      $apoderado_arr[] = $apoderado;
+      return $apoderado_arr;
+  }
+
+  private function tipo_captura($id) {
+      $tipo_captura_arr = [];
+      $captura = Captura::find($id);
+      if (is_null($captura)) { return json_encode($res); }
+      $id_capturable = $captura->capturable_id;
+
+      $tipo_captura = new \stdClass;
+
+      $this->log::alert(json_encode($captura));
+      if (preg_match('/Flagrancia/',$captura->capturable_type))
+      {
+        $flagrancia = Flagrancia::find($id_capturable);
+        $captura_type = "En Flagrancia";
+
+        $tipo_captura->id = $flagrancia->id;
+        $tipo_captura->tipo = $captura_type;
+        $tipo_captura->id_denuncia = $flagrancia->id_denuncia;
+
+        $tipo_captura_arr[] = $tipo_captura;
+        return $tipo_captura_arr;
+
+      }
+      if (preg_match('/FinExtradicion/',$captura->capturable_type)) {
+        $extradicion = CapturaFinExtradicion::find($id_capturable);
+        $captura_type = "Captura Fin Extradicion";
+
+        $tipo_captura->id = $extradicion->id;
+        $tipo_captura->tipo = $captura_type;
+        $tipo_captura->id_nota_roja = $extradicion->id_nota_roja;
+
+        $tipo_captura_arr[] = $tipo_captura;
+        return $tipo_captura_arr;
+      }
+
+       $tipo_captura->id = $captura->id;
+       $tipo_captura->tipo = "Orden Captura";
+       $tipo_captura->id_orden = $captura->id_orden;
+       $tipo_captura->id_requerimiento = $captura->id_requerimiento;
+
+        $tipo_captura_arr[] = $tipo_captura;
+        return $tipo_captura_arr;
+  }
+
+  private function captura($id) {
+    $detenidos_arr = [] ;
+    $captura = Captura::find($id);
+    $capturas = new \stdClass;
+
+    $capturas->numero_captura = $captura->id;
+    $capturas->id_orden_captura = $captura->id_orden;
+    $capturas->id_requerimiento = $captura->id_requerimiento;
+    $capturas->id_expediente = $captura->id_expediente;
+    //date('Y/m/d',strtotime($dss->updated_at))
+    $capturas->fecha_captura = date('Y/m/d',strtotime($captura->fecha_captura));
+    $capturas->descripcion_captura = $captura->descripcion_captura;
+    $capturas->observaciones = $captura->observaciones;
+
+      $detenidos_arr[] = $capturas;
+    return $detenidos_arr;
   }
 
   private function tipo_identidad($persona) {
@@ -110,60 +328,128 @@ class RealizarCapturaTools
     return $user_email;
   }
 
-  private function get_captura($token) {
+  private function get_captura($captura, $id, $token) {
     $captura_arr = [];
+    //$user_email = $this->get_email_from_token($token);
+    //if (!isset($user_email)) { return $captura_arr; }
+    //if (empty($user_email)) {return $captura_arr; }
 
-    $user_email = $this->get_email_from_token($token);
-    if (!isset($user_email)) { return $captura_arr; }
-    if (empty($user_email)) {return $captura_arr; }
+    $capturas = new \stdClass;
+    //$capturas = array($captura);
+    //$arr = $this->lugar_captura($capturas, $id);
+    //$capturas->captura = $captura;
 
-    $this->log::alert(json_encode($arr));
-    $this->log::alert('count of $arr is '. count($arr));
-    foreach($arr as $captura) {
-      $captura->hechos = new \stdClass;
-      $captura->hechos = $this->get_persona_natural($captura->captura_id);
-
-      $captura_arr[] = $captura;
-    }
+    $capturas->persona_capturada = $this->detenido($id);
+    $capturas->lugar_captura = $this->lugar_captura($id);
+    $capturas->capturado_por = $this->funcionario($id);
+    $capturas->tipo_captura = $this->tipo_captura($id);
+    $capturas->captura = $this->captura($id);
+    $captura_arr[] = $capturas;
     return $captura_arr;
   }
 
   public function ss_captura($captura_id, $token){
+    //$captura = Captura::find($captura_id);
+    //return $captura;
+    $res = new \stdClass;
+    //echo $captura_id;
     $captura = Captura::find($captura_id);
-    return $captura;
+    if (is_null($captura)) { return json_encode($res); }
+    $id = $captura->id;
+    //echo $id;
+    //$this->log::alert(json_encode($captura));
+
+    $result = $this->get_captura($captura, $id, $token);
+
+    if (!isset($result)) { return json_encode($res); }
+    if (empty($result)) { return json_encode($res); }
+
+    //$res->ss_captura = $result[0];
+    $json_result = json_encode($result);
+    return $json_result;
+
+  }
+
+  public function ss_capturas($captura_id, $token){
+
+    $persona_natural = Captura::find($captura_id);
+    return $persona_natural;
   }
 
   private function headers(){
     $res = new \stdClass;
     $hdr = new \stdClass;
-    $hdr->name = "id_persona";
-    $hdr->label = "Nombre Capturado";
+    $hdr->name = "id_denuncia";
+    $hdr->label = "Numero Denuncia";
     $res->headers[] = $hdr;
     $hdr = new \stdClass;
-    $hdr->name = "numero_captura";
-    $hdr->label = "Id_captura";
-    $res->headers[] = $hdr;
-    $hdr = new \stdClass;
-    $hdr->name = "lugar_captura";
-    $hdr->label = "Lugar Captura";
+    $hdr->name = "id_lugar";
+    $hdr->label = "Departamento";
     $res->headers[] = $hdr;
     $hdr = new \stdClass;
     $hdr->name = "fecha_captura";
     $hdr->label = "Fecha Captura";
     $res->headers[] = $hdr;
     $hdr = new \stdClass;
+    $hdr->name = "tipo_captura";
+    $hdr->label = "Tipo Captura";
+    $res->headers[] = $hdr;
+    $hdr = new \stdClass;
     $hdr->name = "workflow_state";
     $hdr->label = "Estado";
     $res->headers[] = $hdr;
-    // $hdr = new \stdClass;
-    // $hdr->name = "funcionario_asignado";
-    // $hdr->label = "Asignado a";
-    // $res->headers[] = $hdr;
     $hdr = new \stdClass;
     $hdr->name = "actions";
     $hdr->label = "Acciones";
     $res->headers[] = $hdr;
     return $res->headers;
+  }
+
+  private function deptocaptura($captura){
+    //$captura = Captura::find($id);
+    //$lugar_captura = new \stdClass;
+    $idlugar = $captura->id_lugar;
+    $lugar_ss = LugarSS::find($idlugar);
+    $depto = "";
+    if (is_null($lugar_ss)) {return $depto;}
+     $depto = $lugar_ss->departamento_id;
+     return $depto;
+  }
+
+  private function tipocaptura($captura){
+    $tipo_captura = "Orden Judicial";
+
+    if (preg_match('/Flagrancia/',$captura->capturable_type))
+    { $tipo_captura = "Captura en Flagrancia";
+      return $tipo_captura;
+    }
+
+    if (preg_match('/FinExtradicion/',$captura->capturable_type))
+    { $tipo_captura = "Captura Fines Extradicion";
+      return $tipo_captura;
+    }
+     return $tipo_captura;
+  }
+
+  private function tipoworkflow($captura){
+    $id_capturable = $captura->capturable_id;
+
+    if (preg_match('/Flagrancia/',$captura->capturable_type))
+    {
+      $flagrancia = Flagrancia::find($id_capturable);
+      $workflow = $flagrancia->workflow_state;
+      return $workflow;
+    }
+
+    if (preg_match('/FinExtradicion/',$captura->capturable_type))
+    {
+      //$tipo_captura = "Captura Fines Extradicion";
+      $extradicion = CapturaFinExtradicion::find($id_capturable);
+      $workflow = $extradicion->workflow_state;
+      return $workflow;
+    }
+      $workflow = $captura->workflow_state;
+      return $workflow;
   }
 
   private function acciones($token, $captura) {
@@ -197,13 +483,12 @@ class RealizarCapturaTools
     foreach (Captura::All() as $dmp) {
       $row = new \stdClass;
       $row->numero_captura = $dmp->id;
-      $row->actions = $this->acciones($token, $dmp);
-      //$row->actions = $this->workflow_actions($captura_tipo, $user_email);
+      $row->departamento_captura = $this->deptocaptura($dmp);
+      $row->fecha_captura = date('Y/m/d',strtotime($dmp->fecha_captura));
+      $row->tipo_captura = $this->tipocaptura($dmp);
+      $row->acciones = $this->acciones($token, $dmp);
+      $row->workflow_state = $this->tipoworkflow($dmp);
       $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
-    //  $row->id_persona = $this->id_persona($dmp);
-    //  $row->lugar_captura = $this->id_lugar($dmp);
-    //  $row->fecha_captura = $this->fecha_captura($dmp->tipoable_type);
-      $row->workflow_state = $dmp->workflow_state;
       $res->rows[] = $row;
     }
     return $res->rows;
