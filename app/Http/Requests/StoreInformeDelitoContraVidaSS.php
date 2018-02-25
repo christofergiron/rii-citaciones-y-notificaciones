@@ -25,9 +25,9 @@ use App\Rol;
 use App\Denunciante;
 use App\Sospechoso;
 use App\Testigo;
-use App\SolicitudRecordHistorial;
-use App\Solicitud;
-use App\HitoSolicitudSS;
+use App\InformeDelitoContraVidaSS;
+use App\Informe;
+use App\HitoInformeSS;
 use App\Victima;
 use App\Http\Requests\StorePersona;
 use App\Workflow;
@@ -37,7 +37,7 @@ use App\DefaultActionSS;
 use App\NumeroExpediente;
 use App\DefaultSSNUE;
 
-class StoreSolicitudRecordHistorial //extends FormRequest
+class StoreInformeDelitoContraVidaSS //extends FormRequest
 {
 
     private $response;
@@ -67,7 +67,7 @@ class StoreSolicitudRecordHistorial //extends FormRequest
     public function workflow_rules(Array $arr)
     {
 
-       $this->log::alert('inside workflow rules solicitud ss ....');
+       $this->log::alert('inside workflow rules informes ss ....');
        $this->log::alert(json_encode($arr));
 
        $action = new Action($arr);
@@ -90,20 +90,20 @@ class StoreSolicitudRecordHistorial //extends FormRequest
         "anexos" => "required",
         "anexos.documento_id" => "required",
 
-        "solicitud_record_historial" => "required",
-        "solicitud_record_historial.solicitud" => "required",
-        "solicitud_record_historial.solicitud.fecha" => "required|date_format:Y/m/d",
-        "solicitud_record_historial.solicitud.titulo" => "required",
-        "solicitud_record_historial.solicitud.numero_oficio" => "required",
-        "solicitud_record_historial.solicitud.institucion" => "required",
-        "solicitud_record_historial.solicitud.solicitado_por" => "required",
-        "solicitud_record_historial.solicitud.descripcion" => "nullable",
+        "informe_delito_contra_vida_ss" => "required",
+        "informe_delito_contra_vida_ss.informe" => "required",
+        "informe_delito_contra_vida_ss.informe.fecha" => "required|date_format:Y/m/d",
+        "informe_delito_contra_vida_ss.informe.titulo" => "required",
+        "informe_delito_contra_vida_ss.informe.numero_oficio" => "required",
+        "informe_delito_contra_vida_ss.informe.institucion" => "required",
+        "informe_delito_contra_vida_ss.informe.solicitado_por" => "required",
+        "informe_delito_contra_vida_ss.informe.descripcion" => "nullable",
 
-        "solicitud_record_historial.procesos_investigativos" => "required|array|min:1",
-        "solicitud_record_historial.procesos_investigativos.*.nombre" => "required",
-        "solicitud_record_historial.procesos_investigativos.*.descripcion" => "required",
-        "solicitud_record_historial.procesos_investigativos.*.fecha_inicio" => "required|date_format:Y/m/d",
-        "solicitud_record_historial.procesos_investigativos.*.fecha_fin" => "required|date_format:Y/m/d"
+        "informe_delito_contra_vida_ss.procesos_investigativos" => "required|array|min:1",
+        "informe_delito_contra_vida_ss.procesos_investigativos.*.nombre" => "required",
+        "informe_delito_contra_vida_ss.procesos_investigativos.*.descripcion" => "required",
+        "informe_delito_contra_vida_ss.procesos_investigativos.*.fecha_inicio" => "required|date_format:Y/m/d",
+        "informe_delito_contra_vida_ss.procesos_investigativos.*.fecha_fin" => "required|date_format:Y/m/d"
      ]);
 
        if ($validator->fails()) {
@@ -122,63 +122,63 @@ class StoreSolicitudRecordHistorial //extends FormRequest
         // $this->log::alert(json_encode($res));
 
         try {
-            $solicitud = $this->set_solicitud($arr);
-            $this->log::alert(json_encode($solicitud));
+            $informe = $this->set_informe($arr);
+            $this->log::alert(json_encode($informe));
 
             $this->init();
-            $this->response->message = "Solicitud Creada Exitosamente";
-            $this->response->payload->id = $solicitud->id;//$denuncia->id;
+            $this->response->message = "Informe Creado Exitosamente";
+            $this->response->payload->id = $informe->id;//$denuncia->id;
         } catch (Exception $e) {
             $this->log::error($e);
             $this->init();
             $this->response->code = 403;
             $this->response->success = false;
-            $this->response->message = "Solicitud no creada";
+            $this->response->message = "Informe no creado";
             return $this->response;
         }
 
         return $this->response;
     }
 
-    public function set_solicitud($arr) {
+    public function set_informe($arr) {
       //Solicitud Hijo
-        $solicitud_record_historial_arr = [
-          "workflow_state" => "nueva_solicitud",
+        $informe_delito_contra_vida_ss_arr = [
+          "workflow_state" => "nueva_denuncia",
         ];
-        $solicitud_record_historial = SolicitudRecordHistorial::create($solicitud_record_historial_arr);
+        $informe_delito_contra_vida_ss = InformeDelitoContraVidaSS::create($informe_delito_contra_vida_ss_arr);
       //Solicitud Padre
-        $solicitud_arr = [
-          "fecha" => $arr["solicitud_record_historial"]["solicitud"]["fecha"],
-          "titulo" => $arr["solicitud_record_historial"]["solicitud"]["titulo"],
-          "numero_oficio" => $arr["solicitud_record_historial"]["solicitud"]["numero_oficio"],
-          "institucion" => $arr["solicitud_record_historial"]["solicitud"]["institucion"],
-          "solicitado_por" => $arr["solicitud_record_historial"]["solicitud"]["solicitado_por"],
-          "descripcion" => $arr["solicitud_record_historial"]["solicitud"]["descripcion"]
+        $informe_arr = [
+          "fecha" => $arr["informe_delito_contra_vida_ss"]["informe"]["fecha"],
+          "titulo" => $arr["informe_delito_contra_vida_ss"]["informe"]["titulo"],
+          "numero_oficio" => $arr["informe_delito_contra_vida_ss"]["informe"]["numero_oficio"],
+          "institucion" => $arr["informe_delito_contra_vida_ss"]["informe"]["institucion"],
+          "solicitado_por" => $arr["informe_delito_contra_vida_ss"]["informe"]["solicitado_por"],
+          "descripcion" => $arr["informe_delito_contra_vida_ss"]["informe"]["descripcion"]
         ];
-        $solicitud = new Solicitud($solicitud_arr);
-        $solicitud_record_historial->solicitud()->save($solicitud);
+        $informe = new Informe($informe_arr);
+        $informe_delito_contra_vida_ss->informe()->save($informe);
       //Anexo
         $anexos_arr = [
             "denuncia_id" => $arr["anexos"]["documento_id"]
           ];
         $anexos = new Anexo($anexos_arr);
-        $solicitud->anexo()->save($anexos);
+        $informe->anexo()->save($anexos);
 
         $_arr = [];
-        foreach($arr["solicitud_record_historial"]["procesos_investigativos"] as $d) {
+        foreach($arr["informe_delito_contra_vida_ss"]["procesos_investigativos"] as $d) {
             $hitos_arr = [
                 "nombre" => $d["nombre"],
                 "descripcion" => $d["descripcion"],
                 "fecha_inicio" => $d["fecha_inicio"],
                 "fecha_fin" => $d["fecha_fin"],
               ];
-            $hitos = new HitoSolicitudSS($hitos_arr);
-            $hitos->solicitud()->associate($solicitud);
+            $hitos = new HitoInformeSS($hitos_arr);
+            $hitos->informe()->associate($informe);
             $hitos->save();
             $_arr[] = $hitos;
         }
 
-        return $solicitud_record_historial;
+        return $informe_delito_contra_vida_ss;
     }
 
     // public function set_hitos($arr, $solicitud) {

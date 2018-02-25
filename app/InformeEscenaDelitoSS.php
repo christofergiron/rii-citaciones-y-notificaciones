@@ -9,7 +9,7 @@ class InformeEscenaDelitoSS extends Model
     protected $fillable = [
       "workflow_state"
     ];
-    protected $table = "informesescenacrimenes_ss";
+    protected $table = "informesescenadelitos_ss";
 
     public function informe(){
         return $this->morphOne(Informe::class, 'tipoable');

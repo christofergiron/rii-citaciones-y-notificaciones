@@ -67,7 +67,7 @@ class StoreDelitoContraPropiedadSS //extends FormRequest
     public function workflow_rules(Array $arr)
     {
 
-       $this->log::alert('inside workflow rules denuncia ss ....');
+       $this->log::alert('inside workflow rules solicitud ss ....');
        $this->log::alert(json_encode($arr));
 
        $action = new Action($arr);
