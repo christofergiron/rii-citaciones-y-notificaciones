@@ -10,9 +10,9 @@ class Reporte extends Model
        return $this->morphOne(Anexo::class, 'anexable');
    }
 
-   public function hitos_ss()
+   public function hitos_reporte_ss()
    {
-       return $this->hasMany(HitoSS::class, 'id_documento');
+       return $this->hasMany(HitoReporteSS::class, 'id_reporte');
    }
 
    public function funcionarioss() {

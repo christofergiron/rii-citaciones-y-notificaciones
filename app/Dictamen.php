@@ -20,8 +20,9 @@ class Dictamen extends Model
         return $this->belongsTo(FuncionarioSS::class, 'id_autor');
    }
 
-   public function hitos_ss()
+   public function hitos_dictamen_ss()
    {
-       return $this->hasMany(HitoSS::class, 'id_documento');
+       return $this->hasMany(HitoDictamenSS::class, 'id_dictamen');
    }
+
 }

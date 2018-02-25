@@ -24,6 +24,8 @@ Route::post('/ss/show/solicitud_record_historial/{id}', 'API\SolicitudRecordHist
 Route::post('/ss/tabla_solicitud_record_historial', "API\SolicitudRecordHistorialController@index");
 Route::post('/ss/new/delito_contra_propiedad_ss', 'API\DelitoContraPropiedadSSController@store');
 Route::post('/ss/show/delito_contra_propiedad_ss/{id}', 'API\DelitoContraPropiedadSSController@show');
+Route::post('/ss/new/informe_logistico_ss', 'API\InformeLogisticoSSController@store');
+Route::post('/ss/show/informe_logistico_ss/{id}', 'API\InformeLogisticoSSController@show');
 
 Route::post('/ss/new/captura', 'API\RealizarCapturaController@store');
 Route::post('/ss/captura/{id}', 'API\RealizarCapturaController@show');
