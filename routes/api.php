@@ -18,6 +18,7 @@ Route::resource('InformeLogisticoSS', 'API\InformeLogisticoSSController');
 Route::resource('InformeDelitoContraVidaSS', 'API\InformeDelitoContraVidaSSController');
 Route::resource('InformeDelitoComunSS', 'API\InformeDelitoComunSSController');
 Route::resource('InformeEscenaDelitoSS', 'API\InformeEscenaDelitoSSController');
+Route::resource('HitoSolicitudSS', 'API\HitoSolicitudSSController');
 
 Route::post('/ss/new/solicitud_record_historial', 'API\SolicitudRecordHistorialController@store');
 Route::post('/ss/show/solicitud_record_historial/{id}', 'API\SolicitudRecordHistorialController@show');
@@ -42,6 +43,10 @@ Route::post('/ss/tabla_informe_delito_contra_vida_ss', "API\InformeDelitoContraV
 Route::post('/ss/new/informe_escena_delito_ss', 'API\InformeEscenaDelitoSSController@store');
 Route::post('/ss/show/informe_escena_delito_ss/{id}', 'API\InformeEscenaDelitoSSController@show');
 Route::post('/ss/tabla_informe_escena_delito_ss', "API\InformeEscenaDelitoSSController@index");
+
+Route::post('/ss/new/hito_solicitud_ss', 'API\HitoSolicitudSSController@store');
+Route::post('/ss/show/hito_solicitud_ss/{id}', 'API\HitoSolicitudSSController@show');
+Route::post('/ss/tabla_hito_solicitud_ss', "API\HitoSolicitudSSController@index");
 
 Route::post('/ss/new/captura', 'API\RealizarCapturaController@store');
 Route::post('/ss/captura/{id}', 'API\RealizarCapturaController@show');
