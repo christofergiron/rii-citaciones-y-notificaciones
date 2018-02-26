@@ -39,6 +39,10 @@ class InformeEscenaDelitoSSTools
   private function headers(){
       $res = new \stdClass;
       $hdr = new \stdClass;
+      $hdr->name = "id";
+      $hdr->label = "ID";
+      $res->headers[] = $hdr;
+      $hdr = new \stdClass;
       $hdr->name = "fecha";
       $hdr->label = "Fecha";
       $res->headers[] = $hdr;
@@ -67,7 +71,8 @@ class InformeEscenaDelitoSSTools
 
     foreach ($iteracion as $informe) {
       $row = new \stdClass;
-      $row->fecha = $informe->id;
+      $row->id = $informe->id;
+      $row->fecha = $informe->fecha;
       $row->titulo = $informe->titulo;
       $row->numero_oficio = $informe->numero_oficio;
       $row->institucion = $informe->institucion;

@@ -39,6 +39,10 @@ class SolicitudRecordHistorialTools
   private function headers(){
       $res = new \stdClass;
       $hdr = new \stdClass;
+      $hdr->name = "id";
+      $hdr->label = "ID";
+      $res->headers[] = $hdr;
+      $hdr = new \stdClass;
       $hdr->name = "fecha";
       $hdr->label = "Fecha";
       $res->headers[] = $hdr;
@@ -67,7 +71,8 @@ class SolicitudRecordHistorialTools
 
       foreach ( $iteracion as $solicitud) {
         $row = new \stdClass;
-        $row->fecha = $solicitud->id;
+        $row->id = $solicitud->id;
+        $row->fecha = $solicitud->fecha;
         $row->titulo = $solicitud->titulo;
         $row->numero_oficio = $solicitud->numero_oficio;
         $row->institucion = $solicitud->institucion;
