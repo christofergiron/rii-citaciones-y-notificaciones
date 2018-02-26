@@ -63,19 +63,21 @@ class SolicitudRecordHistorialTools
   private function rows($token) {
     $res = new \stdClass;
     //$res->rows[]=[]; this fails is no data is returned...
-    foreach (Solicitud::All() as $solicitud) {
-      $row = new \stdClass;
-      $row->fecha = $solicitud->id;
-      $row->titulo = $solicitud->titulo;
-      $row->numero_oficio = $solicitud->numero_oficio;
-      $row->institucion = $solicitud->institucion;
-      $row->solicitado_por = $solicitud->solicitado_por;
-      //$row->actions = $this->acciones($token, $solicitud);
-      //$row->updated_at = date('Y/m/d',strtotime($solicitud->updated_at));
-      //$row->workflow_state = $solicitud->solicitable()->get();
-      $res->rows[] = $row;
-    }
-    return $res->rows;
+      $iteracion = Solicitud::where('solicitable_type','App\SolicitudRecordHistorial')->get();
+
+      foreach ( $iteracion as $solicitud) {
+        $row = new \stdClass;
+        $row->fecha = $solicitud->id;
+        $row->titulo = $solicitud->titulo;
+        $row->numero_oficio = $solicitud->numero_oficio;
+        $row->institucion = $solicitud->institucion;
+        $row->solicitado_por = $solicitud->solicitado_por;
+        //$row->actions = $this->acciones($token, $solicitud);
+        //$row->updated_at = date('Y/m/d',strtotime($solicitud->updated_at));
+        //$row->workflow_state = $solicitud->solicitable()->get();
+        $res->rows[] = $row;
+      }
+      return $res->rows;
   }
   private function obtener_solicitud($solicitud, $token) {
       $solicitud_arr = [];

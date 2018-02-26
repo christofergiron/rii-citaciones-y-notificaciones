@@ -63,7 +63,9 @@ class DelitoContraPropiedadSSTools
   private function rows($token) {
     $res = new \stdClass;
     //$res->rows[]=[]; this fails is no data is returned...
-    foreach (Solicitud::All() as $solicitud) {
+    $iteracion = Solicitud::where('solicitable_type','App\DelitoContraPropiedadSS')->get();
+
+    foreach ($iteracion as $solicitud) {
       $row = new \stdClass;
       $row->fecha = $solicitud->id;
       $row->titulo = $solicitud->titulo;

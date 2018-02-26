@@ -63,7 +63,9 @@ class InformeDelitoComunSSTools
   private function rows($token) {
     $res = new \stdClass;
     //$res->rows[]=[]; this fails is no data is returned...
-    foreach (Informe::All() as $informe) {
+    $iteracion = Informe::where('tipoable_type','App\InformeDelitoComunSS')->get();
+
+    foreach ($iteracion as $informe) {
       $row = new \stdClass;
       $row->fecha = $informe->id;
       $row->titulo = $informe->titulo;
