@@ -16,7 +16,7 @@ class CreateHitosSolicitudesSsTable extends Migration
         Schema::create('hitos_solicitudes_ss', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nombre')->nullable();
-            $table->text('descripcion')->nullable();
+            $table->longText('descripcion')->nullable();
             $table->date('fecha_inicio')->nullable();
             $table->date('fecha_fin')->nullable();
             $table->integer('id_solicitud')->nullable();
