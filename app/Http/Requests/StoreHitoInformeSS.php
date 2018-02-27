@@ -25,7 +25,7 @@ use App\Rol;
 use App\Denunciante;
 use App\Sospechoso;
 use App\Testigo;
-use App\HitoSolicitudSS;
+use App\HitoInformeSS;
 use App\Victima;
 use App\Http\Requests\StorePersona;
 use App\Workflow;
@@ -35,7 +35,7 @@ use App\DefaultActionSS;
 use App\NumeroExpediente;
 use App\DefaultSSNUE;
 
-class StoreHitoSolicitudSS //extends FormRequest
+class StoreHitoInformeSS //extends FormRequest
 {
 
     private $response;
@@ -58,13 +58,13 @@ class StoreHitoSolicitudSS //extends FormRequest
         $this->response->code = 200;
         $this->response->success = true;
         $this->response->message = null;
-        $this->response->payload = new \stdClass;        
+        $this->response->payload = new \stdClass;
     }
 
     public function workflow_rules(Array $arr)
     {
 
-       $this->log::alert('inside workflow rules solicitud ss ....');
+       $this->log::alert('inside workflow rules informe ss ....');
        $this->log::alert(json_encode($arr));
 
        $action = new Action($arr);
@@ -90,7 +90,7 @@ class StoreHitoSolicitudSS //extends FormRequest
         "procesos_investigativos.*.descripcion" => "required",
         "procesos_investigativos.*.fecha_inicio" => "required|date_format:Y/m/d",
         "procesos_investigativos.*.fecha_fin" => "required|date_format:Y/m/d",
-        "procesos_investigativos.*.id_solicitud" => "required"
+        "procesos_investigativos.*.id_informe" => "required"
      ]);
 
        if ($validator->fails()) {
@@ -135,9 +135,9 @@ class StoreHitoSolicitudSS //extends FormRequest
                 "fecha_inicio" => $d["fecha_inicio"],
                 "fecha_fin" => $d["fecha_fin"],
                 "fecha_fin" => $d["fecha_fin"],
-                "id_solicitud" => $d["id_solicitud"],
+                "id_informe" => $d["id_informe"],
               ];
-            $hitos = new HitoSolicitudSS($hitos_arr);
+            $hitos = new HitoInformeSS($hitos_arr);
             $hitos->save();
             $_arr[] = $hitos;
         }

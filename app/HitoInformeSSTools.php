@@ -2,7 +2,8 @@
 namespace App;
 use Validator;
 use App\Passport;
-class DelitoContraPropiedadSSTools
+
+class HitoInformeSSTools
 {
   private $ss_require;
     private $log;
@@ -26,15 +27,6 @@ class DelitoContraPropiedadSSTools
       }
       return $user_email;
   }
-  private function acciones($token, $delito_contra_propiedad_ss) {
-      $acciones = [];
-      $user_email = $this->get_email_from_token($token);
-      if (!isset($user_email)) { return $acciones; }
-      if (empty($user_email)) {return $acciones; }
-      $acciones = $this->workflow_actions($delito_contra_propiedad_ss, $user_email);
-      $acciones[] = 'Solicitud';
-      return $acciones;
-  }
 
   private function headers(){
       $res = new \stdClass;
@@ -43,40 +35,34 @@ class DelitoContraPropiedadSSTools
       $hdr->label = "ID";
       $res->headers[] = $hdr;
       $hdr = new \stdClass;
-      $hdr->name = "fecha";
-      $hdr->label = "Fecha";
+      $hdr->name = "nombre";
+      $hdr->label = "Nombre";
       $res->headers[] = $hdr;
       $hdr = new \stdClass;
-      $hdr->name = "titulo";
-      $hdr->label = "Proceso Investigativo";
+      $hdr->name = "fecha_inicio";
+      $hdr->label = "Fecha Inicio";
       $res->headers[] = $hdr;
       $hdr = new \stdClass;
-      $hdr->name = "numero_oficio";
-      $hdr->label = "Numero de Oficio";
+      $hdr->name = "fecha_fin";
+      $hdr->label = "Fecha Fin";
       $res->headers[] = $hdr;
       $hdr = new \stdClass;
-      $hdr->name = "institucion";
-      $hdr->label = "Institucion";
-      $res->headers[] = $hdr;
-      $hdr = new \stdClass;
-      $hdr->name = "solicitado_por";
-      $hdr->label = "Solicitado Por: ";
+      $hdr->name = "id_informe";
+      $hdr->label = "Id de Informe";
       $res->headers[] = $hdr;
       return $res->headers;
   }
   private function rows($token) {
     $res = new \stdClass;
     //$res->rows[]=[]; this fails is no data is returned...
-    $iteracion = Solicitud::where('solicitable_type','App\DelitoContraPropiedadSS')->get();
 
-    foreach ($iteracion as $solicitud) {
+    foreach (HitoInformeSS::all() as $hito) {
       $row = new \stdClass;
-      $row->id = $solicitud->id;
-      $row->fecha = $solicitud->fecha;
-      $row->titulo = $solicitud->titulo;
-      $row->numero_oficio = $solicitud->numero_oficio;
-      $row->institucion = $solicitud->institucion;
-      $row->solicitado_por = $solicitud->solicitado_por;
+      $row->id = $hito->id;
+      $row->nombre = $hito->nombre;
+      $row->fecha_inicio = $hito->fecha_inicio;
+      $row->fecha_fin = $hito->fecha_fin;
+      $row->id_informe = $hito->id_informe;
       //$row->actions = $this->acciones($token, $solicitud);
       //$row->updated_at = date('Y/m/d',strtotime($solicitud->updated_at));
       //$row->workflow_state = $solicitud->solicitable()->get();
@@ -84,16 +70,16 @@ class DelitoContraPropiedadSSTools
     }
     return $res->rows;
   }
-  private function obtener_solicitud($solicitud, $token) {
-      $solicitud_arr = [];
+  private function obtener_hito($hito, $token) {
+      $hito_arr = [];
       $user_email = $this->get_email_from_token($token);
       if(empty($user_email)){
         $user_email = "ssworker@gmail.com";
       }
       $this->log::alert("email: ".$user_email);
 
-      if (!isset($user_email)) { return $solicitud_arr; }
-      if (empty($user_email)) {return $solicitud_arr; }
+      if (!isset($user_email)) { return $hito_arr; }
+      if (empty($user_email)) {return $hito_arr; }
       $item = new \stdClass;
       // $item->updated_at = date('Y/m/d',strtotime($solicitud_record_historial->updated_at));
       // $item->dependencia = 'Secretaría de Seguridad';
@@ -103,40 +89,37 @@ class DelitoContraPropiedadSSTools
         $this->log::info("viene nulo");
       }
       //$item->titulo_documento = $this->titulo_documento($juez);
-      $item->id = $solicitud->id;
-      $item->fecha = $solicitud->fecha;
-      $item->titulo = $solicitud->titulo;
-      $item->numero_oficio = $solicitud->numero_oficio;
-      $item->institucion = $solicitud->institucion;
-      $item->solicitado_por = $solicitud->solicitado_por;
-      $item->descripcion = $solicitud->descripcion;
-      $item->delito_contra_propiedad_ss = $solicitud->solicitable()->get();
-      $item->procesos_investigativos = $solicitud->hitos_ss()->get();
-      $solicitud_arr[] = $item;
-      return $solicitud_arr;
+      $item->id = $hito->id;
+      $item->nombre = $hito->nombre;
+      $item->descripcion = $hito->descripcion;
+      $item->fecha_inicio = $hito->fecha_inicio;
+      $item->fecha_fin = $hito->fecha_fin;
+      $item->id_informe = $hito->id_informe;
+      $hito_arr[] = $item;
+      return $hito_arr;
   }
 
-  public function get_solicitud($solicitud_id, $token){
+  public function get_hito($hito_id, $token){
       $res = new \stdClass;
 
-      $solicitud = Solicitud::find($solicitud_id);
-      if (is_null($solicitud)) {
+      $hito = HitoInformeSS::find($hito_id);
+      if (is_null($hito)) {
         return json_encode($res);
       }
-      $id = $solicitud->id;
-      $this->log::alert("objeto actual: ".json_encode($solicitud));
+      $id = $hito->id;
+      $this->log::alert("objeto actual: ".json_encode($hito));
 
-      $result = $this->obtener_solicitud($solicitud, $token);
+      $result = $this->obtener_hito($hito, $token);
 
       if (!isset($result)) { return json_encode($res); }
       if (empty($result)) { return json_encode($res); }
 
-      $res->solicitud = $result[0];
+      $res->hito = $result[0];
 
       $json_result = json_encode($res);
       return $json_result;
   }
-  public function ss_list_solicitudes($token) {
+  public function ss_list_hito($token) {
       $res = new \stdClass;
       $res->headers = $this->headers();
       $res->rows = $this->rows($token);

@@ -103,11 +103,13 @@ class InformeDelitoContraVidaSSTools
         $this->log::info("viene nulo");
       }
       //$item->titulo_documento = $this->titulo_documento($juez);
+      $item->id = $informe->id;
       $item->fecha = $informe->fecha;
       $item->titulo = $informe->titulo;
       $item->numero_oficio = $informe->numero_oficio;
       $item->institucion = $informe->institucion;
       $item->solicitado_por = $informe->solicitado_por;
+      $item->descripcion = $informe->descripcion;
       $item->informe_delito_contra_vida_ss = $informe->tipoable()->get();
       $item->procesos_investigativos = $informe->hitos_informe_ss()->get();
       $informe_arr[] = $item;

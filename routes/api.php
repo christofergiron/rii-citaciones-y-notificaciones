@@ -48,6 +48,10 @@ Route::post('/ss/new/hito_solicitud_ss', 'API\HitoSolicitudSSController@store');
 Route::post('/ss/show/hito_solicitud_ss/{id}', 'API\HitoSolicitudSSController@show');
 Route::post('/ss/tabla_hito_solicitud_ss', "API\HitoSolicitudSSController@index");
 
+Route::post('/ss/new/hito_informe_ss', 'API\HitoInformeSSController@store');
+Route::post('/ss/show/hito_informe_ss/{id}', 'API\HitoInformeSSController@show');
+Route::post('/ss/tabla_hito_informe_ss', "API\HitoInformeSSController@index");
+
 Route::post('/ss/new/captura', 'API\RealizarCapturaController@store');
 Route::post('/ss/captura/{id}', 'API\RealizarCapturaController@show');
 Route::post('/ss/tabla_capturas', 'API\RealizarCapturaController@index');

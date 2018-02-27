@@ -103,11 +103,13 @@ class SolicitudRecordHistorialTools
         $this->log::info("viene nulo");
       }
       //$item->titulo_documento = $this->titulo_documento($juez);
+      $item->id = $solicitud->id;
       $item->fecha = $solicitud->fecha;
       $item->titulo = $solicitud->titulo;
       $item->numero_oficio = $solicitud->numero_oficio;
       $item->institucion = $solicitud->institucion;
       $item->solicitado_por = $solicitud->solicitado_por;
+      $item->descripcion = $solicitud->descripcion;
       $item->solicitud_record_historial = $solicitud->solicitable()->get();
       $item->procesos_investigativos = $solicitud->hitos_ss()->get();
       $solicitud_arr[] = $item;
