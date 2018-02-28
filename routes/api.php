@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::resource('SolicitudRecordHistorial', 'API\SolicitudRecordHistorialController');
+#Route::resource('SolicitudRecordHistorial', 'API\SolicitudRecordHistorialController');
 Route::resource('DelitoContraPropiedadSS', 'API\DelitoContraPropiedadSSController');
 Route::resource('InformeLogisticoSS', 'API\InformeLogisticoSSController');
 Route::resource('InformeDelitoContraVidaSS', 'API\InformeDelitoContraVidaSSController');
