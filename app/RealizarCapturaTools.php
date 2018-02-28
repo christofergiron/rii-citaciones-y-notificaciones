@@ -36,17 +36,18 @@ class RealizarCapturaTools
 
   private function get_persona_natural($id) {
     $persona_natural = PersonaNatural::find($id);
+    //if (is_null($persona_natural)) {return null;}
     return $persona_natural;
   }
 
   private function detenido($id) {
     $detenidos_arr = [] ;
     $captura = Captura::find($id) ;
-    $detenido = new \stdClass;
+    //$detenido = new \stdClass;
     $detenidos = $captura->detenidos()->get();
     if (is_null($detenidos)) {return $detenidos_arr;}
-
     foreach($detenidos as $d) {
+      $detenido = new \stdClass;
       $persona_natural_id = $d->rol()->first()->persona_natural_id;
 
       $persona = $this->get_persona_natural($persona_natural_id);
@@ -72,22 +73,25 @@ class RealizarCapturaTools
       $detenido->sexo = $d->sexo;
       $detenido->edad = $d->edad;
 
-      $menordetenidos = $d->tipoable()->first();
+      if (preg_match('/MenorDetenido/',$d->tipoable_type))
+      {
+        $menordetenidos = $d->tipoable_id;
+        $tempmenor = MenorDetenido::find($menordetenidos) ;
+        $menor = $tempmenor;
+        $idapoderado = $menor->apoderado;
+        $detenido->apoderado = $this->apoderado($idapoderado);
 
-       if (is_null($menordetenidos)) {
+        //$detenidos_arr[] = $detenido;
+
+      }
+
+         $idunidad = $d->lugar_retencion;
+         $detenido->lugar_retencion = $this->unidad($idunidad);
          $detenidos_arr[] = $detenido;
-         //return $detenido;
-       }
-      $menor = $menordetenidos;
-      //$detenido->apoderado_id = $persona->nombres;
-      $detenido->apoderado = $this->apoderado($menor->apoderado);
-
-      $detenidos_arr[] = $detenido;
-
-
-      $idunidad = $d->lugar_retencion;
-      $detenido->lugar_retencion = $this->unidad($idunidad);
+         unset($detenido);
+          //break;
     }
+
     return $detenidos_arr;
   }
 
@@ -142,7 +146,7 @@ class RealizarCapturaTools
         $funcionario_policia = Funcionario::find($funcionarioid);
         $rol_funcionario = $funcionario_policia->rol()->first();
         $persona_natural_id = $rol_funcionario->persona_natural_id;
-        $persona = $this->get_persona_natural(50);
+        $persona = $this->get_persona_natural($persona_natural_id);
 
         //funcionario
         $responsable->nombres = $persona->nombres;
