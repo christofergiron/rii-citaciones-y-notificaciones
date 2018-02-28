@@ -180,7 +180,7 @@ class StoreRealizarCaptura //extends FormRequest
         }
 
         //captura fin extadicion
-        if (!is_null($arr["tipo_captura"]["captura_fin_extradicion"]>0)) {
+        if ($arr["tipo_captura"]["captura_fin_extradicion"]>0) {
 
           $resul = json_decode($this->set_captura_extradicion($arr), true);
           $capturaExtradicion = CapturaFinExtradicion::create($resul);
