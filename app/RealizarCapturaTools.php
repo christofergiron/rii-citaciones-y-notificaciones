@@ -96,7 +96,7 @@ class RealizarCapturaTools
   }
 
   private function lugar_captura($id) {
-      $lugarss_arr = [] ;
+      $lugarss_arr;
       $captura = Captura::find($id);
       $lugar_captura = new \stdClass;
       $idlugar = $captura->id_lugar;
@@ -126,7 +126,7 @@ class RealizarCapturaTools
         //$lugar_captura->descripcion = $lugar->descripcion;
         //$lugar_captura->caracteristicas = $lugar->caracteristicas;
 
-        $lugarss_arr[] = $lugar_captura;
+        $lugarss_arr = $lugar_captura;
         return $lugarss_arr;
   }
 
@@ -189,7 +189,7 @@ class RealizarCapturaTools
   }
 
   private function tipo_captura($id) {
-      $tipo_captura_arr = [];
+      $tipo_captura_arr;
       $captura = Captura::find($id);
       if (is_null($captura)) { return json_encode($res); }
       $id_capturable = $captura->capturable_id;
@@ -206,7 +206,7 @@ class RealizarCapturaTools
         $tipo_captura->tipo = $captura_type;
         $tipo_captura->id_denuncia = $flagrancia->id_denuncia;
 
-        $tipo_captura_arr[] = $tipo_captura;
+        $tipo_captura_arr = $tipo_captura;
         return $tipo_captura_arr;
 
       }
@@ -218,7 +218,7 @@ class RealizarCapturaTools
         $tipo_captura->tipo = $captura_type;
         $tipo_captura->id_nota_roja = $extradicion->id_nota_roja;
 
-        $tipo_captura_arr[] = $tipo_captura;
+        $tipo_captura_arr = $tipo_captura;
         return $tipo_captura_arr;
       }
 
@@ -227,12 +227,12 @@ class RealizarCapturaTools
        $tipo_captura->id_orden = $captura->id_orden;
        $tipo_captura->id_requerimiento = $captura->id_requerimiento;
 
-        $tipo_captura_arr[] = $tipo_captura;
+        $tipo_captura_arr = $tipo_captura;
         return $tipo_captura_arr;
   }
 
   private function captura($id) {
-    $detenidos_arr = [] ;
+    $captura_arr;
     $captura = Captura::find($id);
     $capturas = new \stdClass;
 
@@ -245,8 +245,8 @@ class RealizarCapturaTools
     $capturas->descripcion_captura = $captura->descripcion_captura;
     $capturas->observaciones = $captura->observaciones;
 
-      $detenidos_arr[] = $capturas;
-    return $detenidos_arr;
+      $captura_arr = $capturas;
+    return $captura_arr;
   }
 
   private function tipo_identidad($persona) {
