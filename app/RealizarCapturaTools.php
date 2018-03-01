@@ -189,46 +189,49 @@ class RealizarCapturaTools
   }
 
   private function tipo_captura($id) {
-      $tipo_captura_arr;
+    $tipo_captura_arr;
       $captura = Captura::find($id);
       if (is_null($captura)) { return json_encode($res); }
-      $id_capturable = $captura->capturable_id;
 
       $tipo_captura = new \stdClass;
+
+      $id_capturable = $captura->capturable_id;
+      if (is_null($captura->capturable_id))
+      {
+        $tipo_captura->orden_captura = 1;
+        $tipo_captura->id_captura = $captura->id;
+        $tipo_captura->flagrancia = 0;
+        $tipo_captura->captura_fin_extradicion = 0;
+        $tipo_captura_arr = $tipo_captura;
+        return $tipo_captura_arr;
+      }
 
       $this->log::alert(json_encode($captura));
       if (preg_match('/Flagrancia/',$captura->capturable_type))
       {
         $flagrancia = Flagrancia::find($id_capturable);
-        $captura_type = "En Flagrancia";
 
-        $tipo_captura->id = $flagrancia->id;
-        $tipo_captura->tipo = $captura_type;
+        $tipo_captura->orden_captura = 0;
+        $tipo_captura->flagrancia = 1;
+        $tipo_captura->id_flagrancia = $flagrancia->id;
         $tipo_captura->id_denuncia = $flagrancia->id_denuncia;
-
+        $tipo_captura->captura_fin_extradicion = 0;
         $tipo_captura_arr = $tipo_captura;
         return $tipo_captura_arr;
 
       }
-      if (preg_match('/FinExtradicion/',$captura->capturable_type)) {
+      if (preg_match('/FinExtradicion/',$captura->capturable_type))
+      {
         $extradicion = CapturaFinExtradicion::find($id_capturable);
-        $captura_type = "Captura Fin Extradicion";
 
-        $tipo_captura->id = $extradicion->id;
-        $tipo_captura->tipo = $captura_type;
+        $tipo_captura->orden_captura = 0;
+        $tipo_captura->flagrancia = 0;
+        $tipo_captura->captura_fin_extradicion = 1;
+        $tipo_captura->id_captura_extradicion = $extradicion->id;
         $tipo_captura->id_nota_roja = $extradicion->id_nota_roja;
-
         $tipo_captura_arr = $tipo_captura;
         return $tipo_captura_arr;
       }
-
-       $tipo_captura->id = $captura->id;
-       $tipo_captura->tipo = "Orden Captura";
-       $tipo_captura->id_orden = $captura->id_orden;
-       $tipo_captura->id_requerimiento = $captura->id_requerimiento;
-
-        $tipo_captura_arr = $tipo_captura;
-        return $tipo_captura_arr;
   }
 
   private function captura($id) {
