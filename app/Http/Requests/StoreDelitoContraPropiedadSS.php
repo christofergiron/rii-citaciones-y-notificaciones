@@ -86,9 +86,7 @@ class StoreDelitoContraPropiedadSS //extends FormRequest
     public function rules($arr)
     {
        $validator = Validator::make($arr   , [
-        "token" => "required",
-        "anexos" => "required",
-        "anexos.documento_id" => "required",
+        "token" => "required",      
 
         "delito_contra_propiedad_ss" => "required",
         "delito_contra_propiedad_ss.solicitud" => "required",
@@ -158,11 +156,11 @@ class StoreDelitoContraPropiedadSS //extends FormRequest
         $solicitud = new Solicitud($solicitud_arr);
         $delito_contra_propiedad_ss->solicitud()->save($solicitud);
       //Anexo
-        $anexos_arr = [
-            "denuncia_id" => $arr["anexos"]["documento_id"]
-          ];
-        $anexos = new Anexo($anexos_arr);
-        $solicitud->anexo()->save($anexos);
+        // $anexos_arr = [
+        //     "denuncia_id" => $arr["anexos"]["documento_id"]
+        //   ];
+        // $anexos = new Anexo($anexos_arr);
+        // $solicitud->anexo()->save($anexos);
 
         $_arr = [];
         foreach($arr["delito_contra_propiedad_ss"]["procesos_investigativos"] as $d) {

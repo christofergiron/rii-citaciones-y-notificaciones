@@ -18,7 +18,7 @@ class CreateSolicitudsTable extends Migration
             $table->DateTime('fecha')->nullable();
             $table->string('titulo')->nullable();
             $table->string('numero_oficio')->nullable();
-            $table->string('institucion')->nullable();
+            $table->integer('institucion')->nullable();
             $table->string('solicitado_por')->nullable();
             $table->string('solicitable_type')->nullable();
             $table->integer('solicitable_id')->nullable();

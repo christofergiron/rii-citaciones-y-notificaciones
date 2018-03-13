@@ -87,8 +87,8 @@ class StoreSolicitudRecordHistorial //extends FormRequest
     {
        $validator = Validator::make($arr   , [
         "token" => "required",
-        "anexos" => "required",
-        "anexos.documento_id" => "required",
+        // "anexos" => "required",
+        // "anexos.documento_id" => "required",
 
         "solicitud_record_historial" => "required",
         "solicitud_record_historial.solicitud" => "required",
@@ -158,11 +158,11 @@ class StoreSolicitudRecordHistorial //extends FormRequest
         $solicitud = new Solicitud($solicitud_arr);
         $solicitud_record_historial->solicitud()->save($solicitud);
       //Anexo
-        $anexos_arr = [
-            "denuncia_id" => $arr["anexos"]["documento_id"]
-          ];
-        $anexos = new Anexo($anexos_arr);
-        $solicitud->anexo()->save($anexos);
+        // $anexos_arr = [
+        //     "denuncia_id" => $arr["anexos"]["documento_id"]
+        //   ];
+        // $anexos = new Anexo($anexos_arr);
+        // $solicitud->anexo()->save($anexos);
 
         $_arr = [];
         foreach($arr["solicitud_record_historial"]["procesos_investigativos"] as $d) {

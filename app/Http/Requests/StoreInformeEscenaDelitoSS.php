@@ -87,8 +87,8 @@ class StoreInformeEscenaDelitoSS //extends FormRequest
     {
        $validator = Validator::make($arr   , [
         "token" => "required",
-        "anexos" => "required",
-        "anexos.documento_id" => "required",
+        // "anexos" => "required",
+        // "anexos.documento_id" => "required",
 
         "informe_escena_delito_ss" => "required",
         "informe_escena_delito_ss.informe" => "required",
@@ -158,11 +158,11 @@ class StoreInformeEscenaDelitoSS //extends FormRequest
         $informe = new Informe($informe_arr);
         $informe_escena_delito_ss->informe()->save($informe);
       //Anexo
-        $anexos_arr = [
-            "denuncia_id" => $arr["anexos"]["documento_id"]
-          ];
-        $anexos = new Anexo($anexos_arr);
-        $informe->anexo()->save($anexos);
+        // $anexos_arr = [
+        //     "denuncia_id" => $arr["anexos"]["documento_id"]
+        //   ];
+        // $anexos = new Anexo($anexos_arr);
+        // $informe->anexo()->save($anexos);
 
         $_arr = [];
         foreach($arr["informe_escena_delito_ss"]["procesos_investigativos"] as $d) {
