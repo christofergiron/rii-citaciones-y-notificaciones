@@ -17,20 +17,17 @@ class CreateDictamensTable extends Migration
           $table->increments('id');
           $table->string('dictamable_type')->nullable();
           $table->integer('dictamable_id')->nullable();
-          $table->string('titulo');
-          //$table->string('tipo_reporte');
-          $table->integer('id_tipo_reporte');
           $table->integer('id_autor');
-          //$table->string('autor');
-          $table->integer('placa_autor')->nullable();
-          $table->string('id_expediente')->nullable();
+          //no se si esto va relacionado con la solicitud?
+          $table->integer('id_expediente');
           $table->DateTime('fecha_creacion');
-          $table->string('Fiscal')->nullable();
-          $table->string('depto_policia_id');
-          //$table->integer('depto_policial');
-          $table->DateTime('fecha_solicitud_reporte')->nullable();
-          $table->longText('descripcion')->nullable();
+          //el fiscal va amarrado al expediente
+          //$table->integer('id_fiscal')->nullable();
+          $table->integer('unidad');
+          //este id de solicitud va en dictamen vehicular
+          $table->string('descripcion')->nullable();
           $table->string('observaciones')->nullable();
+          //a quien envia en dictamen,no tendria que ir en la solicitud dictamen
           $table->integer('remitido_A');
           $table->DateTime('fecha_envio');
           $table->boolean('deleted')->default(false);

@@ -15,13 +15,14 @@ class CreateDictamenVehicularsTable extends Migration
     {
         Schema::create('dictamen_vehiculares', function (Blueprint $table) {
             $table->increments('id');
+            //este workflow estate no tiene que ir aqui, pero no se adonde
             $table->string('workflow_state')->nullable();
-            $table->string('tipo_vehiculo');
-            $table->string('marca_vehiculo');
-            $table->string('modelo_vehiculo');
-            $table->string('placa')->nullable();
-            $table->string('numero_motor')->nullable();
-            $table->integer('dueño')->nullable();
+            //solo tendria que llevar el id vehiculo
+            //tendria que ser una tabla n a n? victamenes vehiculares x vehiculos o con solicitudes?
+            //y el id de dictamen vehicular tendria que ir en la tabla n a n
+            $table->integer('id_solicitud');
+            $table->string('informe_adjunto')->nullable();
+            $table->string('informe_html')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });

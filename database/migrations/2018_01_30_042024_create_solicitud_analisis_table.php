@@ -15,9 +15,13 @@ class CreateSolicitudAnalisisTable extends Migration
     {
         Schema::create('solicitudes_analisis', function (Blueprint $table) {
           $table->increments('id');
-          $table->string('tipo_solicitud');
-          $table->string('tipo_analisis');
+          $table->integer('id_laboratorio');
+          $table->string('nombre_laboratorio');
+          $table->integer('tipo_analisis');
+          $table->string('nombre_analisis');
+          $table->string('detalle_analisis');
           $table->string('workflow_state')->nullable();
+          //se necesita la tabla evidencias x analisis
           $table->boolean('deleted')->default(false);
           $table->timestamps();
         });
