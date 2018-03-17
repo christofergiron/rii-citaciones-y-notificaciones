@@ -7,6 +7,8 @@ use Validator;
 use Illuminate\Http\Request;
 use App\Passport;
 use App\Solicitud;
+use App\Dictamen;
+use App\DictamenVehicular;
 use App\Http\Requests\StorePersona;
 use App\Workflow;
 use App\Action;
@@ -48,45 +50,15 @@ class StoreDictamenVehicular //extends FormRequest
        $this->log::alert(json_encode($arr));
 
        $validator = Validator::make($arr   , [
-         "solicitar" => "required",
-         "solicitar.token" => "required",
-         "solicitar.vehiculo" => "required",
-         "solicitar.solicitud" => "required",
-         "solicitar.solicitante" => "required",
-         "solicitar.propietario" => "required",
-
-         "solicitar.propietario.nombre" => "present|nullable",
-         "solicitar.propietario.apellido" => "rpresent|nullable",
-         "solicitar.propietario.edad" => "present|nullable",
-         "solicitar.propietario.sexo" => "present|nullable"
-
-        "solicitar.vehiculo.tipo_vehiculo" => "required",
-        "solicitar.vehiculo.marca_vehiculo" => "required",
-        "solicitar.vehiculo.modelo_vehiculo" => "required",
-        "solicitar.vehiculo.placa" => "present|nullable",
-        "solicitar.vehiculo.numero_motor" => "required",
-        "solicitar.vehiculo.kilometraje" => "required|numeric",
-        "solicitar.vehiculo.id_propietario" => "present|nullable|numeric",
-
-        "solicitar.solicitud.id_expediente" => "required|numeric",
-        "solicitar.solicitud.id_tipo_solicitud" => "required|numeric",
-        "solicitar.solicitud.fecha_solicitud" => "required|date|date_format:Y/m/d",
-        "solicitar.solicitud.id_fiscal" => "required|numeric",
-        "solicitar.solicitud.descripcion" => "required",
-        "solicitar.solicitud.departamento_policial" => "required",
-        "solicitar.solicitud.observaciones" => "present|nullable",
-        "solicitar.solicitud.id_unidad_tecnico" => "required|numeric",
-        "solicitar.solicitud.id_tecnico" => "required|numeric",
-        "solicitar.solicitud.autorizacion_fiscal" => "required",
-
-        "solicitar.solicitante.id_investigador" => "required|numeric",
-        "solicitar.solicitante.id_departamento" => "required|numeric",
-        "solicitar.solicitante.id_unidad" => "required|numeric",
-        "solicitar.solicitante.placa" => "present|nullable|numeric",
-        "solicitar.solicitante.descripcion" => "present|nullable",
-        "solicitar.solicitante.departamento_policial" => "required",
-        "solicitar.solicitante.rango" => "required",
-        "solicitar.solicitante.puesto" => "required"
+         "token" => "required",
+         "dictamen" => "required",
+         "dictamen.id_autor" => "required",
+         "dictamen.id_expediente" => "required",
+         "dictamen.fecha_creacion" => "required",
+         "dictamen.unidad" => "required",
+         //"dictamen.id_solicitud" => "required",
+         "dictamen.remitido_A" => "required",
+         "dictamen.fecha_envio" => "required"
        ]);
 
        if ($validator->fails()) {
@@ -118,24 +90,21 @@ class StoreDictamenVehicular //extends FormRequest
     }
 
     public function persist($arr) {
-        $user_details = $this->get_user($arr["token"]);
-        $user = $this->get_institucion_dependencia($user_details->funcionario_id);
-        $user->lugar = $this->get_lugar($user_details->funcionario_id);
+        //$user_details = $this->get_user($arr["token"]);
+        //$user = $this->get_institucion_dependencia($user_details->funcionario_id);
+        //$user->lugar = $this->get_lugar($user_details->funcionario_id);
         // $this->log::alert(json_encode($res));
 
         // save expedientes
         try {
-            $expediente = $this->set_solicitud($arr);
-            $this->log::alert(json_encode($expediente));
-            $doc = $this->set_vechiculo($arr);
-            $this->log::alert(json_encode($doc));
-
+            $dictamen = $this->set_dictamen($arr);
+            $this->log::alert(json_encode($dictamen));
             $this->log::alert('this->response is ...');
             $this->log::alert(json_encode($this->response));
 
             $this->init();
             $this->response->message = "Solicitud creada exitosamente";
-            $this->response->payload->id = $solicitud->id;
+            $this->response->payload->id = $dictamen->id;
         } catch (Exception $e) {
             $this->log::error($e);
             $this->init();
@@ -151,50 +120,43 @@ class StoreDictamenVehicular //extends FormRequest
         return $this->response;
     }
 
-    public function set_solicitud($arr) {
-        $soli = Solicitud::create();
+    public function set_dictamen($arr) {
+        $dictamen = new Dictamen;
 
-        // expediente RII
-        $arr = [
-            "id_expediente" => $arr["solicitar"]["solicitud"]["id_expediente"],
-            "id_tipo_solicitud" => $arr["solicitar"]["solicitud"]["id_tipo_solicitud"],
-            "id_solicitante" => $arr["solicitar"]["solicitante"]["id_investigador"],
-            "id_funcionario" => $arr["solicitar"]["solicitante"]["id_investigador"],
-            "id_lugar" => $arr["solicitar"]["solicitud"]["departamento_policial"],
-            "fecha_solicitud" => $arr["solicitar"]["solicitud"]["fecha_solicitud"],
-            "fecha_aprobacion" => $arr["solicitar"]["solicitud"]["fecha_aprobacion"],
-            "descripcion" => $arr["solicitar"]["solicitud"]["descripcion"],
-            "lugar_ejecucion" => $arr["solicitar"]["solicitud"]["id_unidad_tecnico"],
-            "ejecutante" => $arr["solicitar"]["solicitud"]["id_tecnico"],
-            "autorizacion_fiscal" => $arr["solicitar"]["solicitud"]["autorizacion_fiscal"]
-        ];
-        $exp = new Solicitud($arr);
+        $dictamen->id_autor = $arr["dictamen"]["id_autor"];
+        $dictamen->id_expediente = $arr["dictamen"]["id_expediente"];
+        $dictamen->fecha_creacion = $arr["dictamen"]["fecha_creacion"];
+        $dictamen->unidad = $arr["dictamen"]["id_autor"];
 
-        // associate father & child
-        $soli->solicitud()->save($exp);
+        if (!is_null($arr["dictamen"]["descripcion"])) {
+            $dictamen->descripcion = $arr["dictamen"]["descripcion"];
+        }
+        if (!is_null($arr["dictamen"]["observaciones"])) {
+            $dictamen->observaciones = $arr["dictamen"]["observaciones"];
+        }
+        $dictamen->fecha_envio = $arr["dictamen"]["fecha_envio"];
+        $dictamen->remitido_A = $arr["dictamen"]["remitido_A"];
 
-        return $exp;
+        $resul = json_decode($this->set_dictamen_vehicular($arr), true);
+        $dictamenvehicular = DictamenVehicular::create($resul);
+        $dictamenvehicular->dictamen()->save($dictamen);
+        return $dictamen;
     }
 
-    public function set_vechiculo($arr) {
-        $vehi = Vehiculo::create();
+    public function set_dictamen_vehicular($arr) {
+        $dictamenvehicular = new DictamenVehicular;
 
-        // expediente RII
-        $arr = [
-            "tipo_vehiculo" => $arr["solicitar"]["vehiculo"]["tipo_vehiculo"],
-            "marca_vehiculo" => $arr["solicitar"]["vehiculo"]["marca_vehiculo"],
-            "modelo_vehiculo" => $arr["solicitar"]["vehiculo"]["modelo_vehiculo"],
-            "placa" => $arr["solicitar"]["vehiculo"]["placa"],
-            "numero_motor" => $arr["solicitar"]["vehiculo"]["numero_motor"],
-            "kilometraje" => $arr["solicitar"]["vehiculo"]["kilometraje"],
-            "id_propietario" => $arr["solicitar"]["vehiculo"]["id_propietario"]
-        ];
-        $exp = new Vehiculo($arr);
+        $dictamenvehicular->workflow_state = "solicitud_recibida";
+        $dictamenvehicular->id_solicitud = $arr["dictamen"]["id_solicitud"];
 
-        // associate father & child
-        $vehi->vehiculo()->save($exp);
+        if (!is_null($arr["dictamen"]["informe_adjunto"])) {
+            $dictamenvehicular->informe_adjunto = $arr["dictamen"]["informe_adjunto"];
+        }
+        if (!is_null($arr["dictamen"]["informe_html"])) {
+            $dictamenvehicular->informe_html = $arr["dictamen"]["informe_html"];
+        }
 
-        return $exp;
+        return $dictamenvehicular;
     }
 
     public function store_persona($institucion_id, $persona) {
@@ -243,6 +205,72 @@ class StoreDictamenVehicular //extends FormRequest
 
       # return success response
       return $res->id;
+    }
+
+    private function get_lugar($funcionario_id) {
+        $res = new \stdClass;
+        $res->departamento_id = null;
+        $res->municipio_id = null;
+        $res->aldea_id = null;
+        $res->barrio_id = null;
+        $res->caserio_id = null;
+        $result = json_decode(json_encode($res),true);
+
+        $funcionario = Funcionario::whereId($funcionario_id)->with('dependencia.lugar')->first();
+
+        if (is_null($funcionario)) {
+            return $result;
+        }
+
+        if (is_null($funcionario->dependencia)) {
+            return $result;
+        }
+
+        if (is_null($funcionario->dependencia->lugar)) {
+            return $result;
+        }
+
+        if (is_null($funcionario->dependencia->lugar->institucionable)) {
+            return $result;
+        }
+
+        $lugar = $funcionario->dependencia->lugar->institucionable;
+        $res->departamento_id = $lugar->departamento_id;
+        $res->municipio_id = $lugar->municipio_id;
+        $res->aldea_id = $lugar->aldea_id;
+        $res->barrio_id = $lugar->barrio_id;
+        $res->caserio_id = $lugar->caserio_id;
+
+        $result = json_decode(json_encode($res),true);
+        return $result;
+    }
+
+    public function get_institucion_dependencia($id) {
+        $result = new \stdClass;
+        try {
+            $funcionario = Funcionario::findOrFail($id);
+        } catch (\Exception $e) {
+            $this->log::error($e);
+            return $result;
+        }
+        $result->dependencia_id = $funcionario->dependencia_id;
+        $result->institucion_id = $funcionario->dependencia()->first()->institucion_id;
+        return $result;
+    }
+
+    public function get_user($token) {
+        $user_details = "";
+        $passport = new Passport;
+        $user_details = $passport->details($token);
+
+        if (empty($user_details)) {return "";}
+        if (!property_exists($user_details, "code")) {return "";}
+        if ($user_details->code != 200) {return "";}
+        if (!property_exists($user_details, "contents")) {return "";}
+        $contents = json_decode($user_details->contents);
+        if (!property_exists($contents, "success")) {return "";}
+
+        return $contents->success;
     }
 
     public function apply_transition(Array $arr) {

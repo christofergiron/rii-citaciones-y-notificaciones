@@ -12,6 +12,10 @@ use WorkflowTrait;
 
 protected $table = "dictamen_vehiculares";
 
+protected $fillable = [
+    "workflow_state", "id_solicitud", "informe_adjunto", "informe_html"
+  ];
+
       public function dictamen(){
           return $this->morphOne(Dictamen::class, 'dictamable');
       }

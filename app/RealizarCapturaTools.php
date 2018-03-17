@@ -49,7 +49,7 @@ class RealizarCapturaTools
     foreach($detenidos as $d) {
       $detenido = new \stdClass;
       $persona_natural_id = $d->rol()->first()->persona_natural_id;
-
+      if (is_null($persona_natural_id)) {return null;}
       $persona = $this->get_persona_natural($persona_natural_id);
 
       $detenido->numero_detenido = $d->id;
@@ -76,7 +76,8 @@ class RealizarCapturaTools
       if (preg_match('/MenorDetenido/',$d->tipoable_type))
       {
         $menordetenidos = $d->tipoable_id;
-        $tempmenor = MenorDetenido::find($menordetenidos) ;
+        $tempmenor = MenorDetenido::find($menordetenidos);
+        if (is_null($tempmenor)) {return null;}
         $menor = $tempmenor;
         $idapoderado = $menor->apoderado;
         $detenido->apoderado = $this->apoderado($idapoderado);
@@ -104,17 +105,6 @@ class RealizarCapturaTools
       //$s = Lugar::institucionable($lugar_ss);
 
       if (is_null($lugar_ss)) {return $lugarss_arr;}
-        //$temp = $lugar_ss->id;
-        //Lugar::institucionable($temp);
-        //$lugar = Lugar::find($temp);
-      //$menordetenidos = $d->tipoable()->first();
-      //$lugar = $lugar_ss->institucionable()->first();
-      //$lugar = $lugar_ss->institucion();
-
-      //$lugar = $captura->lugar()->first();
-      //if (is_null($lugar)) {break;}
-      //$lugar_ss = $lugar->institucionable()->first();
-
 
         $lugar_captura->regional_id = $lugar_ss->regional_id;
         $lugar_captura->departamento_id = $lugar_ss->departamento_id;
@@ -140,13 +130,15 @@ class RealizarCapturaTools
 
       //funcionarios
       $funcionarios_ss = FuncionarioSS::find($funcionarioss);
-      if (is_null($funcionarios_ss)) {return $lugarss_arr;}
+      if (is_null($funcionarios_ss)) {return null;}
         $funcionario = $funcionarios_ss->institucion()->first();
+        if (is_null($funcionario)) {return null;}
         $funcionarioid = $funcionario->id;
         $funcionario_policia = Funcionario::find($funcionarioid);
         $rol_funcionario = $funcionario_policia->rol()->first();
         $persona_natural_id = $rol_funcionario->persona_natural_id;
         $persona = $this->get_persona_natural($persona_natural_id);
+        if (is_null($persona)) {return null;}
 
         //funcionario
         $responsable->nombres = $persona->nombres;
@@ -159,6 +151,7 @@ class RealizarCapturaTools
   private function unidad($id) {
       $unidad_arr = [];
       $unidad = Dependencia::find($id);
+      if (is_null($unidad)) {return null;}
       $unidades = new \stdClass;
       $unidades->id_unidad = $unidad->institucion_id;
       $unidades->nombre = $unidad->nombre;

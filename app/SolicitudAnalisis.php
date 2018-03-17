@@ -9,6 +9,10 @@ class SolicitudAnalisis extends Model
 
 protected $table = "solicitudes_analisis";
 
+protected $fillable = [
+    "id_laboratorio", "nombre_laboratorio", "tipo_analisis", "nombre_analisis", "detalle_analisis", "workflow_state"
+  ];
+
   public function solicitud(){
       return $this->morphOne(Solicitud::class, 'solicitable');
   }

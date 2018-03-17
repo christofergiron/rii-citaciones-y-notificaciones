@@ -12,6 +12,9 @@ use App\ExpedienteSS;
 use App\Lugar;
 use App\LugarSS;
 use App\Documento;
+use App\Solicitud;
+use App\SolicitudAllanamiento;
+use App\SolicitudAnalisis;
 use App\DocumentoDigital;
 use App\Anexo;
 use App\Denuncia;
@@ -23,13 +26,6 @@ use App\RelacionesImputado;
 use App\RelacionesImputadoDenunciantes;
 use App\RelacionesImputadoOfendidos;
 use App\Parentesco;
-use App\Captura;
-use App\Flagrancia;
-use App\CapturaFinExtradicion;
-use App\Detenido;
-use App\MenorDetenido;
-//use App\ordejudicial;
-//use App\requerimiento fiscal;
 use App\Fiscal;
 use App\DenunciaSS;
 use App\Http\Requests\StorePersona;
@@ -39,13 +35,13 @@ use App\PolyBaseFactory;
 use App\DefaultAction;
 use App\DefaultMPNUE;
 
-class StoreRealizarCaptura //extends FormRequest
+class StoreSolicitud //extends FormRequest
 {
 
     private $response;
     private $nue_type;
     private $rii_nue_type;
-    //private $captura_type;
+    private $tipo;
 
     public function __construct()
     {
@@ -53,7 +49,6 @@ class StoreRealizarCaptura //extends FormRequest
         $this->StorePersona = new StorePersona;
         $this->nue_type = "ss";
         $this->rii_nue_type = "Rii_N_U_E";
-        //$this->$captura_type = "Nueva_Captura";
         $this->init();
     }
 
@@ -74,11 +69,17 @@ class StoreRealizarCaptura //extends FormRequest
 
        $validator = Validator::make($arr   , [
          "token" => "required",
-         "funcionario.id_funcionario" => "required",
-         "persona_capturada.*.edad" => "required|numeric",
-         "captura.descripcion_captura" => "required",
-         "captura.fecha_captura" => "required",
-         "captura.workflow_state" => "required"
+         "documento" => "required",
+         "documento.institucion_id" => "required",
+         "lugar_solicitud" => "required",
+         "lugar_solicitud.departamento_id" => "required",
+         "lugar_solicitud.municipio_id" => "required",
+         "solicitud" => "required",
+         "solicitud.tipo_solicitud" => "required",
+         "solicitud.fecha" => "required",
+         "solicitud.id_lugar" => "required",
+         "solicitud.descripcion" => "required",
+         "solicitud.solicitado_por" => "required"
        ]);
 
        if ($validator->fails()) {
@@ -113,31 +114,33 @@ class StoreRealizarCaptura //extends FormRequest
         $user_details = $this->get_user($arr["token"]);
         //$user = $this->get_institucion_dependencia($user_details->funcionario_id);
         //$user->lugar = $this->get_lugar($user_details->funcionario_id);
-      //  $this->log::alert(json_encode($res));
+        //$this->log::alert(json_encode($res));
 
         // save expedientes
         try {
             $lugar = $this->set_lugar($arr);
             $this->log::alert(json_encode($lugar));
-            $captura = $this->set_captura($arr, $this->response->payload->id = $lugar->id);
-            $this->log::alert(json_encode($captura));
+            $solicitud = $this->set_documento($arr, $this->response->payload->id = $lugar->id);
+            $this->log::alert(json_encode($solicitud));
+            //$solicitud = $this->set_solicitud($arr);
+            //$this->log::alert(json_encode($solicitud));
             //aqui con el response payload seria la asignacion dinamica del id captura
-            $detenido = $this->set_detenido($arr, $this->response->payload->id = $captura->id);
-            $this->log::alert(json_encode($detenido));
+            //$detenido = $this->set_detenido($arr, $this->response->payload->id = $solicitud->id);
+            //$this->log::alert(json_encode($detenido));
             //$rol = $this->set_detenido_rol($detenido, $arr);
             //$this->log::alert(json_encode($rol));
             $this->log::alert('this->response is ...');
             $this->log::alert(json_encode($this->response));
 
             $this->init();
-            $this->response->message = "Capturado registrado Correctamente";
-            $this->response->payload->id = $captura->id;
+            $this->response->message = "solicitud realizada correctamente";
+            $this->response->payload->id = $solicitud->id;
         } catch (Exception $e) {
             $this->log::error($e);
             $this->init();
             $this->response->code = 403;
             $this->response->success = false;
-            $this->response->message = "error al ingresar la captura";
+            $this->response->message = "error al realizar la solicitud";
             return $this->response;
         }
 
@@ -147,143 +150,124 @@ class StoreRealizarCaptura //extends FormRequest
         return $this->response;
     }
 
-     //recorda que esta captura solo puede ser de un tipo de herencia
-    public function set_captura($arr, $idcaptura) {
+    public function set_documento($arr, $lugarid) {
 
-      $captura = new Captura;
+        // documento digital
+        $documento = new Documento;
+        $doc_digital = DocumentoDigital::create();
+        $lugar = Lugar::find($lugarid);
 
-      if (!is_null($arr["captura"]["id_orden"])) {
-          $captura->id_orden = $arr["captura"]["id_orden"];
-      }
-      if (!is_null($arr["captura"]["id_requerimiento"])) {
-          $captura->id_requerimiento = $arr["captura"]["id_requerimiento"];
-      }
-      if (!is_null($arr["captura"]["id_expediente"])) {
-          $captura->id_expediente = $arr["captura"]["id_expediente"];
-      }
-        $captura->workflow_state = $arr["captura"]["workflow_state"];
+        $temp = $this->set_solicitud($arr);
+        $solicitud_id = $temp->id;
+        $solicitud = Solicitud::find($solicitud_id);
 
-        $captura->id_lugar = $idcaptura;
-        $captura->id_funcionario = $arr["funcionario"]["id_funcionario"];
-        $captura->descripcion_captura = $arr["captura"]["descripcion_captura"];
-        if (!is_null($arr["captura"]["observaciones"])) {
-            $captura->observaciones = $arr["captura"]["observaciones"];
-        }
-        $captura->fecha_captura = $arr["captura"]["fecha_captura"];
-        //captura flagrancia
-        if ($arr["tipo_captura"]["flagrancia"]>0) {
+        $documento->expediente_id = 0;
+        //cambio
+        //$documento->tipoable_id = 0;
+        //$documento->tipoable_type = "asdasd";
+        $documento->expediente_id = 0;
+        $documento->institucion_id = $arr["documento"]["institucion_id"];
+        $documento->dependencia_id = $arr["solicitud"]["id_lugar"];
+        $documento->titulo = $this->tipo;
+        $documento->descripcion = $arr["solicitud"]["descripcion"];;
+        //$documento->tags = Array($arr["documento"]["tipo"]);
+        $documento->fecha_documento = $arr["solicitud"]["fecha"];
+        $documento->hora_recepcion = $arr["solicitud"]["hora_solicitud"];
 
-          $resul = json_decode($this->set_captura_flagrancia($arr), true);
-          $capturaflagrancia = Flagrancia::create($resul);
-          $capturaflagrancia->captura()->save($captura);
-          return $captura;
-        }
+        $solicitud->documento()->save($documento);
 
-        //captura fin extadicion
-        if ($arr["tipo_captura"]["captura_fin_extradicion"]>0) {
-
-          $resul = json_decode($this->set_captura_extradicion($arr), true);
-          $capturaExtradicion = CapturaFinExtradicion::create($resul);
-          $capturaExtradicion->captura()->save($captura);
-          return $captura;
-        }
-            $captura->save();
-            return $captura;
+        return $solicitud;
     }
 
-    public function set_captura_flagrancia($arr) {
+    public function set_solicitud($arr) {
 
-        $capturaflagrancia = new Flagrancia;
+      $solicitud = new Solicitud;
 
-        if (!is_null($arr["captura"]["id_denuncia"])) {
-            $capturaflagrancia->id_denuncia = $arr["captura"]["id_denuncia"];
+      $solicitud->fecha = $arr["solicitud"]["fecha"];
+      $solicitud->numero_oficio = $arr["solicitud"]["numero_oficio"];
+      $solicitud->solicitado_por = $arr["solicitud"]["solicitado_por"];
+      $solicitud->institucion = $arr["solicitud"]["id_lugar"];
+      $solicitud->descripcion = $arr["solicitud"]["descripcion"];
+
+      //solicitud allanamiento
+        if ($arr["solicitud"]["tipo_solicitud"]==0) {
+          $solicitud->titulo = "allanamiento";
+          $this->tipo = "allanamiento";
+          $resul = json_decode($this->set_solicitud_allanamiento($arr), true);
+          $solicitudAllanamiento = SolicitudAllanamiento::create($resul);
+          $solicitudAllanamiento->solicitud()->save($solicitud);
+          return $solicitud;
         }
-        $capturaflagrancia->workflow_state = $arr["captura"]["workflow_state"];
 
-           return $capturaflagrancia;
+      //solicitud analisis
+        if ($arr["solicitud"]["tipo_solicitud"]==1) {
+          $solicitud->titulo = "analisis";
+          $this->tipo = "analisis";
+          $resul = json_decode($this->set_solicitud_analisis($arr), true);
+          //echo $resul->id_laboratorio;
+          $solicitudAnalisis = SolicitudAnalisis::create($resul);
+          $solicitudAnalisis->solicitud()->save($solicitud);
+          return $solicitud;
+        }
+
+      //solicitud dictamen
+        if ($arr["solicitud"]["tipo_solicitud"]==2) {
+          $solicitud->titulo = "dictamen_vehicular";
+          $this->tipo = "dictamen_vehicular";
+          //cambio dictamen vehicular
+          //$resul = json_decode($this->set_solicitud_dictamen_vehicular($arr), true);
+          //$solicitudAnalisis = $solicitudAnalisis::create($resul);
+          //$solicitudAnalisis->solicitud()->save($solicitud);
+          //return $solicitud;
+        }
+
     }
 
-    public function set_captura_extradicion($arr) {
+    public function set_solicitud_allanamiento($arr) {
 
-      $capturaExtradicion = new CapturaFinExtradicion;
+        $solicitud_allanamiento = new SolicitudAllanamiento;
 
-      if (!is_null($arr["captura"]["id_nota_roja"])) {
-          $capturaExtradicion->id_nota_roja = $arr["captura"]["id_nota_roja"];
-      }
-        $capturaExtradicion->workflow_state = $arr["captura"]["workflow_state"];
+        $solicitud_allanamiento->workflow_state = "solicitud_recibida";
 
-           return $capturaExtradicion;
+        if (!is_null($arr["solicitud"]["descripcion"])) {
+            $solicitud_allanamiento->descripcion = $arr["solicitud"]["descripcion"];
+        }
+
+        if (isset($arr["solicitud_allanamiento"]["numero_evidencias_encontradas"])) {
+            $solicitud_allanamiento->numero_evidencias_encontradas = $arr["solicitud_allanamiento"]["numero_evidencias_encontradas"];
+        }
+
+        if (isset($arr["solicitud_allanamiento"]["descripcion_evidencias"])) {
+            $solicitud_allanamiento->descripcion_evidencias = $arr["solicitud_allanamiento"]["descripcion_evidencias"];
+        }
+           return $solicitud_allanamiento;
     }
 
-    public function set_detenido($arr, $idcaptura) {
+    public function set_solicitud_analisis($arr) {
 
-      $detenido = new Detenido;
-      $menordetenido = new MenorDetenido;
-      $rol = new Rol;
+        $solicitud_analisis = new SolicitudAnalisis;
 
-     foreach($arr["persona_capturada"] as $d) {
-      $rol->persona_natural_id = $d["persona_natural_id"];
-      //cambio  asignar la institucion dinamicamente
-      $rol->institucion_id = 3;
+        $solicitud_analisis->workflow_state = "solicitud_recibida";
 
-      if (!is_null($arr["captura"]["id_orden"])) {
-          $detenido->id_orden = $arr["captura"]["id_orden"];
-      }
-
-      if (!is_null($arr["captura"]["id_requerimiento"])) {
-          $detenido->id_requerimiento = $arr["captura"]["id_requerimiento"];
-      }
-
-        $detenido->id_captura = $idcaptura;
-
-        if (!is_null($d["fecha_nacimiento"])) {
-            $detenido->fecha_nacimiento = $d["fecha_nacimiento"];
+        if (!is_null($arr["solicitud"]["descripcion"])) {
+            $solicitud_analisis->descripcion = $arr["solicitud"]["descripcion"];
         }
-
-        if (!is_null($d["nacionalidad"])) {
-            $detenido->nacionalidad = $d["nacionalidad"];
+        if (isset($arr["solicitud_analisis"]["id_laboratorio"])) {
+            $solicitud_analisis->id_laboratorio = $arr["solicitud_analisis"]["id_laboratorio"];
         }
-        $detenido->genero = $d["genero"];
-        $detenido->sexo = $d["sexo"];
-        $detenido->edad = $d["edad"];
-        $detenido->lugar_retencion = $arr["unidad"]["lugar_retencion"];
-
-        if (!is_null($arr["funcionario"]["id_fiscal"])) {
-            $detenido->id_fiscal = $arr["funcionario"]["id_fiscal"];
+        if (isset($arr["solicitud_analisis"]["nombre_laboratorio"])) {
+            $solicitud_analisis->nombre_laboratorio = $arr["solicitud_analisis"]["nombre_laboratorio"];
         }
-
-        if (!is_null($arr["funcionario"]["id_investigador"])) {
-            $detenido->id_investigador = $arr["funcionario"]["id_investigador"];
+        if (isset($arr["solicitud_analisis"]["tipo_analisis"])) {
+            $solicitud_analisis->tipo_analisis = $arr["solicitud_analisis"]["tipo_analisis"];
         }
-        //menor detenido
-        if ($d["edad"]<18) {
-          $resul = json_decode($this->set_menor_detenido($arr, $d), true);
-          $menordetenido = MenorDetenido::create($resul);
-
-              $menordetenido->detenido()->save($detenido);
-              $detenido->rol()->save($rol);
-              return $detenido;
+        if (isset($arr["solicitud_analisis"]["nombre_analisis"])) {
+            $solicitud_analisis->nombre_analisis = $arr["solicitud_analisis"]["nombre_analisis"];
         }
-          $detenido->save();
-          $detenido->rol()->save($rol);
-          return $detenido;
-          //fin for
+        if (isset($arr["solicitud_analisis"]["detalle_analisis"])) {
+            $solicitud_analisis->detalle_analisis = $arr["solicitud_analisis"]["detalle_analisis"];
         }
-    }
-
-    public function set_menor_detenido($arr, $d) {
-
-      $menordetenido = new MenorDetenido;
-      if (!is_null($arr["funcionario"]["id_fiscal"])) {
-          $menordetenido->fiscal_niñez = $arr["funcionario"]["id_fiscal"];
-      }
-       //cambio, sera asignacion dinamica?
-      if (!is_null($d["apoderado"])) {
-          $menordetenido->apoderado = $d["apoderado"];
-      }
-        $menordetenido->workflow_state = $arr["captura"]["workflow_state"];
-
-         return $menordetenido;
+           return $solicitud_analisis;
     }
 
     public function set_rol($user, $persona) {
@@ -303,28 +287,6 @@ class StoreRealizarCaptura //extends FormRequest
           ];
             $rol = new Rol($rol_arr);
             return $rol;
-    }
-
-    public function set_detenido_rol($detenido, $arr) {
-        $rol = new Rol;
-        $rol->persona_natural_id = $arr["persona_natural_id"];
-        //cambio  asignar la institucion dinamicamente
-        $rol->institucion_id = 3;
-
-      $this->response->payload->id = $detenido->id;
-      //echo $this->response->payload->id = $detenido->id;
-      $arr_detenido = [
-          "id"=>$this->response->payload->id = $detenido->id
-        ];
-
-      //$resul = json_decode($this, true);
-      //$this->log::alert(json_encode($arr));
-      $temp = new Detenido($arr_detenido);
-      //echo $temp;
-      //$detenidos->denunciante()->associate($temp);
-
-          $temp->rol()->save($rol);
-          return $rol;
     }
 
     public function get_sujeto($sujeto,$denuncia_id, $persona_natural_id){
@@ -376,27 +338,27 @@ class StoreRealizarCaptura //extends FormRequest
       $lugar = new Lugar;
 
 
-      $lugar->descripcion = "lugar captura";
+      $lugar->descripcion = "lugar documento";
       $lugar->caracteristicas = "";
 
-      $lugarss->regional_id = $arr["lugar_captura"]["regional_id"];
-      $lugarss->departamento_id = $arr["lugar_captura"]["departamento_id"];
-      $lugarss->municipio_id = $arr["lugar_captura"]["municipio_id"];
+      $lugarss->regional_id = $arr["lugar_solicitud"]["regional_id"];
+      $lugarss->departamento_id = $arr["lugar_solicitud"]["departamento_id"];
+      $lugarss->municipio_id = $arr["lugar_solicitud"]["municipio_id"];
 
-      if (!is_null($arr["lugar_captura"]["ciudad_ss_id"])) {
-          $lugarss->ciudad_ss_id = $arr["lugar_captura"]["ciudad_ss_id"];
+      if (!is_null($arr["lugar_solicitud"]["ciudad_ss_id"])) {
+          $lugarss->ciudad_ss_id = $arr["lugar_solicitud"]["ciudad_ss_id"];
       }
-      if (!is_null($arr["lugar_captura"]["colonia_ss_id"])) {
-          $lugarss->colonia_ss_id = $arr["lugar_captura"]["colonia_ss_id"];
+      if (!is_null($arr["lugar_solicitud"]["colonia_ss_id"])) {
+          $lugarss->colonia_ss_id = $arr["lugar_solicitud"]["colonia_ss_id"];
       }
-      if (!is_null($arr["lugar_captura"]["aldea_ss_id"])) {
-          $lugarss->aldea_ss_id = $arr["lugar_captura"]["aldea_ss_id"];
+      if (!is_null($arr["lugar_solicitud"]["aldea_ss_id"])) {
+          $lugarss->aldea_ss_id = $arr["lugar_solicitud"]["aldea_ss_id"];
       }
-      if (!is_null($arr["lugar_captura"]["sector_ss_id"])) {
-          $lugarss->sector_ss_id = $arr["lugar_captura"]["sector_ss_id"];
+      if (!is_null($arr["lugar_solicitud"]["sector_ss_id"])) {
+          $lugarss->sector_ss_id = $arr["lugar_solicitud"]["sector_ss_id"];
       }
-      if (!is_null($arr["lugar_captura"]["zona_ss_id"])) {
-          $lugarss->zona_ss_id = $arr["lugar_captura"]["zona_ss_id"];
+      if (!is_null($arr["lugar_solicitud"]["zona_ss_id"])) {
+          $lugarss->zona_ss_id = $arr["lugar_solicitud"]["zona_ss_id"];
       }
       $lugarss->save();
       $lugarss->institucion()->save($lugar);
@@ -471,7 +433,7 @@ class StoreRealizarCaptura //extends FormRequest
     }
 
     public function apply_transition(Array $arr) {
-       $this->log::alert('inside apply_transition realizar captura ....');
+       $this->log::alert('inside apply_transition solicitud analisis ....');
        $this->log::alert(json_encode($arr));
 
        $act = new Action($arr);

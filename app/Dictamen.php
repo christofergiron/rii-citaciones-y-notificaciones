@@ -8,6 +8,11 @@ class Dictamen extends Model
 {
   protected $table = "dictamenes";
 
+  protected $fillable = [
+    "id_autor", "id_expediente", "fecha_creacion", "unidad", "descripcion",
+    "observaciones", "remitido_A", "fecha_envio"
+  ];
+
   public function dictamable(){
      return $this->morphTo();
   }

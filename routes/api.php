@@ -60,6 +60,18 @@ Route::post('/ss/captura/{id}', 'API\RealizarCapturaController@show');
 Route::post('/ss/tabla_capturas', 'API\RealizarCapturaController@index');
 Route::post('/ss/new/flagrancia', "API\FlagranciaController@store");
 
+Route::post('/ss/new/vehiculo', 'API\VehiculoController@store');
+Route::post('/ss/vehiculo/{id}', 'API\VehiculoController@show');
+Route::post('/ss/tabla_vehiculos', 'API\VehiculoController@index');
+
+Route::post('/ss/new/dictamen', 'API\DictamenVehicularController@store');
+Route::post('/ss/dictamen/{id}', 'API\DictamenVehicularController@show');
+Route::post('/ss/tabla_dictamenes', 'API\DictamenVehicularController@index');
+
+Route::post('/new/solicitud', 'API\SolicitudesController@store');
+Route::post('/solicitud/{id}', 'API\SolicitudesController@show');
+Route::post('/tabla_solicitudes', 'API\SolicitudesController@index');
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

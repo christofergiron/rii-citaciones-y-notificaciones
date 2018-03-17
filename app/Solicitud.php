@@ -16,9 +16,9 @@ class Solicitud extends Model
   ];
   protected $table = "solicitudes";
 
-  public function anexo(){
-       return $this->morphOne(Anexo::class, 'anexable');
-   }
+  public function documento(){
+    return $this->morphOne(Documento::class, 'tipoable');
+}
 
   public function solicitable(){
      return $this->morphTo();
@@ -33,4 +33,9 @@ class Solicitud extends Model
   {
       return $this->hasMany(HitoSolicitudSS::class, 'id_solicitud');
   }
+
+  public function funcionario()
+{
+    return $this->belongsTo(Funcionario::class, 'solicitado_por');
+}
 }
