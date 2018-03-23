@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Tools;
 use App\Solicitud;
-use App\SolicitudTools;
+use App\SolicitudAllTools;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -23,7 +23,7 @@ class SolicitudController extends Controller
         $this->log = new \Log;
         $this->logger = $logger;
         $this->tools = new Tools($this->logger);
-        $this->solicitud_tools = new SolicitudTools;
+        $this->solicitud_tools = new SolicitudAllTools;
         $this->root = false;
     }
 

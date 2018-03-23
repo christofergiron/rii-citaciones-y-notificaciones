@@ -24,18 +24,13 @@ class Solicitud extends Model
      return $this->morphTo();
   }
 
-  public function funcionario()
-  {
-      return $this->belongsTo(Funcionario::class, 'id_solicitante');
-  }
-
   public function hitos_ss() //solicitud
   {
       return $this->hasMany(HitoSolicitudSS::class, 'id_solicitud');
   }
 
   public function funcionario()
-{
+  {
     return $this->belongsTo(Funcionario::class, 'solicitado_por');
-}
+  }
 }
