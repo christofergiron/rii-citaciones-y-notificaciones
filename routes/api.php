@@ -72,6 +72,18 @@ Route::post('/new/solicitud', 'API\SolicitudesController@store');
 Route::post('/solicitud/{id}', 'API\SolicitudesController@show');
 Route::post('/tabla_solicitudes', 'API\SolicitudesController@index');
 
+Route::post('/pj/new/orden_captura', 'API\OrdenCapturaController@store');
+Route::post('/pj/orden_captura/{id}', 'API\OrdenCapturaController@show');
+Route::post('/pj/tabla_ordenes_captura', 'API\OrdenCapturaController@index');
+
+Route::post('/persona/orden_captura/{id}', 'API\BuscarOrdenCapturaPersonaController@show_persona');
+Route::post('/menor/orden_captura/{id}', 'API\BuscarOrdenCapturaMenorController@show_menor');
+Route::post('/vehiculo/orden_captura/{id}', 'API\BuscarOrdenCapturaVehiculoController@show_vehiculo');
+
+Route::post('/new/contra_orden_captura', 'API\ContraOrdenCapturaController@store');
+Route::post('/contra_orden_captura/{id}', 'API\ContraOrdenCapturaController@show');
+Route::post('/tabla_contra_ordenes_captura', 'API\ContraOrdenCapturaController@index');
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

@@ -245,70 +245,6 @@ class RealizarCapturaTools
     return $captura_arr;
   }
 
-  private function tipo_identidad($persona) {
-    $persona_tipo_identidad = strtolower($persona->identificable_type);
-    $tipo_identidad = "portador";
-
-    if (preg_match('/anonimo/', $persona_tipo_identidad)) {
-      $tipo_identidad = "anonimo";
-    }
-
-    if (preg_match('/desconocido/', $persona_tipo_identidad)) {
-      $tipo_identidad = "desconocido";
-    }
-
-    if (preg_match('/protegido/', $persona_tipo_identidad)) {
-      $tipo_identidad = "protegido";
-    }
-
-    if (preg_match('/noportador/', $persona_tipo_identidad)) {
-      $tipo_identidad = "no_portador";
-    }
-
-    if (preg_match('/deoficio/', $persona_tipo_identidad)) {
-      $tipo_identidad = "de_oficio";
-    }
-
-    return $tipo_identidad;
-  }
-
-  private function workflow_actions($captura_tipo, $user_email) {
-    $actions_arr = [];
-    $capturas = $captura_tipo->captura()->first();
-    //$capturas =$captura->tipo()->first();
-
-    if (is_null($capturas)) {return $actions_arr; }
-
-    $wf = new Workflow;
-    $params = new \stdClass;
-    $params->subject_id = $capturas->id;
-    $params->object_id = $capturas->id;
-    $params->workflow_type = "realizar_captura";  //$this->workflow_type;
-    $params->user_email = $user_email;
-    $this->log::alert("json_encoded w/o True parameter");
-    $this->log::alert(json_encode($params));
-    // $this->log::alert("json_encoded with True parameter");
-    // $this->log::alert(json_encode($params),true );
-
-    // watch this line
-    $actions = $wf->user_actions(json_encode($params));
-    $this->log::alert(json_encode($actions));
-
-    if (is_null($actions)) {return $actions_arr; }
-    if (!property_exists($actions, "contents")) { return $actions_arr; }
-    if (!property_exists($actions, "code")) { return $actions_arr; }
-    if (!$actions->code == 200) { return $actions_arr; }
-    $json_actions = json_decode($actions->contents);
-
-    if (!is_null($json_actions)) {
-      if (property_exists($json_actions, "message")) {
-        $actions_arr = $json_actions->message;
-      }
-    }
-
-    return $actions_arr;
-  }
-
   private function get_email_from_token($token) {
     $user_email = "";
     $passport = new Passport;
@@ -452,31 +388,6 @@ class RealizarCapturaTools
       return $workflow;
   }
 
-  private function acciones($token, $captura) {
-    $acciones = [];
-
-    $user_email = $this->get_email_from_token($token);
-    if (!isset($user_email)) {
-      $this->log::alert('user_email is null');
-      return $acciones;
-    }
-
-    if (empty($user_email)) {
-      $this->log::alert('user_email is empty');
-      return $acciones;
-    }
-    $captura_tipo = Captura::find($id);
-    //$id = $capturas->id;
-
-    $acciones = $this->workflow_actions($captura_tipo, $user_email);
-    $acciones[] = 'Expediente';
-
-    $this->log::alert('acciones are ...');
-    $this->log::alert(json_encode($acciones));
-
-    return $acciones;
-  }
-
   private function rows($token) {
     $res = new \stdClass;
     //$res->rows[]=[]; this fails is no data is returned...
@@ -486,7 +397,6 @@ class RealizarCapturaTools
       $row->departamento_captura = $this->deptocaptura($dmp);
       $row->fecha_captura = date('Y/m/d',strtotime($dmp->fecha_captura));
       $row->tipo_captura = $this->tipocaptura($dmp);
-      $row->acciones = $this->acciones($token, $dmp);
       $row->workflow_state = $this->tipoworkflow($dmp);
       $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
       $res->rows[] = $row;

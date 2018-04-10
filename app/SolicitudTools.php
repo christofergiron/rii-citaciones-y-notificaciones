@@ -183,42 +183,6 @@ class SolicitudTools
     return $tipo_identidad;
   }
 
-  private function workflow_actions($solicitud_tipo, $user_email) {
-    $actions_arr = [];
-    $solicitudes = $solicitud_tipo->solicitud()->first();
-
-    if (is_null($solicitudes)) {return $actions_arr; }
-
-    $wf = new Workflow;
-    $params = new \stdClass;
-    $params->subject_id = $solicitudes->id;
-    $params->object_id = $solicitudes->id;
-    $params->workflow_type = "realizar_solicitud";  //$this->workflow_type;
-    $params->user_email = $user_email;
-    $this->log::alert("json_encoded w/o True parameter");
-    $this->log::alert(json_encode($params));
-    // $this->log::alert("json_encoded with True parameter");
-    // $this->log::alert(json_encode($params),true );
-
-    // watch this line
-    $actions = $wf->user_actions(json_encode($params));
-    $this->log::alert(json_encode($actions));
-
-    if (is_null($actions)) {return $actions_arr; }
-    if (!property_exists($actions, "contents")) { return $actions_arr; }
-    if (!property_exists($actions, "code")) { return $actions_arr; }
-    if (!$actions->code == 200) { return $actions_arr; }
-    $json_actions = json_decode($actions->contents);
-
-    if (!is_null($json_actions)) {
-      if (property_exists($json_actions, "message")) {
-        $actions_arr = $json_actions->message;
-      }
-    }
-
-    return $actions_arr;
-  }
-
   private function get_email_from_token($token) {
     $user_email = "";
     $passport = new Passport;
@@ -345,30 +309,6 @@ class SolicitudTools
       return $workflow;
   }
 
-  private function acciones($token, $solicitud) {
-    $acciones = [];
-
-    $user_email = $this->get_email_from_token($token);
-    if (!isset($user_email)) {
-      $this->log::alert('user_email is null');
-      return $acciones;
-    }
-
-    if (empty($user_email)) {
-      $this->log::alert('user_email is empty');
-      return $acciones;
-    }
-    $solicitud_tipo = Solicitud::find($id);
-
-    $acciones = $this->workflow_actions($solicitud_tipo, $user_email);
-    $acciones[] = 'Expediente';
-
-    $this->log::alert('acciones are ...');
-    $this->log::alert(json_encode($acciones));
-
-    return $acciones;
-  }
-
   private function rows($token) {
     $res = new \stdClass;
     //$res->rows[]=[]; this fails is no data is returned...
@@ -378,7 +318,6 @@ class SolicitudTools
       $row->fecha_solicitud = date('Y/m/d',strtotime($dmp->fecha));
       $row->unidad = $this->unidadtabla($dmp);
       $row->tipo_solicitud = $this->tiposolicitud($dmp);
-      $row->acciones = $this->acciones($token, $dmp);
       $row->workflow_state = $this->tipoworkflow($dmp);
       $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
       $res->rows[] = $row;
