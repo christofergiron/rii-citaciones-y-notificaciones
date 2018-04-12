@@ -446,17 +446,17 @@ class OrdenCapturaTools
   private function tipoorden($orden_captura){
     $tipo_captura = "";
 
-    if (preg_match('/Persona/',$orden_captura->capturable_type))
+    if (preg_match('/Persona/',$orden_captura->ordenable_type))
     { $tipo_captura = "Persona";
       return $tipo_captura;
     }
 
-    if (preg_match('/Menor/',$orden_captura->capturable_type))
+    if (preg_match('/Menor/',$orden_captura->ordenable_type))
     { $tipo_captura = "niño";
       return $tipo_captura;
     }
 
-    if (preg_match('/Vehiculo/',$orden_captura->capturable_type))
+    if (preg_match('/Vehiculo/',$orden_captura->ordenable_type))
     { $tipo_captura = "Vehiculo";
       return $tipo_captura;
     }
