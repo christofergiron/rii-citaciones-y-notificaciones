@@ -304,21 +304,19 @@ class StoreContraOrdenCaptura
 
     private function get_id_dependencia_from_user($arr) {
       $id_user  = $arr["id_funcionario"];
-      $fiscal = Fiscal::find($id_user);
-      $id_fiscalia = $fiscal->fiscalia_id;
-      $fiscalia = Fiscalia::find($id_fiscalia);
-      $id_dependencia = $fiscalia->dependencia_id;
+      $juez = Juez::find($id_user);
+      if (is_null($juez)) {return 0;}
+      $id_dependencia = $juez->id_dependencia;
       return $id_dependencia;
     }
 
     private function get_id_institucion_from_user($arr) {
       $id_user  = $arr["id_funcionario"];
-      $fiscal = Fiscal::find($id_user);
-      //echo $fiscal;
-      $id_fiscalia = $fiscal->fiscalia_id;
-      $fiscalia = Fiscalia::find($id_fiscalia);
-      $id_dependencia = $fiscalia->dependencia_id;
+      $juez = Juez::find($id_user);
+      if (is_null($juez)) {return 0;}
+      $id_dependencia = $juez->id_dependencia;
       $dependencia = Dependencia::find($id_dependencia);
+      if (is_null($dependencia)) {return 0;}
       $id_institucion = $dependencia->institucion_id;
       return $id_institucion;
     }

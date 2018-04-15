@@ -49,10 +49,10 @@ class ContraOrdenCapturaTools
       $id_juez = $contra_orden->id_juez;
       if (is_null($id_juez)) {return $numero_juez;}
       //cambio, descomentar esto
-      //$juez = Juez::find($id_juez);
-      //if (is_null($juez)) {return $numero_juez;}
-      //$numero_juez = $juez->codigo;
-      //$numero_juez = $contra_orden->id_juez;
+      $juez = Juez::find($id_juez);
+      if (is_null($juez)) {return $numero_juez;}
+      $numero_juez = $juez->codigo;
+      $numero_juez = $contra_orden->id_juez;
       return $numero_juez;
   }
 
