@@ -16,6 +16,8 @@ use App\PersonaNatural;
 use App\Persona;
 use App\Dependencia;
 use App\Institucion;
+use App\Imputado;
+use App\Victima;
 
 class SolicitudContraOrdenTools
 {
