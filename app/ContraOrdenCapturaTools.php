@@ -230,14 +230,6 @@ class ContraOrdenCapturaTools
     $hdr->name = "id_orden";
     $hdr->label = "ID Orden Captura";
     $res->headers[] = $hdr;
-    $hdr = new \stdClass;
-    $hdr->name = "workflow_state";
-    $hdr->label = "Estado";
-    $res->headers[] = $hdr;
-    $hdr = new \stdClass;
-    $hdr->name = "actions";
-    $hdr->label = "Acciones";
-    $res->headers[] = $hdr;
     return $res->headers;
   }
 

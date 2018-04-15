@@ -278,7 +278,7 @@ class StoreSolicitudOrden //extends FormRequest
       $fiscal = Fiscal::find($id_user);
       if (is_null($fiscal)) {return 0;}
       $id_institucion = $fiscal->fiscalia()->first();
-      if (is_null($id_dependencia)) {return 0;}
+      if (is_null($id_institucion)) {return 0;}
       $dependen = find::Dependencia($id_institucion->id_dependencia);
       if (is_null($dependen)) {return 0;}
       $id = $dependen->institucion_id;
