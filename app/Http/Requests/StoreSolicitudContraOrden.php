@@ -154,7 +154,7 @@ class StoreSolicitudContraOrden //extends FormRequest
         $docdig = DocumentoDigital::find($iddoc);
 
         $solicitud = Solicitud::find($idsolicitud);
-        $idsolicitable->$solicitud->solicitable_id;
+        $idsolicitable = $solicitud->solicitable_id;
         $documento->funcionario_id = $arr["id_fiscal"];
         $documento->expediente_id = $arr["solicitud_contra_orden"]["id_expediente"];
         $documento->institucion_id = $this->get_id_institucion_from_user($arr);
