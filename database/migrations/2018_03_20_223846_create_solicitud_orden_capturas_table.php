@@ -16,10 +16,12 @@ class CreateSolicitudOrdenCapturasTable extends Migration
         Schema::create('solicitudes_ordenes_capturas', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('id_orden_captura')->nullable();
+            $table->integer('id_expediente');
+            $table->integer('id_persona');//llave foranea de imputado
             $table->DateTime('fecha_aprovacion')->nullable();
             $table->DateTime('fecha_rechazo')->nullable();
             $table->string('razon_rechazo')->nullable();
-            $table->string('estado');
+            $table->string('workflow_state')->nullable();
             $table->string('motivo');
             $table->boolean('deleted')->default(false);
             $table->timestamps();

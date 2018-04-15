@@ -22,8 +22,7 @@ class CreateOrdenCapturaDelitosTable extends Migration
             //en caso de que sea una persona natural
             $table->integer('id_victima')->nullable();
             //este es string porque puede ser tambien contra personas juridicas
-            $table->string('perjudicado');
-            $table->string('descripcion')->nullable();
+            $table->string('nombre_victima')->nullable();;
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });

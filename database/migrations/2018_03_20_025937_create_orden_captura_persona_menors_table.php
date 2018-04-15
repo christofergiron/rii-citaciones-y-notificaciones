@@ -18,8 +18,6 @@ class CreateOrdenCapturaPersonaMenorsTable extends Migration
             $table->integer('id_orden_captura');
             $table->integer('id_persona_menor');
             //no se si este es integer o string
-            $table->string('direccion');
-            $table->string('motivo');
             //porque se le requerire, orden captura normal o para extradicion
             //0 para medidas cautelares, 1 desaparecido, 2 captura fin extradicion
             $table->boolean('deleted')->default(false);

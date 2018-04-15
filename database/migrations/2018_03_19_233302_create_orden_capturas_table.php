@@ -21,8 +21,8 @@ class CreateOrdenCapturasTable extends Migration
             $table->string('estado');
             $table->integer('id_expediente');
             //dejemos estos 2 campos string por mientras
-            $table->string('id_etapa')->nullable();
-            $table->string('id_audiencia')->nullable();
+            $table->string('audiencia')->nullable();
+            $table->string('auto_motivo')->nullable();
             $table->integer('id_juez')->nullable();
             $table->boolean('deleted')->default(false);
             $table->timestamps();

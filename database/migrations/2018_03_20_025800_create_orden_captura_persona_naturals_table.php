@@ -17,9 +17,6 @@ class CreateOrdenCapturaPersonaNaturalsTable extends Migration
             $table->increments('id');
             $table->integer('id_orden_captura');
             $table->integer('id_persona');
-            //no se si este es integer o string
-            $table->string('direccion');
-            $table->string('motivo');
             //se tiene que cargar su lugar de vivienda
             //porque se le requerire, orden captura normal o para extradicion
             //0 para medidas cautelares, 1 por loquera del juez, 2 captura fin extradicion
