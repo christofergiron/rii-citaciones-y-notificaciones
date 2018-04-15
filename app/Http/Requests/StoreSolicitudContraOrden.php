@@ -72,15 +72,15 @@ class StoreSolicitudContraOrden //extends FormRequest
        $validator = Validator::make($arr   , [
          "token" => "required",
          "id_fiscal" => "required",
-         "documento" => "required",
-         "solicitud" => "required",
-         "solicitud.fecha" => "required",
-         "solicitud.razon" => "required",
-         "solicitud.solicitado_por" => "required",
-         "solicitud_contra_orden" => "required",
-         "solicitud_contra_orden.id_expediente" => "required",
-         "solicitud_contra_orden.imputado" => "required",
-         "solicitud_contra_orden.id_orden_captura" => "required"
+         "solicitud_contra_orden_captura" => "required",
+         "solicitud_contra_orden_captura.documento" => "required",
+         "solicitud_contra_orden_captura.solicitud" => "required",
+         "solicitud_contra_orden_captura.solicitud.fecha" => "required",
+         "solicitud_contra_orden_captura.solicitud.descripcion" => "required",
+         "solicitud_contra_orden_captura.solicitud.solicitado_por" => "required",
+         "solicitud_contra_orden_captura.solicitud_contra_orden.id_expediente" => "required",
+         "solicitud_contra_orden_captura.solicitud_contra_orden.imputado" => "required",
+         "solicitud_contra_orden_captura.solicitud_contra_orden.id_orden_captura" => "required"
        ]);
 
        if ($validator->fails()) {
@@ -157,14 +157,14 @@ class StoreSolicitudContraOrden //extends FormRequest
         $idsolicitable = $solicitud->solicitable_id;
         $contra = SolicitudContraOrden::find($idsolicitable);
         $documento->funcionario_id = $arr["id_fiscal"];
-        $documento->expediente_id = $arr["solicitud_contra_orden"]["id_expediente"];
+        $documento->expediente_id = $arr["solicitud_contra_orden_captura"]["solicitud_contra_orden"]["id_expediente"];
         $documento->institucion_id = $this->get_id_institucion_from_user($arr);
         $documento->dependencia_id = $this->get_id_dependencia_from_user($arr);
         $documento->titulo = "Solicitud Contra Orden Captura";
         $documento->descripcion = "solicitud contra orden captura";
         //$documento->tags = Array($arr["documento"]["tipo"]);
-        $documento->fecha_documento = $arr["solicitud"]["fecha"];
-        $documento->hora_recepcion = $arr["documento"]["hora_solicitud"];
+        $documento->fecha_documento = $arr["solicitud_contra_orden_captura"]["solicitud"]["fecha"];
+        $documento->hora_recepcion = $arr["solicitud_contra_orden_captura"]["documento"]["hora_solicitud"];
 
 
         $temp2 = $docdig->documento()->save($documento);
@@ -179,11 +179,11 @@ class StoreSolicitudContraOrden //extends FormRequest
 
       $solicitud = new Solicitud;
 
-      $solicitud->fecha = $arr["solicitud"]["fecha"];
-      $solicitud->numero_oficio = $arr["solicitud"]["numero_oficio"];
-      $solicitud->solicitado_por = $arr["solicitud"]["solicitado_por"];
-      $solicitud->institucion = $arr["solicitud"]["institucion"];
-      $solicitud->descripcion = $arr["solicitud"]["razon"];
+      $solicitud->fecha = $arr["solicitud_contra_orden_captura"]["solicitud"]["fecha"];
+      $solicitud->numero_oficio = $arr["solicitud_contra_orden_captura"]["solicitud"]["numero_oficio"];
+      $solicitud->solicitado_por = $arr["solicitud_contra_orden_captura"]["solicitud"]["solicitado_por"];
+      $solicitud->institucion = $arr["solicitud_contra_orden_captura"]["solicitud"]["institucion"];
+      $solicitud->descripcion = $arr["solicitud_contra_orden_captura"]["solicitud"]["descripcion"];
 
           $solicitud->titulo = "Solicitud Orden Captura";
           $resul = json_decode($this->set_solicitud_orden($arr), true);
@@ -200,10 +200,10 @@ class StoreSolicitudContraOrden //extends FormRequest
         $solicitud_contra_orden = new SolicitudContraOrden;
 
             $solicitud_contra_orden->workflow_state = "solicitud_realizada";
-            $solicitud_contra_orden->id_orden_captura = $arr["solicitud_contra_orden"]["id_orden_captura"];
-            $solicitud_contra_orden->id_expediente = $arr["solicitud_contra_orden"]["id_expediente"];
-            $solicitud_contra_orden->id_persona = $arr["solicitud_contra_orden"]["imputado"];
-            $solicitud_contra_orden->motivo = $arr["solicitud"]["razon"];
+            $solicitud_contra_orden->id_orden_captura = $arr["solicitud_contra_orden_captura"]["solicitud_contra_orden"]["id_orden_captura"];
+            $solicitud_contra_orden->id_expediente = $arr["solicitud_contra_orden_captura"]["solicitud_contra_orden"]["id_expediente"];
+            $solicitud_contra_orden->id_persona = $arr["solicitud_contra_orden_captura"]["solicitud_contra_orden"]["imputado"];
+            $solicitud_contra_orden->motivo = $arr["solicitud_contra_orden_captura"]["solicitud"]["descripcion"];
 
            return $solicitud_contra_orden;
     }

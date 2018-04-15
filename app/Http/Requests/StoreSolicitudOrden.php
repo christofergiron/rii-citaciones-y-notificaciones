@@ -72,14 +72,14 @@ class StoreSolicitudOrden //extends FormRequest
        $validator = Validator::make($arr   , [
          "token" => "required",
          "id_fiscal" => "required",
-         "documento" => "required",
-         "solicitud" => "required",
-         "solicitud.fecha" => "required",
-         "solicitud.razon" => "required",
-         "solicitud.solicitado_por" => "required",
-         "solicitud_orden" => "required",
-         "solicitud_orden.id_expediente" => "required",
-         "solicitud_orden.imputado" => "required"
+         "solicitud_orden_captura" => "required",
+         "solicitud_orden_captura.documento" => "required",
+         "solicitud_orden_captura.solicitud" => "required",
+         "solicitud_orden_captura.solicitud.fecha" => "required",
+         "solicitud_orden_captura.solicitud.descripcion" => "required",
+         "solicitud_orden_captura.solicitud.solicitado_por" => "required",
+         "solicitud_orden_captura.solicitud_orden.id_expediente" => "required",
+         "solicitud_orden_captura.solicitud_orden.imputado" => "required"
        ]);
 
        if ($validator->fails()) {
@@ -156,14 +156,14 @@ class StoreSolicitudOrden //extends FormRequest
         $idsolicitable = $solicitud->solicitable_id;
         $contra = SolicitudOrdenCaptura::find($idsolicitable);
         $documento->funcionario_id = $arr["id_fiscal"];
-        $documento->expediente_id = $arr["solicitud_orden"]["id_expediente"];
+        $documento->expediente_id = $arr["solicitud_orden_captura"]["solicitud_orden"]["id_expediente"];
         $documento->institucion_id = $this->get_id_institucion_from_user($arr);
         $documento->dependencia_id = $this->get_id_dependencia_from_user($arr);
         $documento->titulo = "Solicitud Orden Captura";
         $documento->descripcion = "solicitud orden captura";
         //$documento->tags = Array($arr["documento"]["tipo"]);
-        $documento->fecha_documento = $arr["solicitud"]["fecha"];
-        $documento->hora_recepcion = $arr["documento"]["hora_solicitud"];
+        $documento->fecha_documento = $arr["solicitud_orden_captura"]["solicitud"]["fecha"];
+        $documento->hora_recepcion = $arr["solicitud_orden_captura"]["documento"]["hora_solicitud"];
 
 
         $temp2 = $docdig->documento()->save($documento);
@@ -178,11 +178,11 @@ class StoreSolicitudOrden //extends FormRequest
 
       $solicitud = new Solicitud;
 
-      $solicitud->fecha = $arr["solicitud"]["fecha"];
-      $solicitud->numero_oficio = $arr["solicitud"]["numero_oficio"];
-      $solicitud->solicitado_por = $arr["solicitud"]["solicitado_por"];
-      $solicitud->institucion = $arr["solicitud"]["institucion"];
-      $solicitud->descripcion = $arr["solicitud"]["razon"];
+      $solicitud->fecha = $arr["solicitud_orden_captura"]["solicitud"]["fecha"];
+      $solicitud->numero_oficio = $arr["solicitud_orden_captura"]["solicitud"]["numero_oficio"];
+      $solicitud->solicitado_por = $arr["solicitud_orden_captura"]["solicitud"]["solicitado_por"];
+      $solicitud->institucion = $arr["solicitud_orden_captura"]["solicitud"]["institucion"];
+      $solicitud->descripcion = $arr["solicitud_orden_captura"]["solicitud"]["descripcion"];
 
           $solicitud->titulo = "Solicitud Orden Captura";
           $resul = json_decode($this->set_solicitud_orden($arr), true);
@@ -199,9 +199,9 @@ class StoreSolicitudOrden //extends FormRequest
         $solicitud_orden = new SolicitudOrdenCaptura;
 
             $solicitud_orden->workflow_state = "solicitud_realizada";
-            $solicitud_orden->id_expediente = $arr["solicitud_orden"]["id_expediente"];
-            $solicitud_orden->id_persona = $arr["solicitud_orden"]["imputado"];
-            $solicitud_orden->motivo = $arr["solicitud"]["razon"];
+            $solicitud_orden->id_expediente = $arr["solicitud_orden_captura"]["solicitud_orden"]["id_expediente"];
+            $solicitud_orden->id_persona = $arr["solicitud_orden_captura"]["solicitud_orden"]["imputado"];
+            $solicitud_orden->motivo = $arr["solicitud_orden_captura"]["solicitud"]["descripcion"];
 
            return $solicitud_orden;
     }
