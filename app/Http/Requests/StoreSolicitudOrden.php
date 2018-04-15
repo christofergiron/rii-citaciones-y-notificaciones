@@ -268,25 +268,18 @@ class StoreSolicitudOrden //extends FormRequest
       $id_user  = $arr["id_fiscal"];
       $fiscal = Fiscal::find($id_user);
       if (is_null($fiscal)) {return 0;}
-      $idfiscalia = $fiscal->fiscalia_id
-      $fiscalia = Fiscalia::find($idfiscalia);
-      if (is_null($fiscalia)) {return 0;}
-      $dependenciaid = $fiscalia->dependencia_id;
-      return $dependenciaid;
+      $id_dependencia = $fiscal->fiscalia()->first()->id_dependencia;
+      if (is_null($id_dependencia)) {return 0;}
+      return $id_dependencia;
     }
 
     private function get_id_institucion_from_user($arr) {
       $id_user  = $arr["id_fiscal"];
       $fiscal = Fiscal::find($id_user);
       if (is_null($fiscal)) {return 0;}
-      $idfiscalia = $fiscal->fiscalia_id
-      $fiscalia = Fiscalia::find($idfiscalia);
-      if (is_null($fiscalia)) {return 0;}
-      $dependenciaid = $fiscalia->dependencia_id;
-      $depend = Dependencia::find($dependenciaid);
+      $id_institucion = $fiscal->fiscalia()->institucion()->first()->institucion_id;
       if (is_null($id_dependencia)) {return 0;}
-      $institu = $depend->institucion_id;
-      return $institu;
+      return $id_institucion;
     }
 
     public function get_user($token) {

@@ -18,6 +18,7 @@ use App\Rol;
 use App\Fiscal;
 use App\Fiscalia;
 use App\Dependencia;
+use App\Institucion;
 use App\OrdenCaptura;
 use App\OrdenCapturaEstado;
 use App\ContraOrdenCaptura;

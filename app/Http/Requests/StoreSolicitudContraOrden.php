@@ -17,6 +17,8 @@ use App\SolicitudContraOrden;
 use App\DocumentoDigital;
 use App\Anexo;
 use App\Denuncia;
+use App\Dependencia;
+use App\Institucion;
 use App\Rol;
 use App\Denunciante;
 use App\Imputado;
@@ -267,21 +269,20 @@ class StoreSolicitudContraOrden //extends FormRequest
     }
 
     private function get_id_dependencia_from_user($arr) {
-      $id_user  = $arr["id_funcionario"];
-      $juez = Juez::find($id_user);
-      if (is_null($juez)) {return 0;}
-      $id_dependencia = $juez->id_dependencia;
+      $id_user  = $arr["id_fiscal"];
+      $fiscal = Fiscal::find($id_user);
+      if (is_null($fiscal)) {return 0;}
+      $id_dependencia = $fiscal->fiscalia()->first()->id_dependencia;
+      if (is_null($id_dependencia)) {return 0;}
       return $id_dependencia;
     }
 
     private function get_id_institucion_from_user($arr) {
-      $id_user  = $arr["id_funcionario"];
-      $juez = Juez::find($id_user);
-      if (is_null($juez)) {return 0;}
-      $id_dependencia = $juez->id_dependencia;
-      $dependencia = Dependencia::find($id_dependencia);
-      if (is_null($dependencia)) {return 0;}
-      $id_institucion = $dependencia->institucion_id;
+      $id_user  = $arr["id_fiscal"];
+      $fiscal = Fiscal::find($id_user);
+      if (is_null($fiscal)) {return 0;}
+      $id_institucion = $fiscal->fiscalia()->institucion()->first()->institucion_id;
+      if (is_null($id_dependencia)) {return 0;}
       return $id_institucion;
     }
 

@@ -11,6 +11,8 @@ use App\FuncionarioPJ;
 use App\Expediente;
 use App\ExpedientePJ;
 use App\Lugar;
+use App\Dependencia;
+use App\Institucion;
 use App\LugarPJ;
 use App\Documento;
 use App\DocumentoDigital;
