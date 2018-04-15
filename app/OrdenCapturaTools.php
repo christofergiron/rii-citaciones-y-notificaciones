@@ -53,11 +53,9 @@ class OrdenCapturaTools
       $orden_captura = OrdenCaptura::find($id);
       $id_juez = $orden_captura->id_juez;
       if (is_null($id_juez)) {return $numero_juez;}
-      //cambio, descomentar esto
-      //$juez = Juez::find($id_juez);
-      //if (is_null($juez)) {return $numero_juez;}
-      //$numero_juez = $juez->codigo;
-      $numero_juez = $orden_captura->id_juez;
+      $juez = Juez::find($id_juez);
+      if (is_null($juez)) {return $numero_juez;}
+      $numero_juez = $juez->codigo;
       return $numero_juez;
   }
 
@@ -300,9 +298,8 @@ class OrdenCapturaTools
     $ordenes_capturas->estado = $orden_captura->estado;
     $ordenes_capturas->fecha_creacion = date('Y/m/d',strtotime($orden_captura->fecha_creacion));
     $ordenes_capturas->id_expediente = $orden_captura->id_expediente;
-    $ordenes_capturas->descripcion = $orden_captura->descripcion;
-    $ordenes_capturas->etapa = $orden_captura->id_etapa;
-    $ordenes_capturas->audiencia = $orden_captura->id_audiencia;
+    $ordenes_capturas->auto_motivo = $orden_captura->auto_motivo;
+    $ordenes_capturas->audiencia = $orden_captura->audiencia;
 
     $ordenes_captura_arr = $ordenes_capturas;
     return $ordenes_captura_arr;
@@ -333,43 +330,6 @@ class OrdenCapturaTools
     }
 
     return $tipo_identidad;
-  }
-
-  private function workflow_actions($orden_captura, $user_email) {
-    $actions_arr = [];
-    $ordenes_capturas = $orden_captura->captura()->first();
-    //$capturas =$captura->tipo()->first();
-
-    if (is_null($ordenes_capturas)) {return $actions_arr; }
-
-    $wf = new Workflow;
-    $params = new \stdClass;
-    $params->subject_id = $ordenes_capturas->id;
-    $params->object_id = $ordenes_capturas->id;
-    $params->workflow_type = "realizar_captura";  //$this->workflow_type;
-    $params->user_email = $user_email;
-    $this->log::alert("json_encoded w/o True parameter");
-    $this->log::alert(json_encode($params));
-    // $this->log::alert("json_encoded with True parameter");
-    // $this->log::alert(json_encode($params),true );
-
-    // watch this line
-    $actions = $wf->user_actions(json_encode($params));
-    $this->log::alert(json_encode($actions));
-
-    if (is_null($actions)) {return $actions_arr; }
-    if (!property_exists($actions, "contents")) { return $actions_arr; }
-    if (!property_exists($actions, "code")) { return $actions_arr; }
-    if (!$actions->code == 200) { return $actions_arr; }
-    $json_actions = json_decode($actions->contents);
-
-    if (!is_null($json_actions)) {
-      if (property_exists($json_actions, "message")) {
-        $actions_arr = $json_actions->message;
-      }
-    }
-
-    return $actions_arr;
   }
 
   private function get_email_from_token($token) {
@@ -441,42 +401,10 @@ class OrdenCapturaTools
     $hdr->label = "Fecha Creacion";
     $res->headers[] = $hdr;
     $hdr = new \stdClass;
-    $hdr->name = "tipo_orden";
-    $hdr->label = "Tipo Orden Captura";
-    $res->headers[] = $hdr;
-    $hdr = new \stdClass;
     $hdr->name = "estado";
     $hdr->label = "Estado";
     $res->headers[] = $hdr;
-    $hdr = new \stdClass;
-    $hdr->name = "workflow_state";
-    $hdr->label = "Estado";
-    $res->headers[] = $hdr;
-    $hdr = new \stdClass;
-    $hdr->name = "actions";
-    $hdr->label = "Acciones";
-    $res->headers[] = $hdr;
     return $res->headers;
-  }
-
-  private function tipoorden($orden_captura){
-    $tipo_captura = "";
-
-    if (preg_match('/Persona/',$orden_captura->capturable_type))
-    { $tipo_captura = "Persona";
-      return $tipo_captura;
-    }
-
-    if (preg_match('/Menor/',$orden_captura->capturable_type))
-    { $tipo_captura = "Menor";
-      return $tipo_captura;
-    }
-
-    if (preg_match('/Vehiculo/',$orden_captura->capturable_type))
-    { $tipo_captura = "Vehiculo";
-      return $tipo_captura;
-    }
-
   }
 
   private function rows($token) {
@@ -484,10 +412,8 @@ class OrdenCapturaTools
     //$res->rows[]=[]; this fails is no data is returned...
     foreach (OrdenCaptura::All() as $dmp) {
       $row = new \stdClass;
-      $row->id_orden_captura = $dmp->id;
       $row->id_expediente = $dmp->id_expediente;
       $row->fecha_creacion = date('Y/m/d',strtotime($dmp->fecha_creacion));
-      $row->tipo_orden = $this->tipoorden($dmp);
       $row->estado = $dmp->estado;
       $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
       $res->rows[] = $row;
