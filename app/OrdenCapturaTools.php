@@ -392,6 +392,10 @@ class OrdenCapturaTools
   private function headers(){
     $res = new \stdClass;
     $hdr = new \stdClass;
+    $hdr->name = "id_orden";
+    $hdr->label = "Codigo Orden Captura";
+    $res->headers[] = $hdr;
+    $hdr = new \stdClass;
     $hdr->name = "id_expediente";
     $hdr->label = "Codigo Expediente";
     $res->headers[] = $hdr;
@@ -411,6 +415,7 @@ class OrdenCapturaTools
     //$res->rows[]=[]; this fails is no data is returned...
     foreach (OrdenCaptura::All() as $dmp) {
       $row = new \stdClass;
+      $row->id_orden_captura = $dmp->id;
       $row->id_expediente = $dmp->id_expediente;
       $row->fecha_creacion = date('Y/m/d',strtotime($dmp->fecha_creacion));
       $row->estado = $dmp->estado;
