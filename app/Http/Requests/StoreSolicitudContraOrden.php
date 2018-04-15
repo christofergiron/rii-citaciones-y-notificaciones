@@ -283,7 +283,7 @@ class StoreSolicitudContraOrden //extends FormRequest
       if (is_null($fiscal)) {return 0;}
       $id_institucion = $fiscal->fiscalia()->first();
       if (is_null($id_institucion)) {return 0;}
-      $dependen = find::Dependencia($id_institucion->id_dependencia);
+      $dependen = Dependencia::find($id_institucion->id_dependencia);
       if (is_null($dependen)) {return 0;}
       $id = $dependen->institucion_id;
       return $id;
