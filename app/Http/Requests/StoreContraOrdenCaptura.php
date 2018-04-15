@@ -307,7 +307,7 @@ class StoreContraOrdenCaptura
       $id_user  = $arr["id_funcionario"];
       $juez = Juez::find($id_user);
       if (is_null($juez)) {return 0;}
-      $id_dependencia = $juez->id_dependencia;
+      $id_dependencia = $juez->dependencia_id;
       return $id_dependencia;
     }
 
@@ -315,7 +315,7 @@ class StoreContraOrdenCaptura
       $id_user  = $arr["id_funcionario"];
       $juez = Juez::find($id_user);
       if (is_null($juez)) {return 0;}
-      $id_dependencia = $juez->id_dependencia;
+      $id_dependencia = $juez->dependencia_id;
       $dependencia = Dependencia::find($id_dependencia);
       if (is_null($dependencia)) {return 0;}
       $id_institucion = $dependencia->institucion_id;
