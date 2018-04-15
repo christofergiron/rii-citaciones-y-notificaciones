@@ -125,6 +125,43 @@ class ContraOrdenCapturaTools
     return $tipo_identidad;
   }
 
+  private function workflow_actions($orden_captura, $user_email) {
+    $actions_arr = [];
+    $ordenes_capturas = $orden_captura->captura()->first();
+    //$capturas =$captura->tipo()->first();
+
+    if (is_null($ordenes_capturas)) {return $actions_arr; }
+
+    $wf = new Workflow;
+    $params = new \stdClass;
+    $params->subject_id = $ordenes_capturas->id;
+    $params->object_id = $ordenes_capturas->id;
+    $params->workflow_type = "realizar_captura";  //$this->workflow_type;
+    $params->user_email = $user_email;
+    $this->log::alert("json_encoded w/o True parameter");
+    $this->log::alert(json_encode($params));
+    // $this->log::alert("json_encoded with True parameter");
+    // $this->log::alert(json_encode($params),true );
+
+    // watch this line
+    $actions = $wf->user_actions(json_encode($params));
+    $this->log::alert(json_encode($actions));
+
+    if (is_null($actions)) {return $actions_arr; }
+    if (!property_exists($actions, "contents")) { return $actions_arr; }
+    if (!property_exists($actions, "code")) { return $actions_arr; }
+    if (!$actions->code == 200) { return $actions_arr; }
+    $json_actions = json_decode($actions->contents);
+
+    if (!is_null($json_actions)) {
+      if (property_exists($json_actions, "message")) {
+        $actions_arr = $json_actions->message;
+      }
+    }
+
+    return $actions_arr;
+  }
+
   private function get_email_from_token($token) {
     $user_email = "";
     $passport = new Passport;

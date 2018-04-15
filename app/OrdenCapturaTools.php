@@ -103,7 +103,6 @@ class OrdenCapturaTools
 
         $tipo_orden_captura->orden_captura_persona = 1;
         $tipo_orden_captura->orden_captura_menor = 0;
-        $tipo_orden_captura->orden_captura_vehiculo = 0;
         $tipo_orden_captura->id = $id_orden;
         $tipo_orden_captura->razon = $orden_persona->razon;
         $tipo_orden_captura->observaciones = $orden_persona->observaciones;
@@ -119,26 +118,10 @@ class OrdenCapturaTools
 
         $tipo_orden_captura->orden_captura_persona = 0;
         $tipo_orden_captura->orden_captura_menor = 1;
-        $tipo_orden_captura->orden_captura_vehiculo = 0;
         $tipo_orden_captura->id = $id_orden;
         $tipo_orden_captura->razon = $orden_menor->razon;
         $tipo_orden_captura->observaciones = $orden_menor->observaciones;
         $tipo_orden_captura->menor_infractor = $this->captura_persona_menor($id_orden);
-        $tipo_orden_captura_arr = $tipo_orden_captura;
-        return $tipo_orden_captura_arr;
-      }
-      if (preg_match('/OrdenCapturaVehiculo/',$orden_captura->ordenable_type))
-      {
-        $orden_menor = OrdenCapturaVehiculo::find($id_ordenable);
-        $id_orden = $orden_menor->id;
-
-        $tipo_orden_captura->orden_captura_persona = 0;
-        $tipo_orden_captura->orden_captura_menor = 0;
-        $tipo_orden_captura->orden_captura_vehiculo = 1;
-        $tipo_orden_captura->id = $id_orden;
-        $tipo_orden_captura->razon = $orden_menor->razon;
-        $tipo_orden_captura->observaciones = $orden_menor->observaciones;
-        $tipo_orden_captura->vehiculo = $this->captura_vehiculo($id_orden);
         $tipo_orden_captura_arr = $tipo_orden_captura;
         return $tipo_orden_captura_arr;
       }
@@ -352,6 +335,43 @@ class OrdenCapturaTools
     return $tipo_identidad;
   }
 
+  private function workflow_actions($orden_captura, $user_email) {
+    $actions_arr = [];
+    $ordenes_capturas = $orden_captura->captura()->first();
+    //$capturas =$captura->tipo()->first();
+
+    if (is_null($ordenes_capturas)) {return $actions_arr; }
+
+    $wf = new Workflow;
+    $params = new \stdClass;
+    $params->subject_id = $ordenes_capturas->id;
+    $params->object_id = $ordenes_capturas->id;
+    $params->workflow_type = "realizar_captura";  //$this->workflow_type;
+    $params->user_email = $user_email;
+    $this->log::alert("json_encoded w/o True parameter");
+    $this->log::alert(json_encode($params));
+    // $this->log::alert("json_encoded with True parameter");
+    // $this->log::alert(json_encode($params),true );
+
+    // watch this line
+    $actions = $wf->user_actions(json_encode($params));
+    $this->log::alert(json_encode($actions));
+
+    if (is_null($actions)) {return $actions_arr; }
+    if (!property_exists($actions, "contents")) { return $actions_arr; }
+    if (!property_exists($actions, "code")) { return $actions_arr; }
+    if (!$actions->code == 200) { return $actions_arr; }
+    $json_actions = json_decode($actions->contents);
+
+    if (!is_null($json_actions)) {
+      if (property_exists($json_actions, "message")) {
+        $actions_arr = $json_actions->message;
+      }
+    }
+
+    return $actions_arr;
+  }
+
   private function get_email_from_token($token) {
     $user_email = "";
     $passport = new Passport;
@@ -413,10 +433,6 @@ class OrdenCapturaTools
   private function headers(){
     $res = new \stdClass;
     $hdr = new \stdClass;
-    $hdr->name = "id_orden_captura";
-    $hdr->label = "Numero Orden Captura";
-    $res->headers[] = $hdr;
-    $hdr = new \stdClass;
     $hdr->name = "id_expediente";
     $hdr->label = "Codigo Expediente";
     $res->headers[] = $hdr;
@@ -446,17 +462,17 @@ class OrdenCapturaTools
   private function tipoorden($orden_captura){
     $tipo_captura = "";
 
-    if (preg_match('/Persona/',$orden_captura->ordenable_type))
+    if (preg_match('/Persona/',$orden_captura->capturable_type))
     { $tipo_captura = "Persona";
       return $tipo_captura;
     }
 
-    if (preg_match('/Menor/',$orden_captura->ordenable_type))
-    { $tipo_captura = "niño";
+    if (preg_match('/Menor/',$orden_captura->capturable_type))
+    { $tipo_captura = "Menor";
       return $tipo_captura;
     }
 
-    if (preg_match('/Vehiculo/',$orden_captura->ordenable_type))
+    if (preg_match('/Vehiculo/',$orden_captura->capturable_type))
     { $tipo_captura = "Vehiculo";
       return $tipo_captura;
     }

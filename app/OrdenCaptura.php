@@ -25,7 +25,7 @@ protected $table = "ordenes_capturas";
     }
 
     public function documento(){
-        return $this->morphOne(Documento::class, 'tipoable');
+        return $this->morphOne(Documento::class, 'documentable');
     }
 
   public function expediente()

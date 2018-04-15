@@ -3,10 +3,11 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Brexis\LaravelWorkflow\Traits\WorkflowTrait;
 
 class SolicitudAnalisis extends Model
 {
-
+use WorkflowTrait;
 protected $table = "solicitudes_analisis";
 
 protected $fillable = [

@@ -6,22 +6,27 @@ namespace App\Http\Requests;
 use Validator;
 use Illuminate\Http\Request;
 use App\Passport;
-use App\Funcionario;
-use App\FuncionarioPJ;
+use App\FuncionarioSS;
 use App\Expediente;
-use App\ExpedientePJ;
+use App\ExpedienteSS;
 use App\Lugar;
-use App\LugarPJ;
+use App\LugarSS;
 use App\Documento;
+use App\Solicitud;
+use App\SolicitudContraOrden;
 use App\DocumentoDigital;
+use App\Anexo;
+use App\Denuncia;
 use App\Rol;
+use App\Denunciante;
+use App\Imputado;
+use App\Ofendido;
+use App\RelacionesImputado;
+use App\RelacionesImputadoDenunciantes;
+use App\RelacionesImputadoOfendidos;
+use App\Parentesco;
 use App\Fiscal;
-use App\Fiscalia;
-use App\Dependencia;
-use App\OrdenCaptura;
-use App\OrdenCapturaEstado;
-use App\ContraOrdenCaptura;
-use App\Juez;
+use App\DenunciaSS;
 use App\Http\Requests\StorePersona;
 use App\Workflow;
 use App\Action;
@@ -29,13 +34,14 @@ use App\PolyBaseFactory;
 use App\DefaultAction;
 use App\DefaultMPNUE;
 
-class StoreContraOrdenCaptura
+class StoreSolicitudContraOrden //extends FormRequest
 {
 
     private $response;
     private $nue_type;
     private $rii_nue_type;
-    private $idorden;
+    private $tipo;
+    private $idsolicitud;
 
     public function __construct()
     {
@@ -63,13 +69,16 @@ class StoreContraOrdenCaptura
 
        $validator = Validator::make($arr   , [
          "token" => "required",
-         "id_funcionario" => "required",
-         "contra_orden_captura" => "required",
-         "contra_orden_captura.id_orden" => "required",
-         "contra_orden_captura.id_expediente" => "required",
-         "contra_orden_captura.fecha_creacion" => "required",
-         "contra_orden_captura.razon" => "required",
-         "documento" => "required"
+         "id_fiscal" => "required",
+         "documento" => "required",
+         "solicitud" => "required",
+         "solicitud.fecha" => "required",
+         "solicitud.razon" => "required",
+         "solicitud.solicitado_por" => "required",
+         "solicitud_contra_orden" => "required",
+         "solicitud_contra_orden.id_expediente" => "required",
+         "solicitud_contra_orden.imputado" => "required",
+         "solicitud_contra_orden.id_orden_captura" => "required"
        ]);
 
        if ($validator->fails()) {
@@ -101,36 +110,29 @@ class StoreContraOrdenCaptura
     }
 
     public function persist($arr) {
-        //$user_details = $this->get_user($arr["token"]);
+        $user_details = $this->get_user($arr["token"]);
         //$user = $this->get_institucion_dependencia($user_details->funcionario_id);
         //$user->lugar = $this->get_lugar($user_details->funcionario_id);
-      //  $this->log::alert(json_encode($res));
+        //$this->log::alert(json_encode($res));
 
-       try {
-             $contra_orden_captura = $this->set_contra_orden_captura($arr);
-             $this->log::alert(json_encode($contra_orden_captura));
-             $orden_estados = $this->set_estados_orden_captura($arr, $this->idorden);
-             $this->log::alert(json_encode($orden_estados));
-             $orden_estado = $this->set_estado_captura($arr);
-             $this->log::alert(json_encode($orden_estado));
-
-            $documento = $this->set_documento($arr, $this->idorden);
-            $this->log::alert(json_encode($documento));
-            //$documento_digital = $this->set_documento_digital($this->response->payload->id = $documento->id);
-            //$this->log::alert(json_encode($documento_digital));
+        // save expedientes
+        try {
+            $solicitud = $this->set_solicitud($arr);
+            $this->log::alert(json_encode($solicitud));
+            $solicitud = $this->set_documento($arr, $this->idsolicitud);
+            $this->log::alert(json_encode($solicitud));
             $this->log::alert('this->response is ...');
             $this->log::alert(json_encode($this->response));
 
             $this->init();
-            $this->response->message = "Contra Orden Captura realizada Correctamente";
-            $this->response->payload->id = $documento->id;
-
+            $this->response->message = "solicitud realizada correctamente";
+            $this->response->payload->id = $solicitud->id;
         } catch (Exception $e) {
             $this->log::error($e);
             $this->init();
             $this->response->code = 403;
             $this->response->success = false;
-            $this->response->message = "error al ingresar la captura";
+            $this->response->message = "error al realizar la solicitud";
             return $this->response;
         }
 
@@ -140,104 +142,66 @@ class StoreContraOrdenCaptura
         return $this->response;
     }
 
-    public function set_documento($arr, $idorden) {
+    public function set_documento($arr, $idsolicitud) {
 
-      $documento = new Documento;
-      $temp = $doc = DocumentoDigital::create();
-      $iddoc = $temp->id;
-      $docdig = DocumentoDigital::find($iddoc);
+        // documento digital
+        //echo $idorden;
+        $documento = new Documento;
+        $temp = $doc = DocumentoDigital::create();
+        $iddoc = $temp->id;
+        $docdig = DocumentoDigital::find($iddoc);
 
-        $contra_orden_captura = ContraOrdenCaptura::find($idorden);
-
-        $documento->expediente_id = $arr["contra_orden_captura"]["id_expediente"];
+        $solicitud = Solicitud::find($idsolicitud);
+        $documento->funcionario_id = $arr["id_fiscal"];
+        $documento->expediente_id = $arr["solicitud_contra_orden"]["id_expediente"];
         $documento->institucion_id = $this->get_id_institucion_from_user($arr);
         $documento->dependencia_id = $this->get_id_dependencia_from_user($arr);
-        $documento->titulo = "Contra Orden Captura";
-        $documento->descripcion = "una contra orden de captura";
+        $documento->titulo = "Solicitud Contra Orden Captura";
+        $documento->descripcion = "solicitud contra orden captura";
         //$documento->tags = Array($arr["documento"]["tipo"]);
-        $documento->fecha_documento = $arr["contra_orden_captura"]["fecha_creacion"];
+        $documento->fecha_documento = $arr["solicitud"]["fecha"];
         $documento->hora_recepcion = $arr["documento"]["hora_solicitud"];
 
 
         $temp2 = $docdig->documento()->save($documento);
         $id_doc = $temp2->id;
         $docu = Documento::find($id_doc);
-        $contra_orden_captura->documento()->save($docu);
+        $solicitud->documento()->save($docu);
 
-        return $contra_orden_captura;
+        return $solicitud;
     }
 
-    public function set_documento_digital($documentid) {
+    public function set_solicitud($arr) {
 
-        // documento digital
-        $documento = Documento::find($documentid);
-        $doc_digital = DocumentoDigital::create();
+      $solicitud = new Solicitud;
 
-       $doc_digital->documento()->save($documento);
+      $solicitud->fecha = $arr["solicitud"]["fecha"];
+      $solicitud->numero_oficio = $arr["solicitud"]["numero_oficio"];
+      $solicitud->solicitado_por = $arr["solicitud"]["solicitado_por"];
+      $solicitud->institucion = $arr["solicitud"]["institucion"];
+      $solicitud->descripcion = $arr["solicitud"]["razon"];
+
+          $solicitud->titulo = "Solicitud Orden Captura";
+          $resul = json_decode($this->set_solicitud_orden($arr), true);
+          //echo $resul->id_laboratorio;
+          $solicitudContraOrden = SolicitudContraOrden::create($resul);
+          $tempo = $solicitudContraOrden->solicitud()->save($solicitud);
+          $this->idsolicitud = $tempo->id;
+          return $solicitud;
+
     }
 
-    public function set_contra_orden_captura($arr) {
+    public function set_solicitud_orden($arr) {
 
-      $contra_orden_captura = new ContraOrdenCaptura;
+        $solicitud_contra_orden = new SolicitudContraOrden;
 
-      $id_orden = $arr["contra_orden_captura"]["id_orden"];
-      $orden_captura = OrdenCaptura::find($id_orden);
-      if (is_null($orden_captura)) {
-          return null;
-      }
-      $contra_orden_captura->id_orden = $arr["contra_orden_captura"]["id_orden"];
-      $contra_orden_captura->fecha_creacion = $arr["contra_orden_captura"]["fecha_creacion"];
-      $contra_orden_captura->id_expediente = $arr["contra_orden_captura"]["id_expediente"];
-      $contra_orden_captura->razon = $arr["contra_orden_captura"]["razon"];
+            $solicitud_contra_orden->workflow_state = "solicitud_realizada";
+            $solicitud_contra_orden->id_orden_captura = $arr["solicitud_contra_orden"]["id_orden_captura"];
+            $solicitud_contra_orden->id_expediente = $arr["solicitud_contra_orden"]["id_expediente"];
+            $solicitud_contra_orden->id_persona = $arr["solicitud_contra_orden"]["imputado"];
+            $solicitud_contra_orden->motivo = $arr["solicitud"]["razon"];
 
-      if (!is_null($arr["contra_orden_captura"]["id_juez"])) {
-          $contra_orden_captura->id_juez = $arr["contra_orden_captura"]["id_juez"];
-      }
-
-      if (!is_null($arr["contra_orden_captura"]["id_fiscal"])) {
-          $contra_orden_captura->id_fiscal = $arr["contra_orden_captura"]["id_fiscal"];
-      }
-
-      if (!is_null($arr["contra_orden_captura"]["descripcion"])) {
-          $contra_orden_captura->descripcion = $arr["contra_orden_captura"]["descripcion"];
-      }
-
-      $contra_orden_captura->save();
-      $temp = $contra_orden_captura;
-      $this->idorden = $temp->id;
-      return $contra_orden_captura;
-    }
-
-    public function set_estados_orden_captura($arr, $idcontraordencaptura) {
-
-      $id_orden = $arr["contra_orden_captura"]["id_orden"];
-      $orden_captura = OrdenCaptura::find($id_orden);
-      if (is_null($orden_captura)) {
-          return null;
-      }
-        $estado_antiguo = $orden_captura->estado;
-        $orden_captura_estado = new OrdenCapturaEstado;
-
-         $orden_captura_estado->id_orden_captura = $id_orden;
-         $orden_captura_estado->id_contra_orden = $idcontraordencaptura;
-         $orden_captura_estado->id_funcionario = $arr["id_funcionario"];
-         $orden_captura_estado->estado_antiguo = $estado_antiguo;
-         $orden_captura_estado->estado_nuevo = "Presentacion Voluntaria";
-         $orden_captura_estado->fecha = $arr["contra_orden_captura"]["fecha_creacion"];
-         $orden_captura_estado->motivo = $arr["contra_orden_captura"]["razon"];
-         $orden_captura_estado->save();
-    }
-
-    public function set_estado_captura($arr) {
-
-     $id_orden = $arr["contra_orden_captura"]["id_orden"];
-
-     $orden_captura = OrdenCaptura::find($id_orden);
-     if (is_null($orden_captura)) {
-         return null;
-     }
-        $orden_captura->estado = "Presentacion Voluntaria";
-        $orden_captura->save();
+           return $solicitud_contra_orden;
     }
 
     public function set_rol($user, $persona) {
@@ -303,64 +267,21 @@ class StoreContraOrdenCaptura
     }
 
     private function get_id_dependencia_from_user($arr) {
-      $id_user  = $arr["id_funcionario"];
+      $id_user  = $arr["id_fiscal"];
       $fiscal = Fiscal::find($id_user);
-      $id_fiscalia = $fiscal->fiscalia_id;
-      $fiscalia = Fiscalia::find($id_fiscalia);
-      $id_dependencia = $fiscalia->dependencia_id;
+      if (is_null($fiscal)) {return 0;}
+      $id_dependencia = $fiscal->fiscalia()->first()->id_dependencia;
+      if (is_null($id_dependencia)) {return 0;}
       return $id_dependencia;
     }
 
     private function get_id_institucion_from_user($arr) {
-      $id_user  = $arr["id_funcionario"];
+      $id_user  = $arr["id_fiscal"];
       $fiscal = Fiscal::find($id_user);
-      //echo $fiscal;
-      $id_fiscalia = $fiscal->fiscalia_id;
-      $fiscalia = Fiscalia::find($id_fiscalia);
-      $id_dependencia = $fiscalia->dependencia_id;
-      $dependencia = Dependencia::find($id_dependencia);
-      $id_institucion = $dependencia->institucion_id;
+      if (is_null($fiscal)) {return 0;}
+      $id_institucion = $fiscal->fiscalia()->institucion()->first()->institucion_id;
+      if (is_null($id_dependencia)) {return 0;}
       return $id_institucion;
-    }
-
-    public function set_lugar($arr) {
-      // lugar SS
-      $lugarpj = new LugarPJ;
-      $lugar = new Lugar;
-
-
-      $lugar->descripcion = "contra orden captura";
-      $lugar->caracteristicas = "";
-
-      $lugarpj->departamento_id = $arr["lugar"]["departamento_id"];
-      $lugarpj->municipio_id = $arr["lugar"]["municipio_id"];
-      $lugarpj->persona_natural_pj_id = $arr["contra_orden_captura"]["id_juez"];
-
-      if (!is_null($arr["lugar"]["barrio_pj_id"])) {
-          $lugarpj->barrio_pj_id = $arr["lugar"]["barrio_pj_id"];
-      }
-      if (!is_null($arr["lugar"]["aldea_pj_id"])) {
-          $lugarpj->aldea_pj_id = $arr["lugar"]["aldea_pj_id"];
-      }
-      if (!is_null($arr["lugar"]["cacerio_pj_id"])) {
-          $lugarpj->cacerio_pj_id = $arr["lugar"]["cacerio_pj_id"];
-      }
-      $lugarpj->save();
-      $lugarpj->institucion()->save($lugar);
-      return $lugarpj;
-    }
-
-    public function get_institucion_dependencia($id) {
-        $result = new \stdClass;
-        try {
-            $funcionario = Funcionario::findOrFail($id);
-        } catch (\Exception $e) {
-            $this->log::error($e);
-            return $result;
-        }
-        $result->dependencia_id = $funcionario->dependencia_id;
-        $result->institucion_id = $funcionario->dependencia()->first()->institucion_id;
-        return $result;
     }
 
     public function get_user($token) {
@@ -418,7 +339,7 @@ class StoreContraOrdenCaptura
     }
 
     public function apply_transition(Array $arr) {
-       $this->log::alert('inside apply_transition realizar captura ....');
+       $this->log::alert('inside apply_transition solicitud analisis ....');
        $this->log::alert(json_encode($arr));
 
        $act = new Action($arr);

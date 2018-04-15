@@ -161,7 +161,8 @@ class BuscarOrdenCapturaTools
   public function buscar_orden_captura_persona($persona_id, $token){
     $idor = 0;
     $res = new \stdClass;
-    $persona = PersonaNatural::find($persona_id);
+    //solo cambiar esto por el id_persona natural y listo
+    $persona = PersonaNatural::where('id_persona_natural',$persona_id);
     if (is_null($persona)) {
       $verificar = "verifique la identidad de la persona";
       return $verificar;

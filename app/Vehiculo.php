@@ -3,9 +3,11 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Brexis\LaravelWorkflow\Traits\WorkflowTrait;
 
 class Vehiculo extends Model
 {
+  use WorkflowTrait;
   protected $fillable = [
       "tipo", "marca", "modelo", "placa", "año", "color", "estado", "motor", "chasis", "vin",
       "descripcion", "id_propietario", "licencia", "id_unidad", "id_funcionario", "fecha_registro", "id_denuncia",

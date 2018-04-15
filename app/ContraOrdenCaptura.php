@@ -21,7 +21,7 @@ class ContraOrdenCaptura extends Model
 // y si es herencia de documento relacion con los usuarios
 public function documento()
 {
-  return $this->morphOne(Documento::class, 'tipoable');
+  return $this->morphOne(Documento::class, 'documentable');
   }
 
 public function orden_captura()

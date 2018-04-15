@@ -39,6 +39,8 @@ class StoreOrdenCaptura
     private $nue_type;
     private $rii_nue_type;
     private $idorden;
+    private $institucion_id;
+    private $dependencia_id;
 
     public function __construct()
     {
@@ -67,17 +69,9 @@ class StoreOrdenCaptura
        $validator = Validator::make($arr   , [
          "token" => "required",
          "orden_captura" => "required",
-         "orden_captura.tipo" => "required|numeric",
          "orden_captura.fecha_creacion" => "required",
          "orden_captura.id_expediente" => "required",
          "delito" => "required|array|min:1",
-         //"ofendidos" => "required|array|min:1",
-         //"delito.*.perjudicado" => "required",
-         //"delito.*.tipo_delito" => "required",
-         //"delito.*.delito" => "required",
-         "lugar" => "required",
-         "lugar.departamento_id" => "required",
-         "lugar.municipio_id" => "required",
          "id_funcionario" => "required",
          "documento" => "required"
        ]);
@@ -122,23 +116,9 @@ class StoreOrdenCaptura
              $this->log::alert(json_encode($orden_captura));
              $orden_estados = $this->set_estados_orden_captura($arr, $this->idorden);
              $this->log::alert(json_encode($orden_estados));
-                if ($arr["orden_captura"]["tipo"]==1) {
                   $persona_orden = $this->set_personas_orden($arr, $this->response->payload->id = $orden_captura->id);
                   $delitos = $this->set_delitos($arr, $this->idorden);
-                }
-
-                if ($arr["orden_captura"]["tipo"]==2) {
-                  $persona_orden = $this->set_menor_orden($arr, $this->response->payload->id = $orden_captura->id);
-                    $delitos = $this->set_delitos($arr, $this->idorden);
-                }
-
-                if ($arr["orden_captura"]["tipo"]==3) {
-                  $persona_orden = $this->set_vehiculo_orden($arr, $this->response->payload->id = $orden_captura->id);
-                    $delitos = $this->set_delitos($arr, $this->idorden);
-                }
-            $lugar = $this->set_lugar($arr);
-            $this->log::alert(json_encode($lugar));
-            $documento = $this->set_documento($arr, $this->response->payload->id = $lugar->id, $this->idorden);
+            $documento = $this->set_documento($arr, $this->idorden);
             $this->log::alert(json_encode($documento));
             //$documento_digital = $this->set_documento_digital($this->response->payload->id = $documento->id);
             //$this->log::alert(json_encode($documento_digital));
@@ -164,19 +144,20 @@ class StoreOrdenCaptura
         return $this->response;
     }
 
-    public function set_documento($arr, $lugarid, $idorden) {
+    public function set_documento($arr, $idorden) {
 
         // documento digital
         //echo $idorden;
         $documento = new Documento;
-        //$doc_digital = DocumentoDigital::create();
-        $lugar = Lugar::find($lugarid);
+        $temp = $doc = DocumentoDigital::create();
+        $iddoc = $temp->id;
+        $docdig = DocumentoDigital::find($iddoc);
 
         $orden_captura = OrdenCaptura::find($idorden);
-
+        $documento->funcionario_id = $arr["id_funcionario"];
         $documento->expediente_id = $arr["orden_captura"]["id_expediente"];;
-        $documento->institucion_id = $arr["documento"]["institucion_id"];
-        $documento->dependencia_id = $arr["documento"]["id_dependencia"];
+        $documento->institucion_id = $this->get_id_institucion_from_user($arr);
+        $documento->dependencia_id = $this->get_id_dependencia_from_user($arr);
         $documento->titulo = "Orden Captura";
         $documento->descripcion = "orden de captura";
         //$documento->tags = Array($arr["documento"]["tipo"]);
@@ -184,7 +165,10 @@ class StoreOrdenCaptura
         $documento->hora_recepcion = $arr["documento"]["hora_solicitud"];
 
 
-        $orden_captura->documento()->save($documento);
+        $temp2 = $docdig->documento()->save($documento);
+        $id_doc = $temp2->id;
+        $docu = Documento::find($id_doc);
+        $orden_captura->documento()->save($docu);
 
         return $orden_captura;
     }
@@ -202,56 +186,27 @@ class StoreOrdenCaptura
 
       $orden_captura = new OrdenCaptura;
 
-      $tipoorden = $arr["orden_captura"]["tipo"];
       $orden_captura->fecha_creacion = $arr["orden_captura"]["fecha_creacion"];
       $orden_captura->estado = "Vigente";
       $orden_captura->id_expediente = $arr["orden_captura"]["id_expediente"];
 
-      if (isset($arr["orden_captura"]["id_etapa"])) {
-          $orden_captura->id_etapa = $arr["orden_captura"]["id_etapa"];
+      if (isset($arr["orden_captura"]["audiencia"])) {
+          $orden_captura->audiencia = $arr["orden_captura"]["audiencia"];
       }
 
-      if (isset($arr["orden_captura"]["id_audiencia"])) {
-          $orden_captura->id_audiencia = $arr["orden_captura"]["id_audiencia"];
+      if (isset($arr["orden_captura"]["auto_motivo"])) {
+          $orden_captura->auto_motivo = $arr["orden_captura"]["auto_motivo"];
       }
 
-      if (isset($arr["orden_captura"]["id_juez"])) {
-          $orden_captura->id_juez = $arr["orden_captura"]["id_juez"];
-      }
-
-        //captura persona
-        if ($arr["orden_captura"]["tipo"]==1) {
+          $orden_captura->id_juez = $arr["id_funcionario"];
 
           $resul = json_decode($this->set_orden_captura_persona($arr), true);
           $orden_captura_persona = OrdenCapturaPersona::create($resul);
           $temp2 = $orden_captura_persona->orden()->save($orden_captura);
           $this->idorden = $temp2->id;
           return $orden_captura_persona;
-
-        }
-
-        if ($arr["orden_captura"]["tipo"]==2) {
-
-          $resul = json_decode($this->set_orden_captura_menor($arr), true);
-          $orden_captura_menor = OrdenCapturaMenor::create($resul);
-          $temp2 = $orden_captura_menor->orden()->save($orden_captura);
-          $this->idorden = $temp2->id;
-          return $orden_captura_menor;
-
-        }
-
-        if ($arr["orden_captura"]["tipo"]==3) {
-
-          $resul = json_decode($this->set_orden_captura_vehiculo($arr), true);
-          $orden_captura_vehiculo = OrdenCapturaVehiculo::create($resul);
-          $temp2 = $orden_captura_vehiculo->orden()->save($orden_captura);
-          $this->idorden = $temp2->id;
-          return $orden_captura_vehiculo;
-
-        }
-
     }
-
+   //hijos capturas
     public function set_orden_captura_persona($arr) {
 
         $orden_captura_persona = new OrdenCapturaPersona;
@@ -307,19 +262,15 @@ class StoreOrdenCaptura
             $orden_delito->id_victima = $d["id_victima"];
         }
 
-        if (isset($d["perjudicado"])) {
-            $orden_delito->perjudicado = $d["perjudicado"];
-        }
-
-        if (isset($d["descripcion_delito"])) {
-            $orden_delito->descripcion = $d["descripcion_delito"];
+        if (isset($d["nombre_victima"])) {
+            $orden_delito->nombre_victima = $d["nombre_victima"];
         }
 
            $orden_delito->save();
            //return $orden_delito;
          }
     }
-
+   //tablas n a n
     public function set_personas_orden($arr, $idordencaptura) {
 
         $orden_persona = new OrdenCapturaPersonaNatural;
@@ -328,14 +279,6 @@ class StoreOrdenCaptura
 
         if (isset($arr["orden_captura"]["id_persona"])) {
             $orden_persona->id_persona = $arr["orden_captura"]["id_persona"];
-        }
-
-        if (isset($arr["orden_captura"]["direccion"])) {
-            $orden_persona->direccion = $arr["orden_captura"]["direccion"];
-        }
-
-        if (isset($arr["orden_captura"]["motivo"])) {
-            $orden_persona->motivo = $arr["orden_captura"]["motivo"];
         }
 
            $orden_persona->save();
@@ -351,14 +294,6 @@ class StoreOrdenCaptura
             $orden_menor->id_persona_menor = $arr["orden_captura"]["id_persona"];
         }
 
-        if (isset($arr["orden_captura"]["direccion"])) {
-            $orden_menor->direccion = $arr["orden_captura"]["direccion"];
-        }
-
-        if (isset($arr["orden_captura"]["motivo"])) {
-            $orden_menor->motivo = $arr["orden_captura"]["motivo"];
-        }
-
            $orden_menor->save();
     }
 
@@ -370,10 +305,6 @@ class StoreOrdenCaptura
 
         if (isset($arr["orden_captura"]["id_vehiculo"])) {
             $orden_vehiculo->id_vehiculo = $arr["orden_captura"]["id_vehiculo"];
-        }
-
-        if (isset($arr["orden_captura"]["motivo"])) {
-            $orden_vehiculo->motivo = $arr["orden_captura"]["motivo"];
         }
 
            $orden_vehiculo->save();
@@ -413,6 +344,44 @@ class StoreOrdenCaptura
     public function get_sujeto($sujeto,$denuncia_id, $persona_natural_id){
       //  $sujeto = $sujeto::where('denuncia_id',$denuncia_id)->whereHas('rol', function($r) use($persona_natural_id) {$r->   //where('persona_natural_id',$persona_natural_id);})->first();
         return $sujeto;
+    }
+
+    private function get_email_from_token($token) {
+      $user_email = "";
+      $passport = new Passport;
+      $res = $passport->details($token);
+
+      if (!isset($res)) {return $user_email; }
+      if (!($res->code == 200)) {return $user_email; }
+
+      $this->log::alert('inside get_email_from_token');
+      $this->log::alert(json_encode($res));
+
+      $contents = json_decode($res->contents);
+      if (property_exists($contents, "success")) {
+        $user_email = $contents->success->email;
+      }
+
+      return $user_email;
+    }
+
+    private function get_id_dependencia_from_user($arr) {
+      $id_user  = $arr["id_funcionario"];
+      //$juez = Juez::find($id_user);
+      //if (is_null($juez)) {return 0;}
+      //$id_dependencia = $juez->id_dependencia;
+      return 0;
+    }
+
+    private function get_id_institucion_from_user($arr) {
+      $id_user  = $arr["id_funcionario"];
+      //$juez = Juez::find($id_user);
+      //if (is_null($juez)) {return 0;}
+      //$id_dependencia = $juez->id_dependencia;
+      //$dependencia = Dependencia::find($id_dependencia);
+      //if (is_null($dependencia)) {return 0;}
+      //$id_institucion = $dependencia->institucion_id;
+      return 0;
     }
 
     private function get_lugar($funcionario_id) {

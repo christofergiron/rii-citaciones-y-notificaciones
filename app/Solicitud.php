@@ -3,9 +3,11 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Brexis\LaravelWorkflow\Traits\WorkflowTrait;
 
 class Solicitud extends Model
 {
+  use WorkflowTrait;
   protected $fillable = [
     "fecha",
     "titulo",
@@ -17,7 +19,7 @@ class Solicitud extends Model
   protected $table = "solicitudes";
 
   public function documento(){
-    return $this->morphOne(Documento::class, 'tipoable');
+    return $this->morphOne(Documento::class, 'documentable');
 }
 
   public function solicitable(){
