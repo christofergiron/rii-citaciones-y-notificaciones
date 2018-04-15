@@ -16,6 +16,8 @@ use App\Solicitud;
 use App\SolicitudOrdenCaptura;
 use App\DocumentoDigital;
 use App\Anexo;
+use App\Dependencia;
+use App\Institucion;
 use App\Denuncia;
 use App\Rol;
 use App\Denunciante;
