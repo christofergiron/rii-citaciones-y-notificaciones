@@ -246,8 +246,7 @@ class OrdenCapturaTools
         $delito->tipo_delito = $d->tipo_delito;
         $delito->delito = $d->delito;
         $delito->id_victima = $d->id_victima;
-        $delito->nombre_victima = $d->perjudicado;
-        $delito->descripcion = $d->descripcion;
+        $delito->nombre_victima = $d->nombre_victima;
 
         $delitos_arr[] = $delito;
         unset($delito);

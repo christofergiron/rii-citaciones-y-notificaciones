@@ -40,7 +40,8 @@ class SolicitudOrdenTools
 
   private function unidad($solicitud) {
       $unidad_arr;
-      $id = $solicitud->institucion;
+      $soli = $solicitud->solicitud()->first();
+      $id = $soli->institucion;
       $unidad = Dependencia::find($id);
         if (is_null($unidad)) {return null;}
       $unidades = new \stdClass;
@@ -65,7 +66,7 @@ class SolicitudOrdenTools
         if (!is_null($imputado)) {
           $persona_natural_id = $imputado->rol()->first()->persona_natural_id;
           $persona = $this->get_persona_natural($persona_natural_id);
-          $tipo_solicitud->id_imputado = $persona->persona_natural_id;
+          $tipo_solicitud->id_imputado = $persona_natural_id;
           $tipo_solicitud->nombre_imputado = $persona->nombres;
           $tipo_solicitud->apellidos_imputado = $persona->primer_apellido.', '.$persona->segundo_apellido;
         }
@@ -73,6 +74,7 @@ class SolicitudOrdenTools
         $tipo_solicitud->id_orden_captura = $solicitud_orden->id_orden_captura;
         $tipo_solicitud->id_expediente = $solicitud_orden->id_expediente;
         $tipo_solicitud->motivo = $solicitud->descripcion;
+        $tipo_solicitud->estado = $solicitud_orden->workflow_state;
 
         //solicitud no aprobada
         if (!is_null($solicitud_orden->razon_rechazo)) {
