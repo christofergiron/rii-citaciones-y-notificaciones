@@ -198,16 +198,16 @@ class SolicitudContraOrdenTools
   }
 
   private function get_solicitud($solicitud, $id, $token) {
-    $solicitud_arr = [];
+    $solicitud_arr;
     //$user_email = $this->get_email_from_token($token);
     //if (!isset($user_email)) { return $solicitud_arr; }
     //if (empty($user_email)) {return $solicitud_arr; }
 
     $solicitudes = new \stdClass;
     $solicitudes->solicitud = $this->solicitudes($id);
-    $solicitudes->solicitud_orden = $this->tipo_solicitud($id);
+    $solicitudes->solicitud->solicitud_contra_orden = $this->tipo_solicitud($id);
     $solicitudes->unidad = $this->unidad($solicitud);
-    $solicitud_arr[] = $solicitudes;
+    $solicitud_arr = $solicitudes;
     return $solicitud_arr;
   }
 
