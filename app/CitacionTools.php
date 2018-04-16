@@ -153,7 +153,6 @@ class CitacionTools
         //funcionario
         $responsable->nombres = $persona->nombres;
         $responsable->apellidos = $persona->primer_apellido.', '.$persona->segundo_apellido;
-        $responsable->placa = $funcionarios_ss->placa;
         $funcionarios_arr[] = $responsable;
         return $funcionarios_arr;
   }
