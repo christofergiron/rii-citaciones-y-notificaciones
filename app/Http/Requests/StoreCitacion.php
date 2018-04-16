@@ -322,7 +322,7 @@ class StoreCitacion
       if (is_null($funcionariopj)) {return 0;}
       $id_institucion = $funcionariopj->institucion()->first()->dependencia_id;
       if (is_null($id_institucion)) {return 0;}
-      $dependen = Dependencia::find($id_institucion->id_dependencia);
+      $dependen = Dependencia::find($id_institucion);
       if (is_null($dependen)) {return 0;}
       $id = $dependen->institucion_id;
       return $id;
