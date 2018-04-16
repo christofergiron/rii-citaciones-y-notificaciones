@@ -286,8 +286,8 @@ class CitacionTools
     $hdr->label = "Fecha Citacion";
     $res->headers[] = $hdr;
     $hdr = new \stdClass;
-    $hdr->name = "estado";
-    $hdr->label = "Estado";
+    $hdr->name = "persona_natural";
+    $hdr->label = "Persona Citada";
     $res->headers[] = $hdr;
     return $res->headers;
   }
@@ -300,6 +300,7 @@ class CitacionTools
       $row->numero_citacion = $dmp->id;
       $row->organo_juridiccional = $dmp->organo_juridiccional;
       $row->fecha_citacion = date('Y/m/d',strtotime($dmp->fecha_citacion));
+      $row->persona_citada = $dmp->persona_natural;
       $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
       $res->rows[] = $row;
     }
