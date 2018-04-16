@@ -95,7 +95,7 @@ class CitacionTools
     $citaciones->numero_expedinte_rii = $expedienterii;
     $citaciones->numero_expedinte_PJ = $expedientepj;
 
-    $citacion_arr = $citacion;
+    $citacion_arr = $citaciones;
     return $citacion_arr;
   }
 
