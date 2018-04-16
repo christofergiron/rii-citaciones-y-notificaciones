@@ -6,29 +6,24 @@ namespace App\Http\Requests;
 use Validator;
 use Illuminate\Http\Request;
 use App\Passport;
-use App\FuncionarioSS;
+use App\Funcionario;
+use App\FuncionarioPJ;
 use App\Expediente;
-use App\ExpedienteSS;
+use App\ExpedientePJ;
 use App\Lugar;
-use App\LugarSS;
+use App\LugarPJ;
 use App\Documento;
-use App\Solicitud;
-use App\SolicitudContraOrden;
+use App\Citacion;
+use App\CanalEnvioCN;
 use App\DocumentoDigital;
-use App\Anexo;
-use App\Denuncia;
-use App\Dependencia;
-use App\Institucion;
 use App\Rol;
-use App\Denunciante;
-use App\Imputado;
-use App\Ofendido;
-use App\RelacionesImputado;
-use App\RelacionesImputadoDenunciantes;
-use App\RelacionesImputadoOfendidos;
-use App\Parentesco;
 use App\Fiscal;
-use App\DenunciaSS;
+use App\Fiscalia;
+use App\Dependencia;
+use App\OrdenCaptura;
+use App\OrdenCapturaEstado;
+use App\ContraOrdenCaptura;
+use App\Juez;
 use App\Http\Requests\StorePersona;
 use App\Workflow;
 use App\Action;
@@ -36,14 +31,13 @@ use App\PolyBaseFactory;
 use App\DefaultAction;
 use App\DefaultMPNUE;
 
-class StoreSolicitudContraOrden //extends FormRequest
+class StoreCitacion
 {
 
     private $response;
     private $nue_type;
     private $rii_nue_type;
-    private $tipo;
-    private $idsolicitud;
+    private $idcitacion;
 
     public function __construct()
     {
@@ -71,16 +65,24 @@ class StoreSolicitudContraOrden //extends FormRequest
 
        $validator = Validator::make($arr   , [
          "token" => "required",
-         "id_fiscal" => "required",
-         "solicitud_contra_orden_captura" => "required",
-         "solicitud_contra_orden_captura.documento" => "required",
-         "solicitud_contra_orden_captura.solicitud" => "required",
-         "solicitud_contra_orden_captura.solicitud.fecha" => "required",
-         "solicitud_contra_orden_captura.solicitud.descripcion" => "required",
-         "solicitud_contra_orden_captura.solicitud.solicitado_por" => "required",
-         "solicitud_contra_orden_captura.solicitud_contra_orden.id_expediente" => "required",
-         "solicitud_contra_orden_captura.solicitud_contra_orden.imputado" => "required",
-         "solicitud_contra_orden_captura.solicitud_contra_orden.id_orden_captura" => "required"
+         "id_funcionario" => "required",
+         "citaciones" => "required",
+         "citaciones.id_expediente" => "required|integer",
+         "citaciones.organo_juridiccional" => "required",
+         "citaciones.fecha_creacion" => "required",
+         //"citaciones.proceso_judicial" => "required",
+         "citaciones.parte_solicitante" => "required",
+         "citaciones.asunto" => "required",
+         "citaciones.tipo_acto_procesal" => "required",
+         "citaciones.lugar_citacion" => "required",
+         "citaciones.fecha_citacion" => "required",
+         "citaciones.persona_natural" => "required",
+         "citaciones.tipo" => "required",
+         "documento" => "required",
+         "documento.hora_creacion" => "required",
+         "envio" => "required|array|min:1",
+         "envio.*.canal_envio" => "required",
+         "envio.*.medios_envio" => "required"
        ]);
 
        if ($validator->fails()) {
@@ -112,29 +114,33 @@ class StoreSolicitudContraOrden //extends FormRequest
     }
 
     public function persist($arr) {
-        $user_details = $this->get_user($arr["token"]);
+        //$user_details = $this->get_user($arr["token"]);
         //$user = $this->get_institucion_dependencia($user_details->funcionario_id);
         //$user->lugar = $this->get_lugar($user_details->funcionario_id);
-        //$this->log::alert(json_encode($res));
+      //  $this->log::alert(json_encode($res));
 
-        // save expedientes
-        try {
-            $solicitud = $this->set_solicitud($arr);
-            $this->log::alert(json_encode($solicitud));
-            $solicitud = $this->set_documento($arr, $this->idsolicitud);
-            $this->log::alert(json_encode($solicitud));
+       try {
+            $citacion = $this->set_citacion($arr);
+            $this->log::alert(json_encode($citacion));
+            $medios_citacion = $this->set_citacion_medios($arr, $this->idcitacion);
+            $this->log::alert(json_encode($medios_citacion));
+            $documento = $this->set_documento($arr, $this->idcitacion);
+            $this->log::alert(json_encode($documento));
+            //$documento_digital = $this->set_documento_digital($this->response->payload->id = $documento->id);
+            //$this->log::alert(json_encode($documento_digital));
             $this->log::alert('this->response is ...');
             $this->log::alert(json_encode($this->response));
 
             $this->init();
-            $this->response->message = "solicitud realizada correctamente";
-            $this->response->payload->id = $solicitud->id;
+            $this->response->message = "Contra Orden Captura realizada Correctamente";
+            $this->response->payload->id = $documento->id;
+
         } catch (Exception $e) {
             $this->log::error($e);
             $this->init();
             $this->response->code = 403;
             $this->response->success = false;
-            $this->response->message = "error al realizar la solicitud";
+            $this->response->message = "error al ingresar la captura";
             return $this->response;
         }
 
@@ -144,68 +150,99 @@ class StoreSolicitudContraOrden //extends FormRequest
         return $this->response;
     }
 
-    public function set_documento($arr, $idsolicitud) {
+    public function set_documento($arr, $idorden) {
 
-        // documento digital
-        //echo $idorden;
-        $documento = new Documento;
-        $temp = $doc = DocumentoDigital::create();
-        $iddoc = $temp->id;
-        $docdig = DocumentoDigital::find($iddoc);
+      $documento = new Documento;
+      $temp = $doc = DocumentoDigital::create();
+      $iddoc = $temp->id;
+      $docdig = DocumentoDigital::find($iddoc);
 
-        $solicitud = Solicitud::find($idsolicitud);
-        $idsolicitable = $solicitud->solicitable_id;
-        $contra = SolicitudContraOrden::find($idsolicitable);
-        $documento->funcionario_id = $arr["id_fiscal"];
-        $documento->expediente_id = $arr["solicitud_contra_orden_captura"]["solicitud_contra_orden"]["id_expediente"];
+        $citacion = Citacion::find($idorden);
+
+        $documento->expediente_id = $arr["citaciones"]["id_expediente"];
         $documento->institucion_id = $this->get_id_institucion_from_user($arr);
         $documento->dependencia_id = $this->get_id_dependencia_from_user($arr);
-        $documento->titulo = "Solicitud Contra Orden Captura";
-        $documento->descripcion = "solicitud contra orden captura";
+        $documento->titulo = "Citacion";
+        $documento->descripcion = "Citacion";
         //$documento->tags = Array($arr["documento"]["tipo"]);
-        $documento->fecha_documento = $arr["solicitud_contra_orden_captura"]["solicitud"]["fecha"];
-        $documento->hora_recepcion = $arr["solicitud_contra_orden_captura"]["documento"]["hora_solicitud"];
+        $documento->fecha_documento = $arr["citaciones"]["fecha_creacion"];
+        $documento->hora_recepcion = $arr["documento"]["hora_creacion"];
 
 
         $temp2 = $docdig->documento()->save($documento);
         $id_doc = $temp2->id;
         $docu = Documento::find($id_doc);
-        $solicitud->documento()->save($docu);
+        $citacion->documento()->save($docu);
 
-        return $contra;
+        return $citacion;
     }
 
-    public function set_solicitud($arr) {
+    public function set_documento_digital($documentid) {
 
-      $solicitud = new Solicitud;
+        // documento digital
+        $documento = Documento::find($documentid);
+        $doc_digital = DocumentoDigital::create();
 
-      $solicitud->fecha = $arr["solicitud_contra_orden_captura"]["solicitud"]["fecha"];
-      $solicitud->numero_oficio = $arr["solicitud_contra_orden_captura"]["solicitud"]["numero_oficio"];
-      $solicitud->solicitado_por = $arr["solicitud_contra_orden_captura"]["solicitud"]["solicitado_por"];
-      $solicitud->institucion = $arr["solicitud_contra_orden_captura"]["solicitud"]["institucion"];
-      $solicitud->descripcion = $arr["solicitud_contra_orden_captura"]["solicitud"]["descripcion"];
-
-          $solicitud->titulo = "Solicitud Orden Captura";
-          $resul = json_decode($this->set_solicitud_orden($arr), true);
-          //echo $resul->id_laboratorio;
-          $solicitudContraOrden = SolicitudContraOrden::create($resul);
-          $tempo = $solicitudContraOrden->solicitud()->save($solicitud);
-          $this->idsolicitud = $tempo->id;
-          return $solicitud;
-
+       $doc_digital->documento()->save($documento);
     }
 
-    public function set_solicitud_orden($arr) {
+    public function set_citacion($arr) {
 
-        $solicitud_contra_orden = new SolicitudContraOrden;
+      $citacion = new Citacion;
 
-            $solicitud_contra_orden->workflow_state = "solicitud_realizada";
-            $solicitud_contra_orden->id_orden_captura = $arr["solicitud_contra_orden_captura"]["solicitud_contra_orden"]["id_orden_captura"];
-            $solicitud_contra_orden->id_expediente = $arr["solicitud_contra_orden_captura"]["solicitud_contra_orden"]["id_expediente"];
-            $solicitud_contra_orden->id_persona = $arr["solicitud_contra_orden_captura"]["solicitud_contra_orden"]["imputado"];
-            $solicitud_contra_orden->motivo = $arr["solicitud_contra_orden_captura"]["solicitud"]["descripcion"];
+      $citacion->id_expediente = $arr["citaciones"]["id_expediente"];
+      $citacion->id_funcionario = $arr["id_funcionario"];
+      $citacion->organo_juridiccional = $arr["citaciones"]["organo_juridiccional"];
+      $citacion->fecha_creacion = $arr["citaciones"]["fecha_creacion"];
 
-           return $solicitud_contra_orden;
+      if (!is_null($arr["citaciones"]["audiencia"])) {
+          $citacion->audiencia = $arr["citaciones"]["audiencia"];
+      }
+
+      if (!is_null($arr["citaciones"]["etapa"])) {
+          $citacion->etapa = $arr["citaciones"]["etapa"];
+      }
+
+      //if (!is_null($arr["citaciones"]["proceso_judicial"])) {
+        //  $citacion->proceso_judicial = $arr["citaciones"]["proceso_judicial"];
+      //}
+
+      $citacion->parte_solicitante = $arr["citaciones"]["parte_solicitante"];
+      $citacion->asunto = $arr["citaciones"]["asunto"];
+      $citacion->tipo_acto_procesal = $arr["citaciones"]["tipo_acto_procesal"];
+
+      $citacion->lugar_citacion = $arr["citaciones"]["lugar_citacion"];
+      $citacion->fecha_citacion = $arr["citaciones"]["fecha_citacion"];
+
+      if (!is_null($arr["citaciones"]["observaciones"])) {
+          $citacion->observaciones = $arr["citaciones"]["observaciones"];
+      }
+
+      if (!is_null($arr["citaciones"]["persona_natural"])) {
+          $citacion->persona_natural = $arr["citaciones"]["persona_natural"];
+      }
+
+      $citacion->tipo = $arr["citaciones"]["tipo"];
+
+      $citacion->save();
+      $temp = $citacion;
+      $this->idcitacion = $temp->id;
+      return $citacion;
+    }
+
+    public function set_citacion_medios($arr, $idcitacion) {
+
+     foreach($arr["envio"] as $e) {
+
+       $canales_envio = new CanalEnvioCN;
+
+         $canales_envio->id_citacion = $idcitacion;
+         $canales_envio->canal_envio = $e["canal_envio"];
+         $canales_envio->medios_envio = $e["medios_envio"];
+
+           $canales_envio->save();
+           //return $orden_delito;
+         }
     }
 
     public function set_rol($user, $persona) {
@@ -271,24 +308,37 @@ class StoreSolicitudContraOrden //extends FormRequest
     }
 
     private function get_id_dependencia_from_user($arr) {
-      $id_user  = $arr["id_fiscal"];
-      $fiscal = Fiscal::find($id_user);
-      if (is_null($fiscal)) {return 0;}
-      $id_dependencia = $fiscal->fiscalia()->first()->dependencia_id;
+      $id_user  = $arr["id_funcionario"];
+      $funcionariopj = FuncionarioPJ::find($id_user);
+      if (is_null($funcionariopj)) {return 0;}
+      $id_dependencia = $funcionariopj->institucion()->first()->dependencia_id;
       if (is_null($id_dependencia)) {return 0;}
       return $id_dependencia;
     }
 
     private function get_id_institucion_from_user($arr) {
-      $id_user  = $arr["id_fiscal"];
-      $fiscal = Fiscal::find($id_user);
-      if (is_null($fiscal)) {return 0;}
-      $id_institucion = $fiscal->fiscalia()->first();
+      $id_user  = $arr["id_funcionario"];
+      $funcionariopj = FuncionarioPJ::find($id_user);
+      if (is_null($funcionariopj)) {return 0;}
+      $id_institucion = $funcionariopj->institucion()->first()->dependencia_id;
       if (is_null($id_institucion)) {return 0;}
-      $dependen = Dependencia::find($id_institucion->dependencia_id);
+      $dependen = Dependencia::find($id_institucion->id_dependencia);
       if (is_null($dependen)) {return 0;}
       $id = $dependen->institucion_id;
       return $id;
+    }
+
+    public function get_institucion_dependencia($id) {
+        $result = new \stdClass;
+        try {
+            $funcionario = Funcionario::findOrFail($id);
+        } catch (\Exception $e) {
+            $this->log::error($e);
+            return $result;
+        }
+        $result->dependencia_id = $funcionario->dependencia_id;
+        $result->institucion_id = $funcionario->dependencia()->first()->institucion_id;
+        return $result;
     }
 
     public function get_user($token) {
@@ -346,7 +396,7 @@ class StoreSolicitudContraOrden //extends FormRequest
     }
 
     public function apply_transition(Array $arr) {
-       $this->log::alert('inside apply_transition solicitud analisis ....');
+       $this->log::alert('inside apply_transition realizar captura ....');
        $this->log::alert(json_encode($arr));
 
        $act = new Action($arr);

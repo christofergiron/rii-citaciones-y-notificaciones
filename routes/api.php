@@ -90,6 +90,10 @@ Route::post('/new/solicitud_contra_orden_captura', 'API\SolicitudContraOrdenCont
 Route::post('/solicitud_contra_orden_captura/{id}', 'API\SolicitudContraOrdenController@show');
 Route::post('/tabla_solicitud_contra_orden_captura', 'API\SolicitudContraOrdenController@index');
 
+Route::post('/pj/new/citacion', 'API\CitacionController@store');
+Route::post('/pj/citacion/{id}', 'API\CitacionController@show');
+Route::post('/pj/tabla_citacion', 'API\CitacionController@index');
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
