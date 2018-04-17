@@ -78,7 +78,7 @@ class EmplazamientoController extends Controller
 
        # chek for nulls
        if (is_null($res)) {
-         return response()->json(['error'=>'No Content due Orden Captura is invalid!'], 403);
+         return response()->json(['error'=>'No Content due Emplazamiento is invalid!'], 403);
        }
 
        # return success response
@@ -87,7 +87,7 @@ class EmplazamientoController extends Controller
 
     public function store(Request $request) {
       $arr = $request->all();
-      $this->logger->alert('inside Store OrdenCaptura');
+      $this->logger->alert('inside Store Emplazamiento');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreEmplazamiento->rules($arr);
 

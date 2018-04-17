@@ -81,7 +81,7 @@ class CitacionController extends Controller
 
        # chek for nulls
        if (is_null($res)) {
-         return response()->json(['error'=>'No Content due Orden Captura is invalid!'], 403);
+         return response()->json(['error'=>'No Content due Citacion is invalid!'], 403);
        }
 
        # return success response
@@ -90,7 +90,7 @@ class CitacionController extends Controller
 
     public function store(Request $request) {
       $arr = $request->all();
-      $this->logger->alert('inside Store OrdenCaptura');
+      $this->logger->alert('inside Store Citacion');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreCitacion->rules($arr);
 
@@ -109,7 +109,7 @@ class CitacionController extends Controller
 
     public function workflow(Request $request) {
       $arr = $request->all();
-      $this->logger->alert('inside workflow service OrdenCaptura');
+      $this->logger->alert('inside workflow service Citacion');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreCitacion->workflow_rules($arr);
 

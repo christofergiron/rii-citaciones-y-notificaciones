@@ -82,7 +82,7 @@ class ContraOrdenCapturaController extends Controller
 
        # chek for nulls
        if (is_null($res)) {
-         return response()->json(['error'=>'No Content due Orden Captura is invalid!'], 403);
+         return response()->json(['error'=>'No Content due contra Orden Captura is invalid!'], 403);
        }
 
        # return success response
@@ -91,7 +91,7 @@ class ContraOrdenCapturaController extends Controller
 
     public function store(Request $request) {
       $arr = $request->all();
-      $this->logger->alert('inside Store OrdenCaptura');
+      $this->logger->alert('inside Store ContraOrdenCaptura');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreContraOrdenCaptura->rules($arr);
 
@@ -110,7 +110,7 @@ class ContraOrdenCapturaController extends Controller
 
     public function workflow(Request $request) {
       $arr = $request->all();
-      $this->logger->alert('inside workflow service OrdenCaptura');
+      $this->logger->alert('inside workflow service ContraOrdenCaptura');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreOrdenCaptura->workflow_rules($arr);
 

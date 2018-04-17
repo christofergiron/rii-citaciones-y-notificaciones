@@ -132,7 +132,7 @@ class StoreCitacion
             $this->log::alert(json_encode($this->response));
 
             $this->init();
-            $this->response->message = "Contra Orden Captura realizada Correctamente";
+            $this->response->message = "citacion realizada Correctamente";
             $this->response->payload->id = $documento->id;
 
         } catch (Exception $e) {

@@ -151,7 +151,7 @@ class StoreNotificacion
             $this->log::alert(json_encode($this->response));
 
             $this->init();
-            $this->response->message = "Contra Orden Captura realizada Correctamente";
+            $this->response->message = "notificacion realizada Correctamente";
             $this->response->payload->id = $documento->id;
 
         } catch (Exception $e) {
