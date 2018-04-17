@@ -94,6 +94,10 @@ Route::post('/pj/new/citacion', 'API\CitacionController@store');
 Route::post('/pj/citacion/{id}', 'API\CitacionController@show');
 Route::post('/pj/tabla_citacion', 'API\CitacionController@index');
 
+Route::post('/pj/new/notificacion', 'API\NotificacionController@store');
+Route::post('/pj/notificacion/{id}', 'API\NotificacionController@show');
+Route::post('/pj/tabla_notificacion', 'API\NotificacionController@index');
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

@@ -26,7 +26,6 @@ use WorkflowTrait;
     "id_fiscal"
   ];
 
-  {
     public function documento()
   {
     return $this->morphOne(Documento::class, 'documentable');
@@ -34,7 +33,7 @@ use WorkflowTrait;
 
     public function expediente()
   {
-        return $this->belongsTo(Expediente::class, 'id_expediente');
+        return $this->belongsTo(ExpedientePJ::class, 'id_expediente');
     }
 
     public function proceso_judicial()
@@ -54,12 +53,17 @@ use WorkflowTrait;
 
     public function imputados()
   {
-        return $this->HasMany(ImputadoaNotificacion::class, 'id_notificacion');
+        return $this->HasMany(ImputadoNotificacion::class, 'id_notificacion');
     }
 
     public function testigos()
   {
         return $this->HasMany(TestigoNotificacion::class, 'id_notificacion');
+    }
+
+    public function delitos()
+  {
+        return $this->HasMany(DelitoNotificacion::class, 'id_notificacion');
     }
 
     public function juez()

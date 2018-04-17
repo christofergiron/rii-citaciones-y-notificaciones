@@ -113,10 +113,10 @@ class CitacionTools
   }
 
   private function medios_citacion($id) {
-      $citacionarr = [];
-      $citacionn = Citacion::find($id);
-      //echo $citacionn;
-      $canales_envio = $citacionn->canales_envio()->get();
+      $citacion_arr = [];
+      $citacion = Citacion::find($id);
+      //echo $citacion;
+      $canales_envio = $citacion->canales_envio()->get();
       //$delitos = $orden_captura->delitos()->get();
       if (is_null($canales_envio)) {return $citacion_arr;}
       foreach($canales_envio as $cn) {
