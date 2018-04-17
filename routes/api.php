@@ -98,6 +98,10 @@ Route::post('/pj/new/notificacion', 'API\NotificacionController@store');
 Route::post('/pj/notificacion/{id}', 'API\NotificacionController@show');
 Route::post('/pj/tabla_notificacion', 'API\NotificacionController@index');
 
+Route::post('/pj/new/emplazamiento', 'API\EmplazamientoController@store');
+Route::post('/pj/emplazamiento/{id}', 'API\EmplazamientoController@show');
+Route::post('/pj/tabla_emplazamiento', 'API\EmplazamientoController@index');
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

@@ -35,7 +35,7 @@ protected $fillable = [
 
   public function expediente()
 {
-      return $this->belongsTo(Expediente::class, 'id_expediente');
+      return $this->belongsTo(ExpedientePJ::class, 'id_expediente');
   }
 
   public function proceso_judicial()
