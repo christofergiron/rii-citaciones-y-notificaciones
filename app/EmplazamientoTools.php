@@ -16,13 +16,13 @@ use App\PersonaNatural;
 use App\Persona;
 use App\Dependencia;
 use App\Institucion;
-use App\Citacion;
+use App\Emplazamiento;
 use App\CanalEnvioCN;
 use App\Juez;
 use App\ProcesoJudicial;
 use App\AsignacionJuez;
 
-class CitacionTools
+class EmplazamientoTools
 {
 
   private $solicitud_required;
@@ -41,84 +41,71 @@ class CitacionTools
     return $persona_natural;
   }
 
-  private function unidad($solicitud) {
-      $unidad_arr;
-      $id = $solicitud->institucion;
-      $unidad = Dependencia::find($id);
-        if (is_null($unidad)) {return null;}
-      $unidades = new \stdClass;
-      $unidades->id_unidad = $unidad->institucion_id;
-      $unidades->nombre = $unidad->nombre;
-
-        $unidad_arr = $unidades;
-        return $unidad_arr;
-  }
-
-  private function citaciones($id) {
-    $citacion_arr;
+  private function emplazamientos($id) {
+    $emplazamiento_arr;
     //$tipo  "App\SolicitudOrdenCaptura";
-    $citacion = Citacion::find($id);
-    $citaciones = new \stdClass;
+    $emplazamiento = Emplazamiento::find($id);
+    $emplazamientos = new \stdClass;
 
-    $citaciones->id_citacion = $citacion->id;
-    $citaciones->organo_juridiccional = $citacion->organo_juridiccional;
-    $citaciones->fecha_creacion = date('Y/m/d',strtotime($citacion->fecha_creacion));
-    $citaciones->audiencia = $citacion->audiencia;
-    $citaciones->etapa = $citacion->etapa;
-    $citaciones->solicitante = $citacion->parte_solicitante;
-    $citaciones->asunto = $citacion->asunto;
-    $citaciones->acto_procesal = $citacion->tipo_acto_procesal;
-    $citaciones->lugar_citacion = $citacion->lugar_citacion;
+    $emplazamientos->id_citacion = $emplazamiento->id;
+    $emplazamientos->organo_juridiccional = $emplazamiento->organo_juridiccional;
+    $emplazamientos->fecha_creacion = date('Y/m/d',strtotime($emplazamiento->fecha_creacion));
+    $emplazamientos->audiencia = $emplazamiento->audiencia;
+    $emplazamientos->etapa = $emplazamiento->etapa;
+    $emplazamientos->solicitante = $emplazamiento->parte_solicitante;
+    $emplazamientos->asunto = $emplazamiento->asunto;
+    $emplazamientos->acto_procesal = $emplazamiento->tipo_acto_procesal;
+    $emplazamientos->lugar_citacion = $emplazamiento->lugar_citacion;
     //ocupa la hora
-    $citaciones->fecha_citacion = date('Y/m/d-g:i',strtotime($citacion->fecha_citacion));
-    $citaciones->observaciones = $citacion->observaciones;
+    $emplazamientos->fecha_citacion = date('Y/m/d-g:i',strtotime($emplazamiento->fecha_citacion));
+    $emplazamientos->observaciones = $emplazamiento->observaciones;
 
-    $citacion_arr = $citaciones;
-    return $citacion_arr;
+    $emplazamiento_arr = $emplazamientos;
+    return $emplazamiento_arr;
   }
 
   private function numero_expediente($id) {
-    $citacion_arr;
+    $emplazamiento_arr;
     //$tipo  "App\SolicitudOrdenCaptura";
-    $citacion = Citacion::find($id);
-    $citaciones = new \stdClass;
+    $emplazamiento = Emplazamiento::find($id);
+    $emplazamientos = new \stdClass;
 
-    $expediente = $citacion->expediente()->first();
+    $expediente = $emplazamiento->expediente()->first();
     if (is_null($expediente)) { return null; }
 
     $expedientepj = $expediente->numero_expediente;
     $expedienterii = $expediente->institucion()->first()->numero_expediente;
 
-    //$expediente_pj = $citacion->expediente()->first()->numero_expediente;
-    //$expediente_pj = $citacion->expediente()->institucion()->first()->numero_expediente;
+    //$expediente_pj = $emplazamiento->expediente()->first()->numero_expediente;
+    //$expediente_pj = $emplazamiento->expediente()->institucion()->first()->numero_expediente;
 
-    $citaciones->numero_expedinte_rii = $expedienterii;
-    $citaciones->numero_expedinte_PJ = $expedientepj;
+    $emplazamientos->numero_expedinte_rii = $expedienterii;
+    $emplazamientos->numero_expedinte_PJ = $expedientepj;
 
-    $citacion_arr = $citaciones;
-    return $citacion_arr;
+    $emplazamiento_arr = $emplazamientos;
+    return $emplazamiento_arr;
   }
 
   private function citado($id) {
-    $citacion_arr;
+    $emplazamiento_arr;
     //$tipo  "App\SolicitudOrdenCaptura";
-    $citacion = Citacion::find($id);
-    $citaciones = new \stdClass;
+    $emplazamiento = Emplazamiento::find($id);
+    $emplazamientos = new \stdClass;
 
-    $citaciones->persona_citada = $citacion->persona_natural;
-    $citaciones->tipo = $citacion->tipo;
+    $emplazamientos->persona_citada = $emplazamiento->persona_natural;
+    $emplazamientos->tipo = $emplazamiento->tipo;
 
-    $citacion_arr = $citaciones;
-    return $citacion_arr;
+    $emplazamiento_arr = $emplazamientos;
+    return $emplazamiento_arr;
   }
 
-  private function medios_citacion($id) {
-      $citacion_arr = [];
-      $citacion = Citacion::find($id);
-      //echo $citacion;
-      $canales_envio = $citacion->canales_envio()->get();
+  private function medios_emplazamientos($id) {
+      $emplazamiento_arr = [];
+      $emplazamiento = Emplazamiento::find($id);
+      //echo $emplazamiento;
+      $canales_envio = $emplazamiento->canales_envio()->get();
       //$delitos = $orden_captura->delitos()->get();
-      if (is_null($canales_envio)) {return $citacion_arr;}
+      if (is_null($canales_envio)) {return null;}
       foreach($canales_envio as $cn) {
         $canal = new \stdClass;
 
@@ -126,17 +113,17 @@ class CitacionTools
         $canal->canal_envio = $cn->canal_envio;
         $canal->medios_envio = $cn->medios_envio;
 
-        $citacion_arr[] = $canal;
+        $emplazamiento_arr[] = $canal;
         unset($canal);
       }
-      return $citacion_arr;
+      return $emplazamiento_arr;
   }
 
   private function funcionario_pj($id) {
       $funcionarios_arr = [];
-      $citacion = Citacion::find($id);
+      $emplazamiento = Emplazamiento::find($id);
       $responsable = new \stdClass;
-      $funcionariopj = $citacion->id_funcionario;
+      $funcionariopj = $emplazamiento->id_funcionario;
       //$investigadores = $captura->id_funcionario;
 
       //funcionarios
@@ -239,29 +226,29 @@ class CitacionTools
     return $user_email;
   }
 
-  private function get_citacion($solicitud, $id, $token) {
-    $citacion_arr;
+  private function get_emplazamiento($solicitud, $id, $token) {
+    $emplazamiento_arr;
     //$user_email = $this->get_email_from_token($token);
     //if (!isset($user_email)) { return $solicitud_arr; }
     //if (empty($user_email)) {return $solicitud_arr; }
 
-    $citaciones = new \stdClass;
-    $citaciones->numero_expediente = $this->numero_expediente($id);
-    $citaciones->citacion = $this->citaciones($id);
-    $citaciones->persona_citada = $this->citado($id);
-    $citaciones->canales_envio = $this->medios_citacion($id);
-    $citaciones->creador = $this->funcionario_pj($id);
-    $citacion_arr = $citaciones;
-    return $citacion_arr;
+    $emplazamientos = new \stdClass;
+    $emplazamientos->numero_expediente = $this->numero_expediente($id);
+    $emplazamientos->emplazamiento = $this->emplazamientos($id);
+    $emplazamientos->persona_citada = $this->citado($id);
+    $emplazamientos->canales_envio = $this->medios_emplazamientos($id);
+    $emplazamientos->creador = $this->funcionario_pj($id);
+    $emplazamiento_arr = $emplazamientos;
+    return $emplazamiento_arr;
   }
 
-  public function pj_citaciones($citacion_id, $token){
+  public function pj_emplazamientos($emplazamiento_id, $token){
     $res = new \stdClass;
-    $citacion = Citacion::find($citacion_id);
-    if (is_null($citacion)) { return json_encode($res); }
-    $id = $citacion->id;
+    $emplazamiento = Emplazamiento::find($emplazamiento_id);
+    if (is_null($emplazamiento)) { return json_encode($res); }
+    $id = $emplazamiento->id;
 
-    $result = $this->get_citacion($citacion, $id, $token);
+    $result = $this->get_emplazamiento($emplazamiento, $id, $token);
 
     if (!isset($result)) { return json_encode($res); }
     if (empty($result)) { return json_encode($res); }
@@ -274,16 +261,16 @@ class CitacionTools
   private function headers(){
     $res = new \stdClass;
     $hdr = new \stdClass;
-    $hdr->name = "numero_citacion";
-    $hdr->label = "Numero Citacion";
+    $hdr->name = "numero_emplazamiento";
+    $hdr->label = "Numero EmplazamientoTools";
     $res->headers[] = $hdr;
     $hdr = new \stdClass;
     $hdr->name = "organo_juridiccional";
     $hdr->label = "Organo Juridiccional";
     $res->headers[] = $hdr;
     $hdr = new \stdClass;
-    $hdr->name = "fecha_citacion";
-    $hdr->label = "Fecha Citacion";
+    $hdr->name = "fecha_emplazamiento";
+    $hdr->label = "Fecha Emplazamiento";
     $res->headers[] = $hdr;
     $hdr = new \stdClass;
     $hdr->name = "persona_natural";
@@ -295,11 +282,11 @@ class CitacionTools
   private function rows($token) {
     $res = new \stdClass;
     //$res->rows[]=[]; this fails is no data is returned...
-    foreach (Citacion::All() as $dmp) {
+    foreach (Emplazamiento::All() as $dmp) {
       $row = new \stdClass;
-      $row->numero_citacion = $dmp->id;
+      $row->numero_emplazamiento = $dmp->id;
       $row->organo_juridiccional = $dmp->organo_juridiccional;
-      $row->fecha_citacion = date('Y/m/d',strtotime($dmp->fecha_citacion));
+      $row->fecha_emplazamiento = date('Y/m/d',strtotime($dmp->fecha_citacion));
       $row->persona_citada = $dmp->persona_natural;
       $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
       $res->rows[] = $row;
@@ -307,7 +294,7 @@ class CitacionTools
     return $res->rows;
   }
 
-  public function pj_list_citaciones($token) {
+  public function pj_list_emplazamientos($token) {
     $res = new \stdClass;
     $res->headers = $this->headers();
     $res->rows = $this->rows($token);

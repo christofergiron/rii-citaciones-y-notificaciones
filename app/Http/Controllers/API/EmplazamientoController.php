@@ -3,11 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Tools;
-use App\OrdenCaptura;
-use App\ContraOrdenCaptura;
-//use App\ordejudicial;
-//use App\requerimiento fiscal;
-use App\ContraOrdenCapturaTools;
+use App\EmplazamientoTools;
 use App\Fiscal;
 use App\FuncionarioSS;
 use App\DenunciaSS;
@@ -17,24 +13,24 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Validator;
-use App\Http\Requests\StoreContraOrdenCaptura;
+use App\Http\Requests\StoreEmplazamiento;
 
-class ContraOrdenCapturaController extends Controller
+class EmplazamientoController extends Controller
 {
 
     public  $successStatus = 200;
     private $root;
-    private $orden_captura_tools;
-    private $StoreOrdenCaptura;
+    private $emplazamiento_tool;
+    private $StoreEmplazamiento;
 
     public function __construct(LoggerInterface $logger)
     {
         $this->log = new \Log;
         $this->logger = $logger;
         $this->tools = new Tools($this->logger);
-        $this->contra_orden_captura_tools = new ContraOrdenCapturaTools;
+        $this->emplazamiento_tool = new EmplazamientoTools;
         $this->root = false;
-        $this->StoreContraOrdenCaptura = new StoreContraOrdenCaptura;
+        $this->StoreEmplazamiento = new StoreEmplazamiento;
     }
 
     public function index(Request $request){
@@ -53,7 +49,7 @@ class ContraOrdenCapturaController extends Controller
        }
 
        #get orden captura
-       $res = $this->contra_orden_captura_tools->list_contra_orden_captura($arr["token"]);
+       $res = $this->emplazamiento_tool->pj_list_emplazamientos($arr["token"]);
 
        # chek for nulls
        if (is_null($res)) {
@@ -78,11 +74,11 @@ class ContraOrdenCapturaController extends Controller
          return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
        }
        #get orden captura
-       $res = $this->contra_orden_captura_tools->contra_orden_captura($id, $arr["token"]);
+       $res = $this->emplazamiento_tool->pj_emplazamientos($id, $arr["token"]);
 
        # chek for nulls
        if (is_null($res)) {
-         return response()->json(['error'=>'No Content due contra Orden Captura is invalid!'], 403);
+         return response()->json(['error'=>'No Content due Emplazamiento is invalid!'], 403);
        }
 
        # return success response
@@ -91,15 +87,15 @@ class ContraOrdenCapturaController extends Controller
 
     public function store(Request $request) {
       $arr = $request->all();
-      $this->logger->alert('inside Store ContraOrdenCaptura');
+      $this->logger->alert('inside Store Emplazamiento');
       $this->logger->alert(json_encode($arr)) ;
-      $res = $this->StoreContraOrdenCaptura->rules($arr);
+      $res = $this->StoreEmplazamiento->rules($arr);
 
       if ($res->code != 200) {
         return response()->json(['error'=>$res->message], 403);
       }
 
-      $res = $this->StoreContraOrdenCaptura->persist($arr);
+      $res = $this->StoreEmplazamiento->persist($arr);
 
       if (!$res->success) {
         return response()->json(['error'=>$res->message], 403);
@@ -110,15 +106,15 @@ class ContraOrdenCapturaController extends Controller
 
     public function workflow(Request $request) {
       $arr = $request->all();
-      $this->logger->alert('inside workflow service ContraOrdenCaptura');
+      $this->logger->alert('inside workflow service OrdenCaptura');
       $this->logger->alert(json_encode($arr)) ;
-      $res = $this->StoreOrdenCaptura->workflow_rules($arr);
+      $res = $this->StoreEmplazamiento->workflow_rules($arr);
 
       if ($res->code != 200) {
         return response()->json(['error'=>$res->message], 403);
       }
 
-      $res = $this->StoreOrdenCaptura->apply_transition($arr);
+      $res = $this->StoreEmplazamiento->apply_transition($arr);
 
       if ($res->code != 200) {
         return response()->json(['error'=>$res->message], 403);

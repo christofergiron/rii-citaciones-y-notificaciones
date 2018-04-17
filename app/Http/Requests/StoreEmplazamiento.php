@@ -13,7 +13,7 @@ use App\ExpedientePJ;
 use App\Lugar;
 use App\LugarPJ;
 use App\Documento;
-use App\Citacion;
+use App\Emplazamiento;
 use App\CanalEnvioCN;
 use App\DocumentoDigital;
 use App\Rol;
@@ -31,13 +31,13 @@ use App\PolyBaseFactory;
 use App\DefaultAction;
 use App\DefaultMPNUE;
 
-class StoreCitacion
+class StoreEmplazamiento
 {
 
     private $response;
     private $nue_type;
     private $rii_nue_type;
-    private $idcitacion;
+    private $idemplazamiento;
 
     public function __construct()
     {
@@ -66,18 +66,18 @@ class StoreCitacion
        $validator = Validator::make($arr   , [
          "token" => "required",
          "id_funcionario" => "required",
-         "citaciones" => "required",
-         "citaciones.id_expediente" => "required|integer",
-         "citaciones.organo_juridiccional" => "required",
-         "citaciones.fecha_creacion" => "required",
-         //"citaciones.proceso_judicial" => "required",
-         "citaciones.parte_solicitante" => "required",
-         "citaciones.asunto" => "required",
-         "citaciones.tipo_acto_procesal" => "required",
-         "citaciones.lugar_citacion" => "required",
-         "citaciones.fecha_citacion" => "required",
-         "citaciones.persona_natural" => "required",
-         "citaciones.tipo" => "required",
+         "emplazamientos" => "required",
+         "emplazamientos.id_expediente" => "required|integer",
+         "emplazamientos.organo_juridiccional" => "required",
+         "emplazamientos.fecha_creacion" => "required",
+         //"emplazamientos.proceso_judicial" => "required",
+         "emplazamientos.parte_solicitante" => "required",
+         "emplazamientos.asunto" => "required",
+         "emplazamientos.tipo_acto_procesal" => "required",
+         "emplazamientos.lugar_citacion" => "required",
+         "emplazamientos.fecha_citacion" => "required",
+         "emplazamientos.persona_natural" => "required",
+         "emplazamientos.tipo" => "required",
          "documento" => "required",
          "documento.hora_creacion" => "required",
          "envio" => "required|array|min:1",
@@ -120,11 +120,11 @@ class StoreCitacion
       //  $this->log::alert(json_encode($res));
 
        try {
-            $citacion = $this->set_citacion($arr);
-            $this->log::alert(json_encode($citacion));
-            $medios_citacion = $this->set_citacion_medios($arr, $this->idcitacion);
-            $this->log::alert(json_encode($medios_citacion));
-            $documento = $this->set_documento($arr, $this->idcitacion);
+            $emplazamiento = $this->set_emplazamiento($arr);
+            $this->log::alert(json_encode($emplazamiento));
+            $medios_emplazamiento = $this->set_emplazamientos_medios($arr, $this->idemplazamiento);
+            $this->log::alert(json_encode($medios_emplazamiento));
+            $documento = $this->set_documento($arr, $this->idemplazamiento);
             $this->log::alert(json_encode($documento));
             //$documento_digital = $this->set_documento_digital($this->response->payload->id = $documento->id);
             //$this->log::alert(json_encode($documento_digital));
@@ -132,7 +132,7 @@ class StoreCitacion
             $this->log::alert(json_encode($this->response));
 
             $this->init();
-            $this->response->message = "citacion realizada Correctamente";
+            $this->response->message = "emplazamiento realizado Correctamente";
             $this->response->payload->id = $documento->id;
 
         } catch (Exception $e) {
@@ -150,31 +150,31 @@ class StoreCitacion
         return $this->response;
     }
 
-    public function set_documento($arr, $idorden) {
+    public function set_documento($arr, $idemplazamiento) {
 
       $documento = new Documento;
       $temp = $doc = DocumentoDigital::create();
       $iddoc = $temp->id;
       $docdig = DocumentoDigital::find($iddoc);
 
-        $citacion = Citacion::find($idorden);
+        $emplazamiento = Emplazamiento::find($idemplazamiento);
 
-        $documento->expediente_id = $arr["citaciones"]["id_expediente"];
+        $documento->expediente_id = $arr["emplazamientos"]["id_expediente"];
         $documento->institucion_id = $this->get_id_institucion_from_user($arr);
         $documento->dependencia_id = $this->get_id_dependencia_from_user($arr);
-        $documento->titulo = "Citacion";
-        $documento->descripcion = "Citacion";
+        $documento->titulo = "Emplazamiento";
+        $documento->descripcion = "Emplazamiento";
         //$documento->tags = Array($arr["documento"]["tipo"]);
-        $documento->fecha_documento = $arr["citaciones"]["fecha_creacion"];
+        $documento->fecha_documento = $arr["emplazamientos"]["fecha_creacion"];
         $documento->hora_recepcion = $arr["documento"]["hora_creacion"];
 
 
         $temp2 = $docdig->documento()->save($documento);
         $id_doc = $temp2->id;
         $docu = Documento::find($id_doc);
-        $citacion->documento()->save($docu);
+        $emplazamiento->documento()->save($docu);
 
-        return $citacion;
+        return $emplazamiento;
     }
 
     public function set_documento_digital($documentid) {
@@ -186,57 +186,57 @@ class StoreCitacion
        $doc_digital->documento()->save($documento);
     }
 
-    public function set_citacion($arr) {
+    public function set_emplazamiento($arr) {
 
-      $citacion = new Citacion;
+      $emplazamiento = new Emplazamiento;
 
-      $citacion->id_expediente = $arr["citaciones"]["id_expediente"];
-      $citacion->id_funcionario = $arr["id_funcionario"];
-      $citacion->organo_juridiccional = $arr["citaciones"]["organo_juridiccional"];
-      $citacion->fecha_creacion = $arr["citaciones"]["fecha_creacion"];
+      $emplazamiento->id_expediente = $arr["emplazamientos"]["id_expediente"];
+      $emplazamiento->id_funcionario = $arr["id_funcionario"];
+      $emplazamiento->organo_juridiccional = $arr["emplazamientos"]["organo_juridiccional"];
+      $emplazamiento->fecha_creacion = $arr["emplazamientos"]["fecha_creacion"];
 
-      if (!is_null($arr["citaciones"]["audiencia"])) {
-          $citacion->audiencia = $arr["citaciones"]["audiencia"];
+      if (!is_null($arr["emplazamientos"]["audiencia"])) {
+          $emplazamiento->audiencia = $arr["emplazamientos"]["audiencia"];
       }
 
-      if (!is_null($arr["citaciones"]["etapa"])) {
-          $citacion->etapa = $arr["citaciones"]["etapa"];
+      if (!is_null($arr["emplazamientos"]["etapa"])) {
+          $emplazamiento->etapa = $arr["emplazamientos"]["etapa"];
       }
 
-      //if (!is_null($arr["citaciones"]["proceso_judicial"])) {
-        //  $citacion->proceso_judicial = $arr["citaciones"]["proceso_judicial"];
+      //if (!is_null($arr["emplazamientos"]["proceso_judicial"])) {
+        //  $emplazamiento->proceso_judicial = $arr["emplazamientos"]["proceso_judicial"];
       //}
 
-      $citacion->parte_solicitante = $arr["citaciones"]["parte_solicitante"];
-      $citacion->asunto = $arr["citaciones"]["asunto"];
-      $citacion->tipo_acto_procesal = $arr["citaciones"]["tipo_acto_procesal"];
+      $emplazamiento->parte_solicitante = $arr["emplazamientos"]["parte_solicitante"];
+      $emplazamiento->asunto = $arr["emplazamientos"]["asunto"];
+      $emplazamiento->tipo_acto_procesal = $arr["emplazamientos"]["tipo_acto_procesal"];
 
-      $citacion->lugar_citacion = $arr["citaciones"]["lugar_citacion"];
-      $citacion->fecha_citacion = $arr["citaciones"]["fecha_citacion"];
+      $emplazamiento->lugar_citacion = $arr["emplazamientos"]["lugar_citacion"];
+      $emplazamiento->fecha_citacion = $arr["emplazamientos"]["fecha_citacion"];
 
-      if (!is_null($arr["citaciones"]["observaciones"])) {
-          $citacion->observaciones = $arr["citaciones"]["observaciones"];
+      if (!is_null($arr["emplazamientos"]["observaciones"])) {
+          $emplazamiento->observaciones = $arr["emplazamientos"]["observaciones"];
       }
 
-      if (!is_null($arr["citaciones"]["persona_natural"])) {
-          $citacion->persona_natural = $arr["citaciones"]["persona_natural"];
+      if (!is_null($arr["emplazamientos"]["persona_natural"])) {
+          $emplazamiento->persona_natural = $arr["emplazamientos"]["persona_natural"];
       }
 
-      $citacion->tipo = $arr["citaciones"]["tipo"];
+      $emplazamiento->tipo = $arr["emplazamientos"]["tipo"];
 
-      $citacion->save();
-      $temp = $citacion;
-      $this->idcitacion = $temp->id;
-      return $citacion;
+      $emplazamiento->save();
+      $temp = $emplazamiento;
+      $this->idemplazamiento = $temp->id;
+      return $emplazamiento;
     }
 
-    public function set_citacion_medios($arr, $idcitacion) {
+    public function set_emplazamientos_medios($arr, $idemplazamiento) {
 
      foreach($arr["envio"] as $e) {
 
        $canales_envio = new CanalEnvioCN;
 
-         $canales_envio->id_citacion = $idcitacion;
+         $canales_envio->id_emplazamiento = $idemplazamiento;
          $canales_envio->canal_envio = $e["canal_envio"];
          $canales_envio->medios_envio = $e["medios_envio"];
 

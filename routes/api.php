@@ -94,6 +94,14 @@ Route::post('/pj/new/citacion', 'API\CitacionController@store');
 Route::post('/pj/citacion/{id}', 'API\CitacionController@show');
 Route::post('/pj/tabla_citacion', 'API\CitacionController@index');
 
+Route::post('/pj/new/notificacion', 'API\NotificacionController@store');
+Route::post('/pj/notificacion/{id}', 'API\NotificacionController@show');
+Route::post('/pj/tabla_notificacion', 'API\NotificacionController@index');
+
+Route::post('/pj/new/emplazamiento', 'API\EmplazamientoController@store');
+Route::post('/pj/emplazamiento/{id}', 'API\EmplazamientoController@show');
+Route::post('/pj/tabla_emplazamiento', 'API\EmplazamientoController@index');
+
 Route::post('/ss/new/sospechoso_investigacion', 'API\SospechosoInvestigacionSSController@store');
 Route::post('/ss/show/sospechoso_investigacion/{id}', 'API\SospechosoInvestigacionSSController@show');
 Route::post('/ss/sospechoso_investigacion', "API\SospechosoInvestigacionSSController@index");

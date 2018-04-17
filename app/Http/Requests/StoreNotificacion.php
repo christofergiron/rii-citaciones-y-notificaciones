@@ -13,16 +13,16 @@ use App\ExpedientePJ;
 use App\Lugar;
 use App\LugarPJ;
 use App\Documento;
-use App\Citacion;
+use App\Notificacion;
+use App\ImputadoNotificacion;
+use App\TestigoNotificacion;
+use App\VictimaNotificacion;
+use App\DelitoNotificacion;
+use App\SujetoProcesalNotificacion;
 use App\CanalEnvioCN;
 use App\DocumentoDigital;
-use App\Rol;
-use App\Fiscal;
-use App\Fiscalia;
 use App\Dependencia;
-use App\OrdenCaptura;
-use App\OrdenCapturaEstado;
-use App\ContraOrdenCaptura;
+use App\Institucion;
 use App\Juez;
 use App\Http\Requests\StorePersona;
 use App\Workflow;
@@ -31,13 +31,13 @@ use App\PolyBaseFactory;
 use App\DefaultAction;
 use App\DefaultMPNUE;
 
-class StoreCitacion
+class StoreNotificacion
 {
 
     private $response;
     private $nue_type;
     private $rii_nue_type;
-    private $idcitacion;
+    private $idnotificacion;
 
     public function __construct()
     {
@@ -66,23 +66,31 @@ class StoreCitacion
        $validator = Validator::make($arr   , [
          "token" => "required",
          "id_funcionario" => "required",
-         "citaciones" => "required",
-         "citaciones.id_expediente" => "required|integer",
-         "citaciones.organo_juridiccional" => "required",
-         "citaciones.fecha_creacion" => "required",
-         //"citaciones.proceso_judicial" => "required",
-         "citaciones.parte_solicitante" => "required",
-         "citaciones.asunto" => "required",
-         "citaciones.tipo_acto_procesal" => "required",
-         "citaciones.lugar_citacion" => "required",
-         "citaciones.fecha_citacion" => "required",
-         "citaciones.persona_natural" => "required",
-         "citaciones.tipo" => "required",
+         "notificaciones" => "required",
+         "notificaciones.id_expediente" => "required|integer",
+         "notificaciones.organo_juridiccional" => "required",
+         "notificaciones.fecha_creacion" => "required",
+         //"notificaciones.proceso_judicial" => "required",
+         "notificaciones.asunto" => "required",
+         "notificaciones.objeto_proceso" => "required",
+         "notificaciones.id_juez" => "required",
+         "notificaciones.id_fiscal" => "required",
          "documento" => "required",
          "documento.hora_creacion" => "required",
          "envio" => "required|array|min:1",
          "envio.*.canal_envio" => "required",
-         "envio.*.medios_envio" => "required"
+         "envio.*.medios_envio" => "required",
+         "delitos" => "required|array|min:1",
+         "delitos.*.id_delito" => "required|integer",
+         "imputados" => "required|array|min:1",
+         "imputados.*.id_imputado" => "required|integer",
+         "victimas" => "required|array|min:1",
+         "victimas.*.id_victima" => "required|integer",
+         "testigos" => "required|array|min:1",
+         "testigos.*.id_testigo" => "required|integer",
+         "otros_sujetos_procesales" => "required|array|min:1",
+         "otros_sujetos_procesales.*.nombre" => "required",
+         "otros_sujetos_procesales.*.tipo" => "required"
        ]);
 
        if ($validator->fails()) {
@@ -120,11 +128,22 @@ class StoreCitacion
       //  $this->log::alert(json_encode($res));
 
        try {
-            $citacion = $this->set_citacion($arr);
+            $citacion = $this->set_notificacion($arr);
             $this->log::alert(json_encode($citacion));
-            $medios_citacion = $this->set_citacion_medios($arr, $this->idcitacion);
-            $this->log::alert(json_encode($medios_citacion));
-            $documento = $this->set_documento($arr, $this->idcitacion);
+            $notificacion_imputados = $this->set_notificacion_imputados($arr, $this->idnotificacion);
+            $this->log::alert(json_encode($notificacion_imputados));
+            $notificacion_testigos = $this->set_notificacion_testigos($arr, $this->idnotificacion);
+            $this->log::alert(json_encode($notificacion_testigos));
+            $notificacion_victimas = $this->set_notificacion_victimas($arr, $this->idnotificacion);
+            $this->log::alert(json_encode($notificacion_victimas));
+            $notificacion_otros = $this->set_notificacion_otros($arr, $this->idnotificacion);
+            $this->log::alert(json_encode($notificacion_otros));
+            $medios_notificacion = $this->set_notificacion_medios($arr, $this->idnotificacion);
+            $this->log::alert(json_encode($medios_notificacion));
+            $delitos_notificacion = $this->set_notificacion_delitos($arr, $this->idnotificacion);
+            $this->log::alert(json_encode($delitos_notificacion));
+
+            $documento = $this->set_documento($arr, $this->idnotificacion);
             $this->log::alert(json_encode($documento));
             //$documento_digital = $this->set_documento_digital($this->response->payload->id = $documento->id);
             //$this->log::alert(json_encode($documento_digital));
@@ -132,7 +151,7 @@ class StoreCitacion
             $this->log::alert(json_encode($this->response));
 
             $this->init();
-            $this->response->message = "citacion realizada Correctamente";
+            $this->response->message = "notificacion realizada Correctamente";
             $this->response->payload->id = $documento->id;
 
         } catch (Exception $e) {
@@ -150,31 +169,31 @@ class StoreCitacion
         return $this->response;
     }
 
-    public function set_documento($arr, $idorden) {
+    public function set_documento($arr, $idnotificacion) {
 
       $documento = new Documento;
       $temp = $doc = DocumentoDigital::create();
       $iddoc = $temp->id;
       $docdig = DocumentoDigital::find($iddoc);
 
-        $citacion = Citacion::find($idorden);
+        $notificacion = Notificacion::find($idnotificacion);
 
-        $documento->expediente_id = $arr["citaciones"]["id_expediente"];
+        $documento->expediente_id = $arr["notificaciones"]["id_expediente"];
         $documento->institucion_id = $this->get_id_institucion_from_user($arr);
         $documento->dependencia_id = $this->get_id_dependencia_from_user($arr);
-        $documento->titulo = "Citacion";
-        $documento->descripcion = "Citacion";
+        $documento->titulo = "Notificacion";
+        $documento->descripcion = "notificacion";
         //$documento->tags = Array($arr["documento"]["tipo"]);
-        $documento->fecha_documento = $arr["citaciones"]["fecha_creacion"];
+        $documento->fecha_documento = $arr["notificaciones"]["fecha_creacion"];
         $documento->hora_recepcion = $arr["documento"]["hora_creacion"];
 
 
         $temp2 = $docdig->documento()->save($documento);
         $id_doc = $temp2->id;
         $docu = Documento::find($id_doc);
-        $citacion->documento()->save($docu);
+        $notificacion->documento()->save($docu);
 
-        return $citacion;
+        return $notificacion;
     }
 
     public function set_documento_digital($documentid) {
@@ -186,61 +205,127 @@ class StoreCitacion
        $doc_digital->documento()->save($documento);
     }
 
-    public function set_citacion($arr) {
+    public function set_notificacion($arr) {
 
-      $citacion = new Citacion;
+      $notificacion = new Notificacion;
 
-      $citacion->id_expediente = $arr["citaciones"]["id_expediente"];
-      $citacion->id_funcionario = $arr["id_funcionario"];
-      $citacion->organo_juridiccional = $arr["citaciones"]["organo_juridiccional"];
-      $citacion->fecha_creacion = $arr["citaciones"]["fecha_creacion"];
+      $notificacion->id_expediente = $arr["notificaciones"]["id_expediente"];
+      $notificacion->id_funcionario = $arr["id_funcionario"];
+      $notificacion->organo_juridiccional = $arr["notificaciones"]["organo_juridiccional"];
+      $notificacion->fecha_creacion = $arr["notificaciones"]["fecha_creacion"];
 
-      if (!is_null($arr["citaciones"]["audiencia"])) {
-          $citacion->audiencia = $arr["citaciones"]["audiencia"];
+      if (!is_null($arr["notificaciones"]["audiencia"])) {
+          $notificacion->audiencia = $arr["notificaciones"]["audiencia"];
       }
 
-      if (!is_null($arr["citaciones"]["etapa"])) {
-          $citacion->etapa = $arr["citaciones"]["etapa"];
+      if (!is_null($arr["notificaciones"]["etapa"])) {
+          $notificacion->etapa = $arr["notificaciones"]["etapa"];
       }
 
-      //if (!is_null($arr["citaciones"]["proceso_judicial"])) {
-        //  $citacion->proceso_judicial = $arr["citaciones"]["proceso_judicial"];
+      //if (isset($arr["notificaciones"]["proceso_judicial"])) {
+        //  $notificacion->proceso_judicial = $arr["notificaciones"]["proceso_judicial"];
       //}
+      if (isset($arr["notificaciones"]["id_resolucion"])) {
+          $notificacion->id_resolucion = $arr["notificaciones"]["id_resolucion"];
+      }
+      $notificacion->asunto = $arr["notificaciones"]["asunto"];
+      $notificacion->objeto_proceso = $arr["notificaciones"]["objeto_proceso"];
 
-      $citacion->parte_solicitante = $arr["citaciones"]["parte_solicitante"];
-      $citacion->asunto = $arr["citaciones"]["asunto"];
-      $citacion->tipo_acto_procesal = $arr["citaciones"]["tipo_acto_procesal"];
-
-      $citacion->lugar_citacion = $arr["citaciones"]["lugar_citacion"];
-      $citacion->fecha_citacion = $arr["citaciones"]["fecha_citacion"];
-
-      if (!is_null($arr["citaciones"]["observaciones"])) {
-          $citacion->observaciones = $arr["citaciones"]["observaciones"];
+      if (!is_null($arr["notificaciones"]["observaciones"])) {
+          $notificacion->observaciones = $arr["notificaciones"]["observaciones"];
       }
 
-      if (!is_null($arr["citaciones"]["persona_natural"])) {
-          $citacion->persona_natural = $arr["citaciones"]["persona_natural"];
-      }
+      $notificacion->id_fiscal = $arr["notificaciones"]["id_fiscal"];
+      $notificacion->id_juez = $arr["notificaciones"]["id_juez"];
 
-      $citacion->tipo = $arr["citaciones"]["tipo"];
-
-      $citacion->save();
-      $temp = $citacion;
-      $this->idcitacion = $temp->id;
-      return $citacion;
+      $notificacion->save();
+      $temp = $notificacion;
+      $this->idnotificacion = $temp->id;
+      return $notificacion;
     }
 
-    public function set_citacion_medios($arr, $idcitacion) {
+    public function set_notificacion_medios($arr, $idnotificacion) {
 
      foreach($arr["envio"] as $e) {
 
        $canales_envio = new CanalEnvioCN;
 
-         $canales_envio->id_citacion = $idcitacion;
+         $canales_envio->id_notificacion = $idnotificacion;
          $canales_envio->canal_envio = $e["canal_envio"];
          $canales_envio->medios_envio = $e["medios_envio"];
 
            $canales_envio->save();
+           //return $orden_delito;
+         }
+    }
+
+    public function set_notificacion_imputados($arr, $idnotificacion) {
+
+     foreach($arr["imputados"] as $e) {
+
+       $imputados = new ImputadoNotificacion;
+
+         $imputados->id_notificacion = $idnotificacion;
+         $imputados->id_imputado = $e["id_imputado"];
+
+           $imputados->save();
+           //return $orden_delito;
+         }
+    }
+
+    public function set_notificacion_testigos($arr, $idnotificacion) {
+
+     foreach($arr["testigos"] as $e) {
+
+       $testigos = new TestigoNotificacion;
+
+         $testigos->id_notificacion = $idnotificacion;
+         $testigos->id_testigo = $e["id_testigo"];
+
+           $testigos->save();
+           //return $orden_delito;
+         }
+    }
+
+    public function set_notificacion_victimas($arr, $idnotificacion) {
+
+     foreach($arr["victimas"] as $e) {
+
+       $victimas = new VictimaNotificacion;
+
+         $victimas->id_notificacion = $idnotificacion;
+         $victimas->id_victima = $e["id_victima"];
+
+           $victimas->save();
+           //return $orden_delito;
+         }
+    }
+
+    public function set_notificacion_delitos($arr, $idnotificacion) {
+
+     foreach($arr["delitos"] as $e) {
+
+       $victimas = new DelitoNotificacion;
+
+         $victimas->id_notificacion = $idnotificacion;
+         $victimas->id_delito = $e["id_delito"];
+
+           $victimas->save();
+           //return $orden_delito;
+         }
+    }
+
+    public function set_notificacion_otros($arr, $idnotificacion) {
+
+     foreach($arr["otros_sujetos_procesales"] as $e) {
+
+       $sujetosprocesales = new SujetoProcesalNotificacion;
+
+         $sujetosprocesales->id_notificacion = $idnotificacion;
+         $sujetosprocesales->nombre = $e["nombre"];
+         $sujetosprocesales->tipo = $e["tipo"];
+
+           $sujetosprocesales->save();
            //return $orden_delito;
          }
     }
