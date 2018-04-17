@@ -94,6 +94,14 @@ Route::post('/pj/new/citacion', 'API\CitacionController@store');
 Route::post('/pj/citacion/{id}', 'API\CitacionController@show');
 Route::post('/pj/tabla_citacion', 'API\CitacionController@index');
 
+Route::post('/ss/new/sospechoso_investigacion', 'API\SospechosoInvestigacionSSController@store');
+Route::post('/ss/show/sospechoso_investigacion/{id}', 'API\SospechosoInvestigacionSSController@show');
+Route::post('/ss/sospechoso_investigacion', "API\SospechosoInvestigacionSSController@index");
+
+Route::post('/ss/new/arma', 'API\ArmaSSController@store');
+Route::post('/ss/show/arma/{id}', 'API\ArmaSSController@show');
+Route::post('/ss/tabla_arma', "API\ArmaSSController@index");
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

@@ -15,6 +15,7 @@ class CreateInformesTable extends Migration
     {
         Schema::create('informes', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('id_denuncia')->nullable();
             $table->DateTime('fecha')->nullable();
             $table->string('titulo')->nullable();
             $table->string('numero_oficio')->nullable();
