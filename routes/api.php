@@ -104,11 +104,13 @@ Route::post('/pj/tabla_emplazamiento', 'API\EmplazamientoController@index');
 
 Route::post('/ss/new/sospechoso_investigacion', 'API\SospechosoInvestigacionSSController@store');
 Route::post('/ss/show/sospechoso_investigacion/{id}', 'API\SospechosoInvestigacionSSController@show');
-Route::post('/ss/sospechoso_investigacion', "API\SospechosoInvestigacionSSController@index");
+Route::post('/ss/sospechoso_investigacion_tabla', "API\SospechosoInvestigacionSSController@index");
 
 Route::post('/ss/new/arma', 'API\ArmaSSController@store');
 Route::post('/ss/show/arma/{id}', 'API\ArmaSSController@show');
 Route::post('/ss/tabla_arma', "API\ArmaSSController@index");
+
+Route::post('/ss/tabla_tipo_arma', "API\TipoArmaSSController@index");
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

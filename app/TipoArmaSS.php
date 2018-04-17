@@ -8,7 +8,7 @@ use Brexis\LaravelWorkflow\Traits\WorkflowTrait;
 class TipoArmaSS extends Model
 {
   use WorkflowTrait;
-  protected $table = "sospechosos_investigacion_ss";
+  protected $table = "tipo_armas_ss";
 
   protected $fillable = [
     "descripcion"
