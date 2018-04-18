@@ -112,6 +112,10 @@ Route::post('/ss/tabla_arma', "API\ArmaSSController@index");
 
 Route::post('/ss/tabla_tipo_arma', "API\TipoArmaSSController@index");
 
+Route::post('/tabla_expedientes_imputados', 'API\CatalogosOrdenCapturaController@expediente_imputado');
+Route::post('/tabla_expedientes_victimas', 'API\CatalogosOrdenCapturaController@expediente_victima');
+Route::post('/lista_expediente_pj', 'API\CatalogosOrdenCapturaController@expediente_pj');
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
