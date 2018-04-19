@@ -25,9 +25,8 @@ use App\Rol;
 use App\Denunciante;
 use App\Sospechoso;
 use App\Testigo;
-use App\DelitoContraPropiedadSS;
-use App\Solicitud;
-use App\HitoSolicitudSS;
+use App\TipoArmaSS;
+use App\ArmaSS;
 use App\Victima;
 use App\Http\Requests\StorePersona;
 use App\Workflow;
@@ -37,7 +36,7 @@ use App\DefaultActionSS;
 use App\NumeroExpediente;
 use App\DefaultSSNUE;
 
-class StoreDelitoContraPropiedadSS //extends FormRequest
+class StoreArmaSSInforme //extends FormRequest
 {
 
     private $response;
@@ -67,7 +66,7 @@ class StoreDelitoContraPropiedadSS //extends FormRequest
     public function workflow_rules(Array $arr)
     {
 
-       $this->log::alert('inside workflow rules solicitud ss ....');
+       $this->log::alert('inside workflow rules Armas ss ....');
        $this->log::alert(json_encode($arr));
 
        $action = new Action($arr);
@@ -87,22 +86,13 @@ class StoreDelitoContraPropiedadSS //extends FormRequest
     {
        $validator = Validator::make($arr   , [
         "token" => "required",
+        // "anexos" => "required",
+        // "anexos.documento_id" => "required",
 
-        "delito_contra_propiedad_ss" => "required",
-        "delito_contra_propiedad_ss.solicitud" => "required",
-        "delito_contra_propiedad_ss.solicitud.fecha" => "required|date_format:Y/m/d",
-        "delito_contra_propiedad_ss.solicitud.id_denuncia" => "required",
-        "delito_contra_propiedad_ss.solicitud.titulo" => "required",
-        "delito_contra_propiedad_ss.solicitud.numero_oficio" => "required",
-        "delito_contra_propiedad_ss.solicitud.institucion" => "required",
-        "delito_contra_propiedad_ss.solicitud.solicitado_por" => "required",
-        "delito_contra_propiedad_ss.solicitud.descripcion" => "nullable",
-
-        "delito_contra_propiedad_ss.procesos_investigativos" => "required|array|min:1",
-        "delito_contra_propiedad_ss.procesos_investigativos.*.nombre" => "required",
-        "delito_contra_propiedad_ss.procesos_investigativos.*.descripcion" => "required",
-        "delito_contra_propiedad_ss.procesos_investigativos.*.fecha_inicio" => "required|date_format:Y/m/d",
-        "delito_contra_propiedad_ss.procesos_investigativos.*.fecha_fin" => "required|date_format:Y/m/d"
+        "armas_ss" => "required",
+        "armas_ss.id_tipo_arma" => "required",
+        "armas_ss.id_informe" => "required",
+        "armas_ss.descripcion" => "required",
      ]);
 
        if ($validator->fails()) {
@@ -121,68 +111,43 @@ class StoreDelitoContraPropiedadSS //extends FormRequest
         // $this->log::alert(json_encode($res));
 
         try {
-            $solicitud = $this->set_solicitud($arr);
-            $this->log::alert(json_encode($solicitud));
+            $arma = $this->set_arma($arr);
+            $this->log::alert(json_encode($arma));
 
             $this->init();
-            $this->response->message = "Solicitud Creada Exitosamente";
-            $this->response->payload->id = $solicitud->id;//$denuncia->id;
+            $this->response->message = "Arma Creada Exitosamente";
+            $this->response->payload->id = $arma->id;//$denuncia->id;
         } catch (Exception $e) {
             $this->log::error($e);
             $this->init();
             $this->response->code = 403;
             $this->response->success = false;
-            $this->response->message = "Solicitud no creada";
+            $this->response->message = "Arma no creada";
             return $this->response;
         }
 
         return $this->response;
     }
 
-    public function set_solicitud($arr) {
-      //Solicitud Hijo
-        $delito_contra_propiedad_ss_arr = [
-          "workflow_state" => "nueva_solicitud",
+    public function set_arma($arr) {
+        $arma_arr = [
+          "id_tipo_arma" => $arr["armas_ss"]["id_tipo_arma"],
+          "id_informe" => $arr["armas_ss"]["id_informe"],
+          "descripcion" => $arr["armas_ss"]["descripcion"],
+          "calibre" => $arr["armas_ss"]["calibre"],
+          "modelo" => $arr["armas_ss"]["modelo"],
+          "nombre" => $arr["armas_ss"]["nombre"],
+          "serial" => $arr["armas_ss"]["serial"],
+          "marca" => $arr["armas_ss"]["marca"]
         ];
-        $delito_contra_propiedad_ss = DelitoContraPropiedadSS::create($delito_contra_propiedad_ss_arr);
-      //Solicitud Padre
-        $solicitud_arr = [
-          "fecha" => $arr["delito_contra_propiedad_ss"]["solicitud"]["fecha"],
-          "id_denuncia" => $arr["delito_contra_propiedad_ss"]["solicitud"]["id_denuncia"],
-          "titulo" => $arr["delito_contra_propiedad_ss"]["solicitud"]["titulo"],
-          "numero_oficio" => $arr["delito_contra_propiedad_ss"]["solicitud"]["numero_oficio"],
-          "institucion" => $arr["delito_contra_propiedad_ss"]["solicitud"]["institucion"],
-          "solicitado_por" => $arr["delito_contra_propiedad_ss"]["solicitud"]["solicitado_por"],
-          "descripcion" => $arr["delito_contra_propiedad_ss"]["solicitud"]["descripcion"]
-        ];
-        $solicitud = new Solicitud($solicitud_arr);
-        $delito_contra_propiedad_ss->solicitud()->save($solicitud);
-      //Anexo
-        // $anexos_arr = [
-        //     "denuncia_id" => $arr["anexos"]["documento_id"]
-        //   ];
-        // $anexos = new Anexo($anexos_arr);
-        // $solicitud->anexo()->save($anexos);
-
-        $_arr = [];
-        foreach($arr["delito_contra_propiedad_ss"]["procesos_investigativos"] as $d) {
-            $hitos_arr = [
-                "nombre" => $d["nombre"],
-                "descripcion" => $d["descripcion"],
-                "fecha_inicio" => $d["fecha_inicio"],
-                "fecha_fin" => $d["fecha_fin"],
-              ];
-            $hitos = new HitoSolicitudSS($hitos_arr);
-            $hitos->solicitud()->associate($solicitud);
-            $hitos->save();
-        }
-
-        return $delito_contra_propiedad_ss;
+        $arma = new ArmaSS($arma_arr);
+        $arma->save();
+        return $arma;
     }
 
     // public function set_hitos($arr, $solicitud) {
     //   $_arr = [];
-    //   foreach($arr["delito_contra_propiedad_ss"]["procesos_investigativos"] as $d) {
+    //   foreach($arr["solicitud_record_historial"]["procesos_investigativos"] as $d) {
     //       $hitos_arr = [
     //           "nombre" => $d["nombre"],
     //           "descripcion" => $d["descripcion"],

@@ -13,6 +13,8 @@ class ArmaSS extends Model
   protected $fillable = [
     "id_tipo_arma",
     "id_sospechoso_investigacion",
+    "id_informe",
+    "id_solicitud",
     "descripcion",
     "calibre",
     "modelo",
@@ -24,5 +26,13 @@ class ArmaSS extends Model
   public function tipoarma()
   {
       return $this->belongsTo(TipoArmaSS::class, 'id_tipo_arma');
+  }
+
+  public function solicitud() {
+       return $this->belongsTo(Solicitud::class, 'id_solicitud');
+  }
+
+  public function informe() {
+       return $this->belongsTo(Solicitud::class, 'id_informe');
   }
 }

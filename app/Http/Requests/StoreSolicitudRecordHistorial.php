@@ -93,6 +93,7 @@ class StoreSolicitudRecordHistorial //extends FormRequest
         "solicitud_record_historial" => "required",
         "solicitud_record_historial.solicitud" => "required",
         "solicitud_record_historial.solicitud.fecha" => "required|date_format:Y/m/d",
+        "solicitud_record_historial.solicitud.id_denuncia" => "required",
         "solicitud_record_historial.solicitud.titulo" => "required",
         "solicitud_record_historial.solicitud.numero_oficio" => "required",
         "solicitud_record_historial.solicitud.institucion" => "required",
@@ -149,6 +150,7 @@ class StoreSolicitudRecordHistorial //extends FormRequest
       //Solicitud Padre
         $solicitud_arr = [
           "fecha" => $arr["solicitud_record_historial"]["solicitud"]["fecha"],
+          "id_denuncia" => $arr["solicitud_record_historial"]["solicitud"]["id_denuncia"],
           "titulo" => $arr["solicitud_record_historial"]["solicitud"]["titulo"],
           "numero_oficio" => $arr["solicitud_record_historial"]["solicitud"]["numero_oficio"],
           "institucion" => $arr["solicitud_record_historial"]["solicitud"]["institucion"],

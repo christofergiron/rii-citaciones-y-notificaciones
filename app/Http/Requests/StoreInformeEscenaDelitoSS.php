@@ -94,6 +94,7 @@ class StoreInformeEscenaDelitoSS //extends FormRequest
         "informe_escena_delito_ss.informe" => "required",
         "informe_escena_delito_ss.informe.fecha" => "required|date_format:Y/m/d",
         "informe_escena_delito_ss.informe.titulo" => "required",
+        "informe_escena_delito_ss.informe.id_denuncia" => "required",
         "informe_escena_delito_ss.informe.numero_oficio" => "required",
         "informe_escena_delito_ss.informe.institucion" => "required",
         "informe_escena_delito_ss.informe.solicitado_por" => "required",
@@ -150,6 +151,7 @@ class StoreInformeEscenaDelitoSS //extends FormRequest
         $informe_arr = [
           "fecha" => $arr["informe_escena_delito_ss"]["informe"]["fecha"],
           "titulo" => $arr["informe_escena_delito_ss"]["informe"]["titulo"],
+          "id_denuncia" => $arr["informe_escena_delito_ss"]["informe"]["id_denuncia"],
           "numero_oficio" => $arr["informe_escena_delito_ss"]["informe"]["numero_oficio"],
           "institucion" => $arr["informe_escena_delito_ss"]["informe"]["institucion"],
           "solicitado_por" => $arr["informe_escena_delito_ss"]["informe"]["solicitado_por"],

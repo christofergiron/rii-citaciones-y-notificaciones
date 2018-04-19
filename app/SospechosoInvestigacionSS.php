@@ -32,4 +32,12 @@ class SospechosoInvestigacionSS extends Model
   {
       return $this->belongsToMany(Delito::class, 'delito_sospechoso_ss', 'sospechoso_id', 'delito_id')->withTimestamps();
   }
+
+  public function solicitud() {
+       return $this->belongsTo(Solicitud::class, 'id_solicitud');
+  }
+
+  public function informe() {
+       return $this->belongsTo(Solicitud::class, 'id_informe');
+  }
 }

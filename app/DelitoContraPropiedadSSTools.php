@@ -112,6 +112,43 @@ class DelitoContraPropiedadSSTools
       $item->descripcion = $solicitud->descripcion;
       $item->delito_contra_propiedad_ss = $solicitud->solicitable()->get();
       $item->procesos_investigativos = $solicitud->hitos_ss()->get();
+      $item->armas_investigacion = $solicitud->armas()->get();
+      $item->sospechosos_investigacion = $solicitud->sospechosos()->get();
+
+      $item->sospechosos_denuncia = [];
+      $denuncia = Denuncia::find($solicitud->id_denuncia);
+
+      $sospechosos_denuncia = Sospechoso::
+        where("denuncia_id", $denuncia->id)->get();
+
+      foreach ($sospechosos_denuncia as $sospechoso_node) {
+        $sospechoso = new \stdClass;
+
+        $persona = $sospechoso_node->rol()->first()->persona()->first();
+
+        $sospechoso->nombre = $persona->primer_apellido." ".$persona->nombres;
+        $sospechoso->delitos = $this->getDelitos($sospechoso_node);
+        $sospechoso->detenido = $sospechoso_node->detenido;
+        $sospechoso->remitido = $sospechoso_node->remitido;
+
+        $item->sospechosos_denuncia[] = $sospechoso;
+      }
+
+    $item->testigos_denuncia = [];
+
+     $testigos = Testigo::
+        where("denuncia_id", $denuncia->id)->get();
+
+      foreach ($testigos as $testigo_node) {
+        $testigo = new \stdClass;
+
+        $persona = $testigo_node->rol()->first()->persona()->first();
+        $testigo->persona_natural_id = $persona->id;
+        $testigo->nombre = $persona->primer_apellido." ".$persona->nombres;
+        $testigo->residente = $testigo_node->residente;
+        $item->testigos_denuncia[] = $testigo;
+      }
+
       $solicitud_arr[] = $item;
       return $solicitud_arr;
   }
@@ -136,6 +173,34 @@ class DelitoContraPropiedadSSTools
       $json_result = json_encode($res);
       return $json_result;
   }
+
+
+  private function getDelitos($sospechoso){
+    $res = new \stdClass;
+
+    $delitos_id = DelitoAtribuido::
+      where("sospechoso_id", $sospechoso->id)
+      ->select('delito_id')->get()->toArray();
+
+    $delitos = Delito::whereIn('id', $delitos_id)->get();
+
+    if(!isset($delitos) || count($delitos) < 1){
+      return array();
+    }
+
+    foreach ($delitos as $delito) {
+        $row = new \stdClass;
+
+        $row->id = $delito->id;
+          $row->nombre = $delito->descripcion;
+
+        $res->rows[] = $row;
+      }
+
+    return $res->rows;
+  }
+
+
   public function ss_list_solicitudes($token) {
       $res = new \stdClass;
       $res->headers = $this->headers();

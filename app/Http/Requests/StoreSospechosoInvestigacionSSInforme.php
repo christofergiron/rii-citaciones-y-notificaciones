@@ -25,9 +25,10 @@ use App\Rol;
 use App\Denunciante;
 use App\Sospechoso;
 use App\Testigo;
-use App\DelitoContraPropiedadSS;
-use App\Solicitud;
-use App\HitoSolicitudSS;
+use App\TipoArmaSS;
+use App\ArmaSS;
+use App\SospechosoInvestigacionSS;
+use App\Delito;
 use App\Victima;
 use App\Http\Requests\StorePersona;
 use App\Workflow;
@@ -37,7 +38,7 @@ use App\DefaultActionSS;
 use App\NumeroExpediente;
 use App\DefaultSSNUE;
 
-class StoreDelitoContraPropiedadSS //extends FormRequest
+class StoreSospechosoInvestigacionSSInforme //extends FormRequest
 {
 
     private $response;
@@ -67,7 +68,7 @@ class StoreDelitoContraPropiedadSS //extends FormRequest
     public function workflow_rules(Array $arr)
     {
 
-       $this->log::alert('inside workflow rules solicitud ss ....');
+       $this->log::alert('inside workflow rules Armas ss ....');
        $this->log::alert(json_encode($arr));
 
        $action = new Action($arr);
@@ -87,22 +88,12 @@ class StoreDelitoContraPropiedadSS //extends FormRequest
     {
        $validator = Validator::make($arr   , [
         "token" => "required",
+        // "anexos" => "required",
+        // "anexos.documento_id" => "required",
 
-        "delito_contra_propiedad_ss" => "required",
-        "delito_contra_propiedad_ss.solicitud" => "required",
-        "delito_contra_propiedad_ss.solicitud.fecha" => "required|date_format:Y/m/d",
-        "delito_contra_propiedad_ss.solicitud.id_denuncia" => "required",
-        "delito_contra_propiedad_ss.solicitud.titulo" => "required",
-        "delito_contra_propiedad_ss.solicitud.numero_oficio" => "required",
-        "delito_contra_propiedad_ss.solicitud.institucion" => "required",
-        "delito_contra_propiedad_ss.solicitud.solicitado_por" => "required",
-        "delito_contra_propiedad_ss.solicitud.descripcion" => "nullable",
-
-        "delito_contra_propiedad_ss.procesos_investigativos" => "required|array|min:1",
-        "delito_contra_propiedad_ss.procesos_investigativos.*.nombre" => "required",
-        "delito_contra_propiedad_ss.procesos_investigativos.*.descripcion" => "required",
-        "delito_contra_propiedad_ss.procesos_investigativos.*.fecha_inicio" => "required|date_format:Y/m/d",
-        "delito_contra_propiedad_ss.procesos_investigativos.*.fecha_fin" => "required|date_format:Y/m/d"
+        "sospechoso_investigacion" => "required",
+        "sospechoso_investigacion.id_informe" => "required",
+        "sospechoso_investigacion.caracteristicas" => "required",
      ]);
 
        if ($validator->fails()) {
@@ -121,42 +112,43 @@ class StoreDelitoContraPropiedadSS //extends FormRequest
         // $this->log::alert(json_encode($res));
 
         try {
-            $solicitud = $this->set_solicitud($arr);
-            $this->log::alert(json_encode($solicitud));
+            $sospechoso_investigacion_ss = $this->set_sospechoso_investigacion_ss($arr);
+            $this->log::alert(json_encode($sospechoso_investigacion_ss));
 
             $this->init();
-            $this->response->message = "Solicitud Creada Exitosamente";
-            $this->response->payload->id = $solicitud->id;//$denuncia->id;
+            $this->response->message = "Sospechoso Creado Exitosamente";
+            $this->response->payload->id = $sospechoso_investigacion_ss->id;//$denuncia->id;
         } catch (Exception $e) {
             $this->log::error($e);
             $this->init();
             $this->response->code = 403;
             $this->response->success = false;
-            $this->response->message = "Solicitud no creada";
+            $this->response->message = "Sospechoso no creado";
             return $this->response;
         }
 
         return $this->response;
     }
 
-    public function set_solicitud($arr) {
-      //Solicitud Hijo
-        $delito_contra_propiedad_ss_arr = [
-          "workflow_state" => "nueva_solicitud",
+    public function set_sospechoso_investigacion_ss($arr) {
+        $sospechoso_investigacion_ss_arr = [
+          "id_informe" => $arr["sospechoso_investigacion"]["id_informe"],
+          "alias" => $arr["sospechoso_investigacion"]["alias"],
+          "otros_nombres" => $arr["sospechoso_investigacion"]["otros_nombres"],
+          "caracteristicas" => $arr["sospechoso_investigacion"]["caracteristicas"],
+          "forma_cara" => $arr["sospechoso_investigacion"]["forma_cara"],
+          "contextura" => $arr["sospechoso_investigacion"]["contextura"],
+          "tono_voz" => $arr["sospechoso_investigacion"]["tono_voz"],
+          "discapacidad" => $arr["sospechoso_investigacion"]["discapacidad"],
+          "peso" => $arr["sospechoso_investigacion"]["peso"],
+          "estatura" => $arr["sospechoso_investigacion"]["estatura"],
+          "tipo_sangre" => $arr["sospechoso_investigacion"]["tipo_sangre"],
+          "cicatrices" => $arr["sospechoso_investigacion"]["cicatrices"],
+          "zona" => $arr["sospechoso_investigacion"]["zona"],
+          "descripcion_zona" => $arr["sospechoso_investigacion"]["descripcion_zona"],
         ];
-        $delito_contra_propiedad_ss = DelitoContraPropiedadSS::create($delito_contra_propiedad_ss_arr);
-      //Solicitud Padre
-        $solicitud_arr = [
-          "fecha" => $arr["delito_contra_propiedad_ss"]["solicitud"]["fecha"],
-          "id_denuncia" => $arr["delito_contra_propiedad_ss"]["solicitud"]["id_denuncia"],
-          "titulo" => $arr["delito_contra_propiedad_ss"]["solicitud"]["titulo"],
-          "numero_oficio" => $arr["delito_contra_propiedad_ss"]["solicitud"]["numero_oficio"],
-          "institucion" => $arr["delito_contra_propiedad_ss"]["solicitud"]["institucion"],
-          "solicitado_por" => $arr["delito_contra_propiedad_ss"]["solicitud"]["solicitado_por"],
-          "descripcion" => $arr["delito_contra_propiedad_ss"]["solicitud"]["descripcion"]
-        ];
-        $solicitud = new Solicitud($solicitud_arr);
-        $delito_contra_propiedad_ss->solicitud()->save($solicitud);
+        $sospechoso_investigacion_ss = new SospechosoInvestigacionSS($sospechoso_investigacion_ss_arr);
+        $sospechoso_investigacion_ss->save();
       //Anexo
         // $anexos_arr = [
         //     "denuncia_id" => $arr["anexos"]["documento_id"]
@@ -164,25 +156,20 @@ class StoreDelitoContraPropiedadSS //extends FormRequest
         // $anexos = new Anexo($anexos_arr);
         // $solicitud->anexo()->save($anexos);
 
-        $_arr = [];
-        foreach($arr["delito_contra_propiedad_ss"]["procesos_investigativos"] as $d) {
-            $hitos_arr = [
-                "nombre" => $d["nombre"],
-                "descripcion" => $d["descripcion"],
-                "fecha_inicio" => $d["fecha_inicio"],
-                "fecha_fin" => $d["fecha_fin"],
-              ];
-            $hitos = new HitoSolicitudSS($hitos_arr);
-            $hitos->solicitud()->associate($solicitud);
-            $hitos->save();
-        }
+        foreach($arr["sospechoso_investigacion"]["id_delito"] as $d) {
+          $delito_arr = [
+               "delito_id" => $d
+             ];
+             $delito = Delito::find($delito_arr);
+             $sospechoso_investigacion_ss->delitos()->attach($delito);
+         }
 
-        return $delito_contra_propiedad_ss;
+        return $sospechoso_investigacion_ss;
     }
 
     // public function set_hitos($arr, $solicitud) {
     //   $_arr = [];
-    //   foreach($arr["delito_contra_propiedad_ss"]["procesos_investigativos"] as $d) {
+    //   foreach($arr["solicitud_record_historial"]["procesos_investigativos"] as $d) {
     //       $hitos_arr = [
     //           "nombre" => $d["nombre"],
     //           "descripcion" => $d["descripcion"],

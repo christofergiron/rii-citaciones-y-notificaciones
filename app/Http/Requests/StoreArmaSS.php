@@ -91,6 +91,7 @@ class StoreArmaSS //extends FormRequest
 
         "armas_ss" => "required",
         "armas_ss.id_tipo_arma" => "required",
+        "armas_ss.id_solicitud" => "required",
         "armas_ss.descripcion" => "required",
      ]);
 
@@ -131,6 +132,7 @@ class StoreArmaSS //extends FormRequest
     public function set_arma($arr) {
         $arma_arr = [
           "id_tipo_arma" => $arr["armas_ss"]["id_tipo_arma"],
+          "id_solicitud" => $arr["armas_ss"]["id_solicitud"],
           "descripcion" => $arr["armas_ss"]["descripcion"],
           "calibre" => $arr["armas_ss"]["calibre"],
           "modelo" => $arr["armas_ss"]["modelo"],

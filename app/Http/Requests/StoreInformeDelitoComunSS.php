@@ -94,6 +94,7 @@ class StoreInformeDelitoComunSS //extends FormRequest
         "informe_delito_comun_ss.informe" => "required",
         "informe_delito_comun_ss.informe.fecha" => "required|date_format:Y/m/d",
         "informe_delito_comun_ss.informe.titulo" => "required",
+        "informe_delito_comun_ss.informe.id_denuncia" => "required",
         "informe_delito_comun_ss.informe.numero_oficio" => "required",
         "informe_delito_comun_ss.informe.institucion" => "required",
         "informe_delito_comun_ss.informe.solicitado_por" => "required",
@@ -150,6 +151,7 @@ class StoreInformeDelitoComunSS //extends FormRequest
         $informe_arr = [
           "fecha" => $arr["informe_delito_comun_ss"]["informe"]["fecha"],
           "titulo" => $arr["informe_delito_comun_ss"]["informe"]["titulo"],
+          "id_denuncia" => $arr["informe_delito_comun_ss"]["informe"]["id_denuncia"],
           "numero_oficio" => $arr["informe_delito_comun_ss"]["informe"]["numero_oficio"],
           "institucion" => $arr["informe_delito_comun_ss"]["informe"]["institucion"],
           "solicitado_por" => $arr["informe_delito_comun_ss"]["informe"]["solicitado_por"],

@@ -10,6 +10,7 @@ class Solicitud extends Model
   use WorkflowTrait;
   protected $fillable = [
     "fecha",
+    "id_denuncia",
     "titulo",
     "numero_oficio",
     "institucion",
@@ -35,4 +36,19 @@ class Solicitud extends Model
   {
     return $this->belongsTo(Funcionario::class, 'solicitado_por');
   }
+
+  public function denuncia(){
+      return $this->hasOne(DenunciaSS::class, "id_denuncia");
+  }
+
+  public function sospechosos() //solicitud
+  {
+      return $this->hasMany(SospechosoInvestigacionSS::class, 'id_solicitud');
+  }
+
+  public function armas() //solicitud
+  {
+      return $this->hasMany(ArmaSS::class, 'id_solicitud');
+  }
+
 }

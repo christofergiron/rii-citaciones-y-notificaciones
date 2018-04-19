@@ -16,6 +16,8 @@ class CreateArmasTable extends Migration
         Schema::create('armas_ss', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('id_tipo_arma')->nullable();
+            $table->integer('id_informe')->nullable();
+            $table->integer('id_solicitud')->nullable();
             $table->integer('id_sospechoso_investigacion')->nullable();
             $table->text('descripcion')->nullable();
             $table->string('calibre')->nullable();

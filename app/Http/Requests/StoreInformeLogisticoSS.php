@@ -93,6 +93,7 @@ class StoreInformeLogisticoSS //extends FormRequest
         "informe_logistico_ss" => "required",
         "informe_logistico_ss.informe" => "required",
         "informe_logistico_ss.informe.fecha" => "required|date_format:Y/m/d",
+        "informe_logistico_ss.informe.id_denuncia" => "required",
         "informe_logistico_ss.informe.titulo" => "required",
         "informe_logistico_ss.informe.numero_oficio" => "required",
         "informe_logistico_ss.informe.institucion" => "required",
@@ -149,6 +150,7 @@ class StoreInformeLogisticoSS //extends FormRequest
       //Solicitud Padre
         $informe_arr = [
           "fecha" => $arr["informe_logistico_ss"]["informe"]["fecha"],
+          "id_denuncia" => $arr["informe_logistico_ss"]["informe"]["id_denuncia"],
           "titulo" => $arr["informe_logistico_ss"]["informe"]["titulo"],
           "numero_oficio" => $arr["informe_logistico_ss"]["informe"]["numero_oficio"],
           "institucion" => $arr["informe_logistico_ss"]["informe"]["institucion"],
