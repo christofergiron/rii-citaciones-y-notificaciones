@@ -87,12 +87,22 @@ class ContraOrdenCapturaTools
     $ordenes_capturas->numero_contra_orden_captura = $contra_orden->id;
     $ordenes_capturas->orden_captura = $contra_orden->id_orden;
     $ordenes_capturas->fecha_creacion = date('Y/m/d',strtotime($contra_orden->fecha_creacion));
-    $ordenes_capturas->numero_expediente = $contra_orden->id_expediente;
+    $ordenes_capturas->numero_expediente = $this->expediente($contra_orden->id_expediente);
     $ordenes_capturas->motivo = $contra_orden->razon;
     $ordenes_capturas->descripcion = $contra_orden->descripcion;
 
     $contra_ordenes_captura_arr = $ordenes_capturas;
     return $contra_ordenes_captura_arr;
+  }
+
+  private function expediente($id_expediente) {
+    $unidad_arr;
+    $expediente = Expediente::find($id_expediente);
+    if (is_null($expediente)) {return null;}
+      $temp = ExpedientePJ::find($expediente->institucionable_id)->first();
+      if (is_null($temp)) {return null;}
+      $temp2 = $temp->numero_expediente;
+      return $temp2;
   }
 
   private function tipo_identidad($persona) {
@@ -237,7 +247,7 @@ class ContraOrdenCapturaTools
     foreach (ContraOrdenCaptura::All() as $dmp) {
       $row = new \stdClass;
       $row->id_contra_orden_captura = $dmp->id;
-      $row->id_expediente = $dmp->id_expediente;
+      $row->id_expediente = $this->expediente($dmp->id_expediente);
       $row->id_orden_captura = $dmp->id_orden;
       $row->fecha_creacion = date('Y/m/d',strtotime($dmp->fecha_creacion));
       $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));

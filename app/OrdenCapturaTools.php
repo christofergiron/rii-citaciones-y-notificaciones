@@ -412,7 +412,7 @@ class OrdenCapturaTools
 
   private function expediente($id_expediente) {
     $unidad_arr;
-    $expediente = Expediente::find($idexp);
+    $expediente = Expediente::find($id_expediente);
     if (is_null($expediente)) {return null;}
       $temp = ExpedientePJ::find($expediente->institucionable_id)->first();
       if (is_null($temp)) {return null;}
