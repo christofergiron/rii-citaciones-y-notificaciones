@@ -12,7 +12,7 @@ class SolicitudOrdenCaptura extends Model
 protected $table = "solicitudes_ordenes_capturas";
 protected $fillable = [
     "id_orden_captura", "id_expediente", "id_persona", "fecha_aprovacion", "fecha_rechazo",
-    "razon_rechazo", "workflow_state", "motivo"
+    "razon_rechazo", "workflow_state", "motivo", "id_juez", "id_fiscal"
   ];
 
   public function solicitud()
