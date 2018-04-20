@@ -129,14 +129,15 @@ class solicitudesJuezTools
   private function rows_solicitud_orden($arr) {
     $res = new \stdClass;
 
-    //$id_juez = $arr["id_juez"];
-    //$solicitud = SolicitudOrdenCaptura::where('id_juez', $id_juez)->get();
+    $id_juez = $arr["id_juez"];
+    $solicitud = SolicitudOrdenCaptura::where('id_juez', $id_juez)->get();
+    if (is_null($solicitud)) {return null;}
 
-    foreach (SolicitudOrdenCaptura::All() as $dmp) {
+    foreach ($solicitud as $dmp) {
       $row = new \stdClass;
-      //falta mostrar el fiscal que la solicita
       $row->numero_solicitud = $dmp->id;
       $row->fecha_solicitud = date('Y/m/d',strtotime($dmp->fecha));
+      $row->estado = $this->fiscal($dmp->id_fiscal);
       $row->estado = $this->estado_solicitud_orden($dmp->workflow_state);
       $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
       $res->rows[] = $row;
@@ -168,17 +169,39 @@ class solicitudesJuezTools
     return $res->headers;
   }
 
+  private function fiscal($id_fiscal) {
+      $funcionarios_arr;
+      $responsable = new \stdClass;
+      $fiscales = Fiscal::find($id_fiscal);
+      if (is_null($fiscales)) {return null;}
+      $fiscal = $fiscales->rol()->first()->persona_natural_id;
+      if (is_null($fiscal)) {return null;}
+
+      //funcionarios
+      if (is_null($fiscal)) {
+        return null;
+      }
+        $persona = $this->get_persona_natural($fiscal);
+
+        //funcionario
+        $responsable->nombres = $persona->nombres.' '.$persona->primer_apellido.' '.$persona->segundo_apellido;
+        $funcionarios_arr = $responsable;
+        return $funcionarios_arr;
+  }
+
   private function rows_solicitud_contra_orden($arr) {
     $res = new \stdClass;
 
-    //$id_juez = $arr["id_juez"];
-    //$solicitud = SolicitudContraOrden::where('id_juez', $id_juez)->get();
+    $id_juez = $arr["id_juez"];
+    $solicitud = SolicitudContraOrden::where('id_juez', $id_juez)->get();
+    if (is_null($solicitud)) {return null;}
 
-    foreach (SolicitudContraOrden::All() as $dmp) {
+    foreach ($solicitud as $dmp) {
       $row = new \stdClass;
       //falta mostrar el fiscal que la solicita
       $row->numero_solicitud = $dmp->id;
       $row->fecha_solicitud = date('Y/m/d',strtotime($dmp->fecha));
+      $row->estado = $this->fiscal($dmp->id_fiscal);
       $row->estado = $this->estado_solicitud_orden($dmp->workflow_state);
       $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
       $res->rows[] = $row;

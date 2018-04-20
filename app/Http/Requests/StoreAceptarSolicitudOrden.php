@@ -129,7 +129,7 @@ class StoreAceptarSolicitudOrden //extends FormRequest
 
       $solicitud = SolicitudOrdenCaptura::find($arr["solicitud_orden_captura"]["id_solicitud"]);
 
-      //$solicitud->id_orden_captura = $arr["solicitud_orden_captura"]["id_orden_captura"];
+      $solicitud->id_orden_captura = $arr["solicitud_orden_captura"]["id_orden_captura"];
       $solicitud->fecha_aprovacion = $arr["solicitud_orden_captura"]["fecha_aprovacion"];
       $solicitud->workflow_state = "solicitud_aprovada";
 

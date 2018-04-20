@@ -296,7 +296,7 @@ class OrdenCapturaTools
     $ordenes_capturas->numero_orden_captura = $orden_captura->id;
     $ordenes_capturas->estado = $orden_captura->estado;
     $ordenes_capturas->fecha_creacion = date('Y/m/d',strtotime($orden_captura->fecha_creacion));
-    $ordenes_capturas->id_expediente = $orden_captura->id_expediente;
+    $ordenes_capturas->id_expediente = $this->expediente($orden_captura->id_expediente);
     $ordenes_capturas->auto_motivo = $orden_captura->auto_motivo;
     $ordenes_capturas->audiencia = $orden_captura->audiencia;
 
@@ -410,13 +410,23 @@ class OrdenCapturaTools
     return $res->headers;
   }
 
+  private function expediente($id_expediente) {
+    $unidad_arr;
+    $expediente = Expediente::find($idexp);
+    if (is_null($expediente)) {return null;}
+      $temp = ExpedientePJ::find($expediente->institucionable_id)->first();
+      if (is_null($temp)) {return null;}
+      $temp2 = $temp->numero_expediente;
+      return $temp2;
+  }
+
   private function rows($token) {
     $res = new \stdClass;
     //$res->rows[]=[]; this fails is no data is returned...
     foreach (OrdenCaptura::All() as $dmp) {
       $row = new \stdClass;
       $row->id_orden_captura = $dmp->id;
-      $row->id_expediente = $dmp->id_expediente;
+      $row->id_expediente = $this->expediente($dmp->id_expediente);
       $row->fecha_creacion = date('Y/m/d',strtotime($dmp->fecha_creacion));
       $row->estado = $dmp->estado;
       $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
