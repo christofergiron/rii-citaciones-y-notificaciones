@@ -15,17 +15,6 @@ use App\Documento;
 use App\Solicitud;
 use App\SolicitudOrdenCaptura;
 use App\DocumentoDigital;
-use App\Anexo;
-use App\Dependencia;
-use App\Institucion;
-use App\Denuncia;
-use App\Rol;
-use App\Denunciante;
-use App\Imputado;
-use App\Ofendido;
-use App\RelacionesImputado;
-use App\RelacionesImputadoDenunciantes;
-use App\RelacionesImputadoOfendidos;
 use App\Parentesco;
 use App\Fiscal;
 use App\DenunciaSS;
@@ -36,7 +25,7 @@ use App\PolyBaseFactory;
 use App\DefaultAction;
 use App\DefaultMPNUE;
 
-class StoreSolicitudOrden //extends FormRequest
+class StoreRechazarSolicitudOrden //extends FormRequest
 {
 
     private $response;
@@ -71,16 +60,10 @@ class StoreSolicitudOrden //extends FormRequest
 
        $validator = Validator::make($arr   , [
          "token" => "required",
-         "id_fiscal" => "required",
          "solicitud_orden_captura" => "required",
-         "solicitud_orden_captura.documento" => "required",
-         "solicitud_orden_captura.solicitud" => "required",
-         "solicitud_orden_captura.solicitud.fecha" => "required",
-         "solicitud_orden_captura.solicitud.id_juez" => "required",
-         "solicitud_orden_captura.solicitud.descripcion" => "required",
-         "solicitud_orden_captura.solicitud.solicitado_por" => "required",
-         "solicitud_orden_captura.solicitud_orden.id_expediente" => "required",
-         "solicitud_orden_captura.solicitud_orden.imputado" => "required"
+         "solicitud_orden_captura.id_solicitud" => "required",
+         "solicitud_orden_captura.fecha_rechazo" => "required",
+         "solicitud_orden_captura.razon_rechazo" => "required"
        ]);
 
        if ($validator->fails()) {
@@ -121,8 +104,6 @@ class StoreSolicitudOrden //extends FormRequest
         try {
             $solicitud = $this->set_solicitud($arr);
             $this->log::alert(json_encode($solicitud));
-            $solicitud = $this->set_documento($arr, $this->idsolicitud);
-            $this->log::alert(json_encode($solicitud));
             $this->log::alert('this->response is ...');
             $this->log::alert(json_encode($this->response));
 
@@ -144,69 +125,17 @@ class StoreSolicitudOrden //extends FormRequest
         return $this->response;
     }
 
-    public function set_documento($arr, $idsolicitud) {
-
-        // documento digital
-        //echo $idorden;
-        $documento = new Documento;
-        $temp = $doc = DocumentoDigital::create();
-        $iddoc = $temp->id;
-        $docdig = DocumentoDigital::find($iddoc);
-
-        $solicitud = Solicitud::find($idsolicitud);
-        $idsolicitable = $solicitud->solicitable_id;
-        $contra = SolicitudOrdenCaptura::find($idsolicitable);
-        $documento->funcionario_id = $arr["id_fiscal"];
-        $documento->expediente_id = $arr["solicitud_orden_captura"]["solicitud_orden"]["id_expediente"];
-        $documento->institucion_id = $this->get_id_institucion_from_user($arr);
-        $documento->dependencia_id = $this->get_id_dependencia_from_user($arr);
-        $documento->titulo = "Solicitud Orden Captura";
-        $documento->descripcion = "solicitud orden captura";
-        //$documento->tags = Array($arr["documento"]["tipo"]);
-        $documento->fecha_documento = $arr["solicitud_orden_captura"]["solicitud"]["fecha"];
-        $documento->hora_recepcion = $arr["solicitud_orden_captura"]["documento"]["hora_solicitud"];
-
-
-        $temp2 = $docdig->documento()->save($documento);
-        $id_doc = $temp2->id;
-        $docu = Documento::find($id_doc);
-        $solicitud->documento()->save($docu);
-
-        return $contra;
-    }
-
     public function set_solicitud($arr) {
 
-      $solicitud = new Solicitud;
+      $solicitud = SolicitudOrdenCaptura::find($arr["solicitud_orden_captura"]["id_solicitud"]);
 
-      $solicitud->fecha = $arr["solicitud_orden_captura"]["solicitud"]["fecha"];
-      $solicitud->numero_oficio = $arr["solicitud_orden_captura"]["solicitud"]["numero_oficio"];
-      $solicitud->solicitado_por = $arr["solicitud_orden_captura"]["solicitud"]["solicitado_por"];
-      $solicitud->institucion = $arr["solicitud_orden_captura"]["solicitud"]["institucion"];
-      $solicitud->descripcion = $arr["solicitud_orden_captura"]["solicitud"]["descripcion"];
+      $solicitud->fecha_rechazo = $arr["solicitud_orden_captura"]["fecha_rechazo"];
+      $solicitud->razon_rechazo = $arr["solicitud_orden_captura"]["razon_rechazo"];
+      $solicitud->workflow_state = "solicitud_rechazada";
 
-          $solicitud->titulo = "Solicitud Orden Captura";
-          $resul = json_decode($this->set_solicitud_orden($arr), true);
-          //echo $resul->id_laboratorio;
-          $solicitudOrden = SolicitudOrdenCaptura::create($resul);
-          $tempo = $solicitudOrden->solicitud()->save($solicitud);
-          $this->idsolicitud = $tempo->id;
+      $solicitud->save();
+
           return $solicitud;
-
-    }
-
-    public function set_solicitud_orden($arr) {
-
-        $solicitud_orden = new SolicitudOrdenCaptura;
-
-            $solicitud_orden->workflow_state = "solicitud_realizada";
-            $solicitud_orden->id_expediente = $arr["solicitud_orden_captura"]["solicitud_orden"]["id_expediente"];
-            $solicitud_orden->id_juez = $arr["solicitud_orden_captura"]["solicitud_orden"]["id_juez"];
-            $solicitud_orden->id_fiscal = $arr["id_fiscal"];
-            $solicitud_orden->id_persona = $arr["solicitud_orden_captura"]["solicitud_orden"]["imputado"];
-            $solicitud_orden->motivo = $arr["solicitud_orden_captura"]["solicitud"]["descripcion"];
-
-           return $solicitud_orden;
     }
 
     public function set_rol($user, $persona) {
@@ -275,7 +204,7 @@ class StoreSolicitudOrden //extends FormRequest
       $id_user  = $arr["id_fiscal"];
       $fiscal = Fiscal::find($id_user);
       if (is_null($fiscal)) {return 0;}
-      $id_dependencia = $fiscal->fiscalia()->first()->dependencia_id;
+      $id_dependencia = $fiscal->fiscalia()->first()->id_dependencia;
       if (is_null($id_dependencia)) {return 0;}
       return $id_dependencia;
     }
@@ -284,12 +213,9 @@ class StoreSolicitudOrden //extends FormRequest
       $id_user  = $arr["id_fiscal"];
       $fiscal = Fiscal::find($id_user);
       if (is_null($fiscal)) {return 0;}
-      $id_institucion = $fiscal->fiscalia()->first();
-      if (is_null($id_institucion)) {return 0;}
-      $dependen = Dependencia::find($id_institucion->dependencia_id);
-      if (is_null($dependen)) {return 0;}
-      $id = $dependen->institucion_id;
-      return $id;
+      $id_institucion = $fiscal->fiscalia()->institucion()->first()->institucion_id;
+      if (is_null($id_dependencia)) {return 0;}
+      return $id_institucion;
     }
 
     public function get_user($token) {

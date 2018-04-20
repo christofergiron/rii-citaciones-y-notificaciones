@@ -162,7 +162,7 @@ class BuscarOrdenCapturaTools
     $idor = 0;
     $res = new \stdClass;
     //solo cambiar esto por el id_persona natural y listo
-    $persona = PersonaNatural::where('id_persona_natural',$persona_id);
+    $persona = PersonaNatural::where('id',$persona_id);
     if (is_null($persona)) {
       $verificar = "verifique la identidad de la persona";
       return $verificar;
@@ -170,7 +170,7 @@ class BuscarOrdenCapturaTools
     $id = $persona->id;
     $orden_persona_natural = OrdenCapturaPersonaNatural::where('id_persona',$id)->get();
     if (is_null($orden_persona_natural)) {
-       return null;
+       return "persona sin orden de captura";
     }
     foreach($orden_persona_natural as $op) {
       $orden_persona_temp = $op->id_orden_captura;

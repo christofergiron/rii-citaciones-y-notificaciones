@@ -214,7 +214,9 @@ class CatalogoTools
       //if (preg_match('/PJ/', $dmp->numero_expediente)) {
       if ($dmp->id > 146) {
       $row = new \stdClass;
-      $row->id_expediente_pj = $dmp->id;
+      $expediente = ExpedientePJ::find($dmp->id);
+      $tipo_expediente = $expediente->institucion()->first()->id;
+      $row->id_expediente_pj = $tipo_expediente;
       $row->numero_expediente = $dmp->numero_expediente;
       $res->rows[] = $row;
       $n = $n + 1;

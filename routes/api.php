@@ -118,6 +118,17 @@ Route::post('/tabla_expedientes_imputados', 'API\CatalogosOrdenCapturaController
 Route::post('/tabla_expedientes_victimas', 'API\CatalogosOrdenCapturaController@expediente_victima');
 Route::post('/lista_expediente_pj', 'API\CatalogosOrdenCapturaController@expediente_pj');
 
+Route::post('/tabla_solicitudes_orden_juez', 'API\SolicitudesJuezController@solicitud_orden');
+Route::post('/tabla_solicitudes_contra_orden_juez', 'API\SolicitudesJuezController@solicitud_contra_orden');
+Route::post('/tabla_busqueda_orden_captura', 'API\BusquedaOrdenCapturaController@solicitud_orden');
+
+Route::post('/aceptar_solicitud_orden', 'API\AceptarSolicitudOrdenController@store');
+Route::post('/aceptar_solicitud_contra_orden', 'API\AceptarSolicitudContraOrdenController@store');
+Route::post('/rechazar_solicitud_orden', 'API\RechazarSolicitudOrdenController@store');
+Route::post('/rechazar_solicitud_contra_orden', 'API\RechazarSolicitudContraController@store');
+Route::post('/acciones_orden', 'API\AccionesSolicitudesController@store_orden');
+Route::post('/acciones_contra_orden', 'API\AccionesSolicitudesController@store_contra_orden');
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

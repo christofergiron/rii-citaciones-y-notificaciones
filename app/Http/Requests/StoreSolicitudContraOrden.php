@@ -76,6 +76,7 @@ class StoreSolicitudContraOrden //extends FormRequest
          "solicitud_contra_orden_captura.documento" => "required",
          "solicitud_contra_orden_captura.solicitud" => "required",
          "solicitud_contra_orden_captura.solicitud.fecha" => "required",
+         "solicitud_contra_orden_captura.solicitud.id_juez" => "required",
          "solicitud_contra_orden_captura.solicitud.descripcion" => "required",
          "solicitud_contra_orden_captura.solicitud.solicitado_por" => "required",
          "solicitud_contra_orden_captura.solicitud_contra_orden.id_expediente" => "required",
@@ -203,6 +204,8 @@ class StoreSolicitudContraOrden //extends FormRequest
             $solicitud_contra_orden->id_orden_captura = $arr["solicitud_contra_orden_captura"]["solicitud_contra_orden"]["id_orden_captura"];
             $solicitud_contra_orden->id_expediente = $arr["solicitud_contra_orden_captura"]["solicitud_contra_orden"]["id_expediente"];
             $solicitud_contra_orden->id_persona = $arr["solicitud_contra_orden_captura"]["solicitud_contra_orden"]["imputado"];
+            $solicitud_contra_orden->id_juez = $arr["solicitud_contra_orden_captura"]["solicitud_contra_orden"]["id_juez"];
+            $solicitud_contra_orden->id_fiscal = $arr["id_fiscal"];
             $solicitud_contra_orden->motivo = $arr["solicitud_contra_orden_captura"]["solicitud"]["descripcion"];
 
            return $solicitud_contra_orden;

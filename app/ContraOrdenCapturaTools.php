@@ -58,21 +58,16 @@ class ContraOrdenCapturaTools
   private function fiscal($id) {
       $funcionarios_arr;
       $contra_orden = ContraOrdenCaptura::find($id);
-      $fiscal = $contra_orden->id_fiscal;
       $responsable = new \stdClass;
+      $id_fiscal = $contra_orden->id_fiscal;
+      $fiscales = Fiscal::find($id_fiscal);
+      $fiscal = $fiscales->rol()->first()->persona_natural_id;
 
       //funcionarios
-      $funcionarios_ss = FuncionarioMP::find($fiscal);
-      if (is_null($funcionarios_ss)) {
+      if (is_null($fiscal)) {
         return null;
       }
-        $funcionario = $funcionarios_ss->institucion()->first();
-          if (is_null($funcionario)) {return null;}
-        $funcionarioid = $funcionario->id;
-        $funcionario_mp = Funcionario::find($funcionarioid);
-        $rol_funcionario = $funcionario_mp->rol()->first();
-        $persona_natural_id = $rol_funcionario->persona_natural_id;
-        $persona = $this->get_persona_natural($persona_natural_id);
+        $persona = $this->get_persona_natural($fiscal);
 
         //funcionario
         $responsable->nombres = $persona->nombres;

@@ -38,6 +38,39 @@ class SolicitudOrdenTools
     return $persona_natural;
   }
 
+  private function juez($id) {
+      $numero_juez = null;
+      $contra_orden = SolicitudContraOrden::find($id);
+      $id_juez = $contra_orden->id_juez;
+      if (is_null($id_juez)) {return $numero_juez;}
+      //cambio, descomentar esto
+      $juez = Juez::find($id_juez);
+      if (is_null($juez)) {return $numero_juez;}
+      $numero_juez = $juez->codigo;
+      return $numero_juez;
+  }
+
+  private function fiscal($id) {
+      $funcionarios_arr;
+      $orden = SolicitudOrdenCaptura::find($id);
+      $responsable = new \stdClass;
+      $id_fiscal = $orden->id_fiscal;
+      $fiscales = Fiscal::find($id_fiscal);
+      $fiscal = $fiscales->rol()->first()->persona_natural_id;
+
+      //funcionarios
+      if (is_null($fiscal)) {
+        return null;
+      }
+        $persona = $this->get_persona_natural($fiscal);
+
+        //funcionario
+        $responsable->nombres = $persona->nombres;
+        $responsable->apellidos = $persona->primer_apellido.', '.$persona->segundo_apellido;
+        $funcionarios_arr = $responsable;
+        return $funcionarios_arr;
+  }
+
   private function unidad($solicitud) {
       $unidad_arr;
       $soli = $solicitud->solicitud()->first();
@@ -206,6 +239,8 @@ class SolicitudOrdenTools
     $solicitudes->solicitud = $this->solicitudes($id);
     $solicitudes->solicitud->solicitud_orden = $this->tipo_solicitud($id);
     $solicitudes->unidad = $this->unidad($solicitud);
+    $solicitudes->juez = $this->juez($id);
+    $solicitudes->fiscal = $this->fiscal($id);
     $solicitud_arr = $solicitudes;
     return $solicitud_arr;
   }
