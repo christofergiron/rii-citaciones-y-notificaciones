@@ -76,10 +76,10 @@ class StoreSolicitudContraOrden //extends FormRequest
          "solicitud_contra_orden_captura.documento" => "required",
          "solicitud_contra_orden_captura.solicitud" => "required",
          "solicitud_contra_orden_captura.solicitud.fecha" => "required",
-         "solicitud_contra_orden_captura.solicitud.id_juez" => "required",
          "solicitud_contra_orden_captura.solicitud.descripcion" => "required",
          "solicitud_contra_orden_captura.solicitud.solicitado_por" => "required",
          "solicitud_contra_orden_captura.solicitud_contra_orden.id_expediente" => "required",
+         "solicitud_contra_orden_captura.solicitud_contra_orden.id_juez" => "required",
          "solicitud_contra_orden_captura.solicitud_contra_orden.imputado" => "required",
          "solicitud_contra_orden_captura.solicitud_contra_orden.id_orden_captura" => "required"
        ]);

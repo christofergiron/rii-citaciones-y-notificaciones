@@ -76,10 +76,10 @@ class StoreSolicitudOrden //extends FormRequest
          "solicitud_orden_captura.documento" => "required",
          "solicitud_orden_captura.solicitud" => "required",
          "solicitud_orden_captura.solicitud.fecha" => "required",
-         "solicitud_orden_captura.solicitud.id_juez" => "required",
          "solicitud_orden_captura.solicitud.descripcion" => "required",
          "solicitud_orden_captura.solicitud.solicitado_por" => "required",
          "solicitud_orden_captura.solicitud_orden.id_expediente" => "required",
+         "solicitud_orden_captura.solicitud_orden.id_juez" => "required",
          "solicitud_orden_captura.solicitud_orden.imputado" => "required"
        ]);
 
