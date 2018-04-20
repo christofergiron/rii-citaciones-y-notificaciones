@@ -60,8 +60,11 @@ class ContraOrdenCapturaTools
       $contra_orden = ContraOrdenCaptura::find($id);
       $responsable = new \stdClass;
       $id_fiscal = $contra_orden->id_fiscal;
+      if (is_null($id_fiscal)) {return null;}
       $fiscales = Fiscal::find($id_fiscal);
+      if (is_null($fiscales)) {return null;}
       $fiscal = $fiscales->rol()->first()->persona_natural_id;
+      if (is_null($fiscal)) {return null;}
 
       //funcionarios
       if (is_null($fiscal)) {
