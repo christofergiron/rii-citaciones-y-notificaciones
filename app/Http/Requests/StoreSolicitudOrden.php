@@ -79,7 +79,7 @@ class StoreSolicitudOrden //extends FormRequest
          "solicitud_orden_captura.solicitud.descripcion" => "required",
          "solicitud_orden_captura.solicitud.solicitado_por" => "required",
          "solicitud_orden_captura.solicitud_orden.id_expediente" => "required",
-         "solicitud_orden_captura.solicitud_orden.id_juez" => "required",
+         //"solicitud_orden_captura.solicitud_orden.id_juez" => "required",
          "solicitud_orden_captura.solicitud_orden.imputado" => "required"
        ]);
 
@@ -201,7 +201,8 @@ class StoreSolicitudOrden //extends FormRequest
 
             $solicitud_orden->workflow_state = "solicitud_realizada";
             $solicitud_orden->id_expediente = $arr["solicitud_orden_captura"]["solicitud_orden"]["id_expediente"];
-            $solicitud_orden->id_juez = $arr["solicitud_orden_captura"]["solicitud_orden"]["id_juez"];
+            //$solicitud_orden->id_juez = $arr["solicitud_orden_captura"]["solicitud_orden"]["id_juez"];
+            $solicitud_orden->id_juez = 1;
             $solicitud_orden->id_fiscal = $arr["id_fiscal"];
             $solicitud_orden->id_persona = $arr["solicitud_orden_captura"]["solicitud_orden"]["imputado"];
             $solicitud_orden->motivo = $arr["solicitud_orden_captura"]["solicitud"]["descripcion"];
