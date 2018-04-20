@@ -117,7 +117,8 @@ class InformeEscenaDelitoSSTools
 
       $item->sospechosos_denuncia = [];
 
-      $denuncia = Denuncia::find($informe->id_denuncia);
+      $denuncia_ss = DenunciaSS::find($informe->id_denuncia);
+      $denuncia = $denuncia_ss->institucion()->first();
 
       $sospechosos_denuncia = Sospechoso::
         where("denuncia_id", $denuncia->id)->get();

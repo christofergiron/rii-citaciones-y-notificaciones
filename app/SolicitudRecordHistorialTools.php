@@ -117,7 +117,8 @@ class SolicitudRecordHistorialTools
 
       $item->sospechosos_denuncia = [];
 
-      $denuncia = Denuncia::find($solicitud->id_denuncia);
+      $denuncia_ss = DenunciaSS::find($solicitud->id_denuncia);
+      $denuncia = $denuncia_ss->institucion()->first();
 
       $sospechosos_denuncia = Sospechoso::
         where("denuncia_id", $denuncia->id)->get();
