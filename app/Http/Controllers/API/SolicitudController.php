@@ -30,13 +30,12 @@ class SolicitudController extends Controller
     public function index(Request $request){
       $arr = $request->all();
 
-       $validator = Validator::make($arr   , [
-         "token" => "required",
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
 
        #get denuncia_mp
        $res = $this->solicitud_tools->ss_list_solicitudes($arr["token"]);

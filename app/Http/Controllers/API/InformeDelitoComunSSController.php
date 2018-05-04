@@ -33,13 +33,12 @@ class InformeDelitoComunSSController extends Controller
     public function index(Request $request){
       $arr = $request->all();
 
-       $validator = Validator::make($arr   , [
-         "token" => "required",
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
 
        #get denuncia_mp
        $res = $this->informe_delito_comun_ss_tools->ss_list_informes($arr["token"]);
@@ -58,16 +57,15 @@ class InformeDelitoComunSSController extends Controller
       // $parsed_request = $this->tools->parse_request($request);
       // $arr = $parsed_request[1];
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->log::alert($arr);
-
-
-       $validator = Validator::make($arr, [
-         "token" => "required"
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
 
        #get denuncia_mp
        $res = $this->informe_delito_comun_ss_tools->get_informe($id, $arr["token"]);
@@ -84,7 +82,14 @@ class InformeDelitoComunSSController extends Controller
     public function store(Request $request) {
       $arr = $request->all();
 
-      $this->logger->alert('inside Store DenunciaMP');
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
+      $this->logger->alert('inside Store Informe Delito Comun');
       $this->log::alert(json_encode($arr));
 
       $res = $this->StoreInformeDelitoComunSS->rules($arr);
