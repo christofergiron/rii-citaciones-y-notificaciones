@@ -1,13 +1,20 @@
 branch-defaults:
   develop:
     environment: rii-ss-dev
-    group_suffix: null
+environment-defaults:
+  rii-ss-dev:
+    branch: null
+    repository: null
 global:
-  application_name: rii-ss
-  branch: null
-  default_ec2_keyname: rii
-  default_platform: PHP 7.1
+  application_name: expediente-api-dev
+  default_ec2_keyname: PBLH-Dev
+  default_platform: arn:aws:elasticbeanstalk:us-west-2::platform/PHP 7.1 running on
+    64bit Amazon Linux/2.6.6
   default_region: us-west-2
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
   profile: null
-  repository: null
   sc: git
+  workspace_type: Application
