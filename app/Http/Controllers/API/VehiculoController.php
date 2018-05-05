@@ -39,13 +39,12 @@ class VehiculoController extends Controller
       $arr = $request->all();
       // $id = $request->params->id
 
-       $validator = Validator::make($arr   , [
-         "token" => "required",
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
 
        #get vehiculo
        $res = $this->vehiculo_tools->ss_list_vehiculo($arr["token"]);
@@ -62,16 +61,16 @@ class VehiculoController extends Controller
     public function show(Request $request, $id) {
       # parsing
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->log::alert($arr);
 
-
-       $validator = Validator::make($arr, [
-         "token" => "required"
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
         //echo $id;
        #get vehiculo
        $res = $this->vehiculo_tools->ss_vehiculo($id, $arr["token"]);
@@ -90,6 +89,14 @@ class VehiculoController extends Controller
       // $parsed_request = $this->tools->parse_request($request);
       // $arr = $parsed_request[1];
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->logger->alert('inside Store Vehiculo');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreVehiculo->rules($arr);
@@ -109,6 +116,14 @@ class VehiculoController extends Controller
 
     public function workflow(Request $request) {
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+      
       $this->logger->alert('inside workflow service Vehiculo');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreVehiculo->workflow_rules($arr);

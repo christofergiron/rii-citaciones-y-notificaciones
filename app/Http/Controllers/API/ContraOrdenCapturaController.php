@@ -44,13 +44,12 @@ class ContraOrdenCapturaController extends Controller
       $arr = $request->all();
       // $id = $request->params->id
 
-       $validator = Validator::make($arr   , [
-         "token" => "required",
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
 
        #get orden captura
        $res = $this->contra_orden_captura_tools->list_contra_orden_captura($arr["token"]);
@@ -67,16 +66,16 @@ class ContraOrdenCapturaController extends Controller
     public function show(Request $request, $id) {
       # parsing
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->log::alert($arr);
 
-
-       $validator = Validator::make($arr, [
-         "token" => "required"
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
        #get orden captura
        $res = $this->contra_orden_captura_tools->contra_orden_captura($id, $arr["token"]);
 
@@ -91,6 +90,14 @@ class ContraOrdenCapturaController extends Controller
 
     public function store(Request $request) {
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->logger->alert('inside Store ContraOrdenCaptura');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreContraOrdenCaptura->rules($arr);
@@ -110,6 +117,14 @@ class ContraOrdenCapturaController extends Controller
 
     public function workflow(Request $request) {
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+      
       $this->logger->alert('inside workflow service ContraOrdenCaptura');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreOrdenCaptura->workflow_rules($arr);

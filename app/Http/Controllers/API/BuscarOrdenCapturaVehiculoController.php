@@ -37,16 +37,16 @@ class BuscarOrdenCapturaVehiculoController extends Controller
     public function show_vehiculo(Request $request, $id) {
       # parsing
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+      
       $this->log::alert($arr);
 
-
-       $validator = Validator::make($arr, [
-         "token" => "required"
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
        #get orden captura
        $res = $this->orden_captura_tools->buscar_orden_captura_vehiculo($id, $arr["token"]);
 

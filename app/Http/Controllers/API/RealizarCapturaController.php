@@ -43,13 +43,12 @@ class RealizarCapturaController extends Controller
       $arr = $request->all();
       // $id = $request->params->id
 
-       $validator = Validator::make($arr   , [
-         "token" => "required",
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
 
        #get captura
        $res = $this->captura_tools->ss_list_captura($arr["token"]);
@@ -66,16 +65,16 @@ class RealizarCapturaController extends Controller
     public function show(Request $request, $id) {
       # parsing
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->log::alert($arr);
 
-
-       $validator = Validator::make($arr, [
-         "token" => "required"
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
         //echo $id;
        #get captura
        $res = $this->captura_tools->ss_captura($id, $arr["token"]);
@@ -94,6 +93,14 @@ class RealizarCapturaController extends Controller
       // $parsed_request = $this->tools->parse_request($request);
       // $arr = $parsed_request[1];
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->logger->alert('inside Store RealizarCaptura');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreRealizarCaptura->rules($arr);
@@ -113,6 +120,14 @@ class RealizarCapturaController extends Controller
 
     public function workflow(Request $request) {
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+      
       $this->logger->alert('inside workflow service RealizarCaptura');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreRealizarCaptura->workflow_rules($arr);

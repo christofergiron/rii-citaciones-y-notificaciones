@@ -43,13 +43,12 @@ class CitacionController extends Controller
       $arr = $request->all();
       // $id = $request->params->id
 
-       $validator = Validator::make($arr   , [
-         "token" => "required",
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
 
        #get orden captura
        $res = $this->citacion_tool->pj_list_citaciones($arr["token"]);
@@ -66,16 +65,16 @@ class CitacionController extends Controller
     public function show(Request $request, $id) {
       # parsing
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->log::alert($arr);
 
-
-       $validator = Validator::make($arr, [
-         "token" => "required"
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
        #get orden captura
        $res = $this->citacion_tool->pj_citaciones($id, $arr["token"]);
 
@@ -90,6 +89,14 @@ class CitacionController extends Controller
 
     public function store(Request $request) {
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->logger->alert('inside Store Citacion');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreCitacion->rules($arr);
@@ -109,6 +116,14 @@ class CitacionController extends Controller
 
     public function workflow(Request $request) {
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+      
       $this->logger->alert('inside workflow service Citacion');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreCitacion->workflow_rules($arr);

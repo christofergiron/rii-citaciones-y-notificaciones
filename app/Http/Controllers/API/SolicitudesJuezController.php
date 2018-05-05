@@ -37,13 +37,12 @@ class SolicitudesJuezController extends Controller
       $arr = $request->all();
       // $id = $request->params->id
 
-       $validator = Validator::make($arr   , [
-         "token" => "required",
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
 
        #get orden captura
        $res = $this->solicitudes->list_solicitud_orden($arr);
@@ -64,13 +63,12 @@ class SolicitudesJuezController extends Controller
       $arr = $request->all();
       // $id = $request->params->id
 
-       $validator = Validator::make($arr   , [
-         "token" => "required",
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
 
        #get orden captura
        $res = $this->solicitudes->list_solicitud_contra_orden($arr);

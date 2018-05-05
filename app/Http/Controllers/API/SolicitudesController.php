@@ -38,13 +38,12 @@ class SolicitudesController extends Controller
     public function index(Request $request){
       $arr = $request->all();
 
-       $validator = Validator::make($arr   , [
-         "token" => "required",
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
 
        $res = $this->solicitud_tools->list_solicitudes($arr["token"]);
 
@@ -60,16 +59,15 @@ class SolicitudesController extends Controller
     public function show(Request $request, $id) {
       # parsing
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->log::alert($arr);
-
-
-       $validator = Validator::make($arr, [
-         "token" => "required"
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
 
        $res = $this->solicitud_tools->solicitud($id, $arr["token"]);
 
@@ -84,6 +82,14 @@ class SolicitudesController extends Controller
 
     public function store(Request $request) {
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->logger->alert('inside Store solicitud');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreSolicitud->rules($arr);
@@ -103,6 +109,14 @@ class SolicitudesController extends Controller
 
     public function workflow(Request $request) {
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+      
       $this->logger->alert('inside workflow service solicitud');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreSolicitud->workflow_rules($arr);

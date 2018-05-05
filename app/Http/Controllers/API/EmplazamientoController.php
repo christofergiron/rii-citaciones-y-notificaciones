@@ -40,13 +40,12 @@ class EmplazamientoController extends Controller
       $arr = $request->all();
       // $id = $request->params->id
 
-       $validator = Validator::make($arr   , [
-         "token" => "required",
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
 
        #get orden captura
        $res = $this->emplazamiento_tool->pj_list_emplazamientos($arr["token"]);
@@ -63,16 +62,16 @@ class EmplazamientoController extends Controller
     public function show(Request $request, $id) {
       # parsing
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->log::alert($arr);
 
-
-       $validator = Validator::make($arr, [
-         "token" => "required"
-       ]);
-
-       if ($validator->fails()) {
-         return response()->json(['error'=>'No Content due to null or empty parameters'], 403);
-       }
        #get orden captura
        $res = $this->emplazamiento_tool->pj_emplazamientos($id, $arr["token"]);
 
@@ -87,6 +86,14 @@ class EmplazamientoController extends Controller
 
     public function store(Request $request) {
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->logger->alert('inside Store Emplazamiento');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreEmplazamiento->rules($arr);
@@ -106,6 +113,14 @@ class EmplazamientoController extends Controller
 
     public function workflow(Request $request) {
       $arr = $request->all();
+
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+      
       $this->logger->alert('inside workflow service OrdenCaptura');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreEmplazamiento->workflow_rules($arr);

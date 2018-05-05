@@ -31,6 +31,14 @@ class AceptarSolicitudContraOrdenController extends Controller
 
     public function store(Request $request) {
       $arr = $request->all();
+      
+      $header = $request->header('Authorization');
+      if ($header=='') {
+          $header =  $request->all()['token'];
+      }
+      $header = str_replace('Bearer ', '', $header);
+      $arr['token'] = $header;
+
       $this->logger->alert('inside Store solicitud');
       $this->logger->alert(json_encode($arr)) ;
       $res = $this->StoreSolicitud->rules($arr);
