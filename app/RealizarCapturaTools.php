@@ -315,12 +315,12 @@ class RealizarCapturaTools
   private function headers(){
     $res = new \stdClass;
     $hdr = new \stdClass;
-    $hdr->name = "id_denuncia";
-    $hdr->label = "Numero Denuncia";
+    $hdr->name = "id_captura";
+    $hdr->label = "Numero Captura";
     $res->headers[] = $hdr;
     $hdr = new \stdClass;
     $hdr->name = "id_lugar";
-    $hdr->label = "Departamento";
+    $hdr->label = "Departamento captura";
     $res->headers[] = $hdr;
     $hdr = new \stdClass;
     $hdr->name = "fecha_captura";
@@ -333,10 +333,6 @@ class RealizarCapturaTools
     $hdr = new \stdClass;
     $hdr->name = "workflow_state";
     $hdr->label = "Estado";
-    $res->headers[] = $hdr;
-    $hdr = new \stdClass;
-    $hdr->name = "actions";
-    $hdr->label = "Acciones";
     $res->headers[] = $hdr;
     return $res->headers;
   }
@@ -390,9 +386,11 @@ class RealizarCapturaTools
 
   private function rows($token) {
     $res = new \stdClass;
-    $n = 0;
-    //$res->rows[]=[]; this fails is no data is returned...
-    try {
+
+    $captura = Captura::All();
+    if (is_null($captura)) {
+      return null;
+    } else {
       foreach (Captura::All() as $dmp) {
         $row = new \stdClass;
         $row->numero_captura = $dmp->id;
@@ -404,10 +402,7 @@ class RealizarCapturaTools
         $res->rows[] = $row;
       }
       return $res->rows;
-
-    } catch (Exception $e) {
-      return null;
-    }
+    }    
 
   }
 
