@@ -330,10 +330,6 @@ class RealizarCapturaTools
     $hdr->name = "tipo_captura";
     $hdr->label = "Tipo Captura";
     $res->headers[] = $hdr;
-    $hdr = new \stdClass;
-    $hdr->name = "workflow_state";
-    $hdr->label = "Estado";
-    $res->headers[] = $hdr;
     return $res->headers;
   }
 
@@ -386,24 +382,17 @@ class RealizarCapturaTools
 
   private function rows($token) {
     $res = new \stdClass;
-
-    $captura = Captura::All();
-    if (is_null($captura)) {
-      return null;
-    } else {
-      foreach (Captura::All() as $dmp) {
-        $row = new \stdClass;
-        $row->numero_captura = $dmp->id;
-        $row->departamento_captura = $this->deptocaptura($dmp);
-        $row->fecha_captura = date('Y/m/d',strtotime($dmp->fecha_captura));
-        $row->tipo_captura = $this->tipocaptura($dmp);
-        $row->workflow_state = $this->tipoworkflow($dmp);
-        $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
-        $res->rows[] = $row;
-      }
-      return $res->rows;
-    }    
-
+    //$res->rows[]=[]; this fails is no data is returned...
+    foreach (Captura::All() as $dmp) {
+      $row = new \stdClass;
+      $row->numero_captura = $dmp->id;
+      $row->departamento_captura = $this->deptocaptura($dmp);
+      $row->fecha_captura = date('Y/m/d',strtotime($dmp->fecha_citacion));
+      $row->tipo_captura = $this->tipocaptura($dmp);
+      $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
+      $res->rows[] = $row;
+    }
+    return $res->rows;
   }
 
   public function ss_list_captura($token) {
