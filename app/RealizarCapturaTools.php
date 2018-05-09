@@ -392,7 +392,11 @@ class RealizarCapturaTools
       $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
       $res->rows[] = $row;
     }
-    return $res->rows;
+    try {
+      return $res->rows;
+    } catch (\Exception $e) {
+      return null;
+    }
   }
 
   public function ss_list_captura($token) {
