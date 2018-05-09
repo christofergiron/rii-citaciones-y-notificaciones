@@ -390,6 +390,7 @@ class RealizarCapturaTools
 
   private function rows($token) {
     $res = new \stdClass;
+    $n = 0;
     //$res->rows[]=[]; this fails is no data is returned...
     foreach (Captura::All() as $dmp) {
       $row = new \stdClass;
@@ -400,8 +401,9 @@ class RealizarCapturaTools
       $row->workflow_state = $this->tipoworkflow($dmp);
       $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
       $res->rows[] = $row;
+      $n = $n + 1;
     }
-    if(is_null($row)){return null;}
+    if($n > 0){return null;}
     return $res->rows;
   }
 
