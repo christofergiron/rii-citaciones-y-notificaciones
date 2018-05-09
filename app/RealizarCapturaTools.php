@@ -401,6 +401,7 @@ class RealizarCapturaTools
       $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
       $res->rows[] = $row;
     }
+    if(is_null($res)){return null;}
     return $res->rows;
   }
 
