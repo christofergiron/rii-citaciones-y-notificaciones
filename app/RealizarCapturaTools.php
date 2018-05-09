@@ -392,19 +392,23 @@ class RealizarCapturaTools
     $res = new \stdClass;
     $n = 0;
     //$res->rows[]=[]; this fails is no data is returned...
-    foreach (Captura::All() as $dmp) {
-      $row = new \stdClass;
-      $row->numero_captura = $dmp->id;
-      $row->departamento_captura = $this->deptocaptura($dmp);
-      $row->fecha_captura = date('Y/m/d',strtotime($dmp->fecha_captura));
-      $row->tipo_captura = $this->tipocaptura($dmp);
-      $row->workflow_state = $this->tipoworkflow($dmp);
-      $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
-      $res->rows[] = $row;
-      $n = $n + 1;
+    try {
+      foreach (Captura::All() as $dmp) {
+        $row = new \stdClass;
+        $row->numero_captura = $dmp->id;
+        $row->departamento_captura = $this->deptocaptura($dmp);
+        $row->fecha_captura = date('Y/m/d',strtotime($dmp->fecha_captura));
+        $row->tipo_captura = $this->tipocaptura($dmp);
+        $row->workflow_state = $this->tipoworkflow($dmp);
+        $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
+        $res->rows[] = $row;
+      }
+      return $res->rows;
+
+    } catch (Exception $e) {
+      return null;
     }
-    if($n > 0){return null;}
-    return $res->rows;
+
   }
 
   public function ss_list_captura($token) {
