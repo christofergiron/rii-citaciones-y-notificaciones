@@ -337,6 +337,7 @@ class VehiculoTools
 
   private function rows($token) {
     $res = new \stdClass;
+    $res->rows = [];
     //$res->rows[]=[]; this fails is no data is returned...
     foreach (Vehiculo::All() as $dmp) {
       $row = new \stdClass;
