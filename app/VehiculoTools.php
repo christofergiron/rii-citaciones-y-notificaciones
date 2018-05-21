@@ -296,6 +296,9 @@ class VehiculoTools
 
   private function vehiculopropietario($vehiculo){
     $idpersona = $vehiculo->id_propietario;
+    if ($idpersona == null){
+      return "";
+    }
     $temp = PersonaNatural::find($idpersona);
     $persona_natural_id = $temp->id;
     $persona = $this->get_persona_natural($persona_natural_id);
@@ -341,7 +344,7 @@ class VehiculoTools
     //$res->rows[]=[]; this fails is no data is returned...
     foreach (Vehiculo::All() as $dmp) {
       $row = new \stdClass;
-      $row->numero_vehiculo = $dmp->id;
+      $row->id = $dmp->id;
       $row->placa = $dmp->placa;
       $row->tipo = $dmp->tipo;
       $row->marca = $dmp->marca;

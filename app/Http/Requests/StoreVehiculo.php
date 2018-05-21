@@ -55,9 +55,8 @@ class StoreVehiculo //extends FormRequest
 
        $validator = Validator::make($arr   , [
          "token" => "required",
-         "id_funcionario" => "required",
+         //"id_funcionario" => "required",
          "vehiculo" => "required|array|min:1",
-         "vehiculo.*.fecha_registro" => "required",
          "vehiculo.*.tipo" => "required",
          "vehiculo.*.marca" => "required",
          "vehiculo.*.modelo" => "required",
@@ -139,19 +138,19 @@ class StoreVehiculo //extends FormRequest
        $vehiculo->año = $d["año"];
        $vehiculo->color = $d["color"];
 
-       if (!is_null($d["estado"])) {
+       if (isset($d["estado"])) {
           $vehiculo->estado = $d["estado"];
        }
-       if (!is_null($d["motor"])) {
+       if (isset($d["motor"])) {
           $vehiculo->motor = $d["motor"];
        }
-       if (!is_null($d["chasis"])) {
+       if (isset($d["chasis"])) {
           $vehiculo->chasis = $d["chasis"];
        }
-       if (!is_null($d["vin"])) {
+       if (isset($d["vin"])) {
           $vehiculo->vin = $d["vin"];
        }
-       if (!is_null($d["descripcion"])) {
+       if (isset($d["descripcion"])) {
           $vehiculo->descripcion = $d["descripcion"];
        }
        if (isset($d["id_propietario"])) {
@@ -164,8 +163,16 @@ class StoreVehiculo //extends FormRequest
           $vehiculo->unidad = $d["unidad"];
        }
 
-       $vehiculo->id_funcionario = $arr["id_funcionario"];
-       $vehiculo->fecha_registro = $d["fecha_registro"];
+       
+        if (isset($arr["id_funcionario"])) {
+            $vehiculo->id_funcionario = $arr["id_funcionario"];
+        }
+
+        if (isset($d["fecha_registro"])) {
+            $vehiculo->fecha_registro = $d["fecha_registro"];
+        }else{
+            $vehiculo->fecha_registro = new \DateTime();
+        }
 
        if (isset($d["id_denuncia"])) {
           $vehiculo->id_denuncia = $d["id_denuncia"];
