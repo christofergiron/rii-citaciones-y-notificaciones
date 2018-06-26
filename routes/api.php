@@ -131,4 +131,9 @@ Route::group(['middleware' => ["authAPI"]], function(){
   Route::post('/acciones_orden', 'API\AccionesSolicitudesController@store_orden');
   Route::post('/acciones_contra_orden', 'API\AccionesSolicitudesController@store_contra_orden');
   Route::post('/ss/table_unidades_tecnicas', 'API\cmbdependenciassController@index');
+
+  Route::post('/ss/tabla_celulares', 'API\CelularController@index');
+  Route::post('/ss/new/celular', 'API\CelularController@store');
+  Route::post('/ss/show/celular', 'API\CelularController@show');
+  Route::post('/ss/edit/celular', 'API\CelularController@edit');
 });
