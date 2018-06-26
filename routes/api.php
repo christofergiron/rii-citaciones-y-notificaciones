@@ -130,4 +130,5 @@ Route::group(['middleware' => ["authAPI"]], function(){
   Route::post('/rechazar_solicitud_contra_orden', 'API\RechazarSolicitudContraController@store');
   Route::post('/acciones_orden', 'API\AccionesSolicitudesController@store_orden');
   Route::post('/acciones_contra_orden', 'API\AccionesSolicitudesController@store_contra_orden');
+  Route::post('/ss/table_unidades_tecnicas', 'API\cmbdependenciassController@index');
 });
