@@ -14,9 +14,9 @@ class Vehiculo extends Model
       "id_orden_captura", "id_lugar"
     ];
 
-  public function denuncia()
+  public function denuncias()
   {
-      return $this->hasOne(Denuncia::class, 'id_denuncia');
+      return $this->belongsToMany(Denuncia::class, 'denuncia_vehiculo', 'id_vehiculo', 'id_denuncia');
   }
 
   public function propietario()

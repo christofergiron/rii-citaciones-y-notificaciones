@@ -109,9 +109,10 @@ Route::group(['middleware' => ["authAPI"]], function(){
   Route::post('/ss/sospechoso_investigacion_tabla', "API\SospechosoInvestigacionSSController@index");
   Route::post('/ss/new/sospechoso_investigacion_informe', 'API\SospechosoInvestigacionSSInformeController@store');
 
-  Route::post('/ss/new/arma_solicitud', 'API\ArmaSSController@store');
+  Route::post('/ss/new/arma', 'API\ArmaSSController@store');
   Route::post('/ss/show/arma/{id}', 'API\ArmaSSController@show');
   Route::post('/ss/tabla_arma', "API\ArmaSSController@index");
+  
   Route::post('/ss/new/arma_informe', 'API\ArmaSSInformeController@store');
 
   Route::post('/ss/tabla_tipo_arma', "API\TipoArmaSSController@index");

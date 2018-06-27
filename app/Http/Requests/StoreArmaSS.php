@@ -91,7 +91,6 @@ class StoreArmaSS //extends FormRequest
 
         "armas_ss" => "required",
         "armas_ss.id_tipo_arma" => "required",
-        "armas_ss.id_solicitud" => "required",
         "armas_ss.descripcion" => "required",
      ]);
 
@@ -132,14 +131,16 @@ class StoreArmaSS //extends FormRequest
     public function set_arma($arr) {
         $arma_arr = [
           "id_tipo_arma" => $arr["armas_ss"]["id_tipo_arma"],
-          "id_solicitud" => $arr["armas_ss"]["id_solicitud"],
+          "id_solicitud" => array_key_exists("id_solicitud", $arr["armas_ss"]) ? $arr["armas_ss"]["id_solicitud"] : null,
           "descripcion" => $arr["armas_ss"]["descripcion"],
-          "calibre" => $arr["armas_ss"]["calibre"],
-          "modelo" => $arr["armas_ss"]["modelo"],
-          "nombre" => $arr["armas_ss"]["nombre"],
-          "serial" => $arr["armas_ss"]["serial"],
-          "marca" => $arr["armas_ss"]["marca"]
+          "calibre" => array_key_exists("calibre", $arr["armas_ss"]) ? $arr["armas_ss"]["calibre"] : null,
+          "modelo" => array_key_exists("modelo", $arr["armas_ss"]) ? $arr["armas_ss"]["modelo"] : null,
+          "nombre" => array_key_exists("nombre", $arr["armas_ss"]) ? $arr["armas_ss"]["nombre"] : null,
+          "serial" => array_key_exists("serial", $arr["armas_ss"]) ? $arr["armas_ss"]["serial"] : null,
+          "marca" => array_key_exists("marca", $arr["armas_ss"]) ? $arr["armas_ss"]["marca"] : null
         ];
+
+
         $arma = new ArmaSS($arma_arr);
         $arma->save();
         return $arma;

@@ -62,18 +62,10 @@ class ArmaSSTools
   }
   private function rows($token) {
     $res = new \stdClass;
-    //$res->rows[]=[]; this fails is no data is returned...
+    $res->rows = []; 
       foreach (ArmaSS::All() as $arma) {
-        $row = new \stdClass;
-        $row->id = $arma->id;
-        $row->id_tipo_arma = $arma->id_tipo_arma;
-        $row->calibre = $arma->calibre;
-        $row->modelo = $arma->modelo;
-        $row->serial = $arma->serial;
-        //$row->actions = $this->acciones($token, $solicitud);
-        //$row->updated_at = date('Y/m/d',strtotime($solicitud->updated_at));
-        //$row->workflow_state = $solicitud->solicitable()->get();
-        $res->rows[] = $row;
+       
+        $res->rows[] = $arma;
       }
       return $res->rows;
   }

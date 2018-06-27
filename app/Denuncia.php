@@ -82,4 +82,9 @@ class Denuncia extends Model
       return $this->hasMany(DelitoAtribuido::class);
   }
 
+  public function vehiculos()
+  {
+      return $this->belongsToMany(Vehiculo::class, 'denuncia_vehiculo', 'id_denuncia', 'id_vehiculo');
+  }
+
 }
