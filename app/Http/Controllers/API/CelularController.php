@@ -37,8 +37,8 @@ class CelularController extends Controller
 
     public function store(CelularRequest $request)
     {
-        Celular::create($request->all());
-    return response()->json(['success'=>'true']);
+        $id = Celular::create($request->all())->id;
+    return response()->json(['success'=>'true',"id"=>$id]);
     }
 
     public function show(Request $request)
