@@ -26,7 +26,7 @@ class CelularRequest extends FormRequest
     public function rules()
     {
         return [
-            'marca' => 'required',
+            'id_marca' => 'required',
             'modelo' => 'required',
             'imei' => 'required |max:15',
         ];
@@ -34,7 +34,7 @@ class CelularRequest extends FormRequest
     public function messages()
     {
         return [
-            'marca.required' => 'Campo marca es requerido',
+            'id_marca.required' => 'Campo marca es requerido',
             'modelo.required'  => 'Campo modelo es requerido',
             'imei.required'  => 'Campo imei es requerido',
             'imei.max'  => 'Longitud campo imei no debe ser mayor a 15',

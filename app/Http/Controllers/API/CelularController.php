@@ -18,7 +18,7 @@ class CelularController extends Controller
      */
     public function index()
     {
-        $celulares = Celular::all();
+        $celulares = Celular::with('detalle_catalgo')->get();
 
         $builder = new BuilderTable();
        $table= $builder->newTable()
