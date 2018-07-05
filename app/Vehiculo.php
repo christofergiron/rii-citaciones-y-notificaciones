@@ -34,4 +34,7 @@ class Vehiculo extends Model
       return $this->hasOne(LugarSS::class, 'id_lugar');
   }
 
+  public function marca_object(){
+    return $this->hasOne(DetalleListaValorRelacional::class,'id_detalle_catalago','marca');
+  }
 }

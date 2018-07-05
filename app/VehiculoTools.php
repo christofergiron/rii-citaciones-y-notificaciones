@@ -162,12 +162,12 @@ class VehiculoTools
 
   private function vehiculo($id) {
     $vehiculo_arr;
-    $vehiculo = Vehiculo::find($id);
+    $vehiculo = Vehiculo::with('marca_object')->find($id);
     $vehiculos = new \stdClass;
 
     $vehiculos->numero_vehiculo = $vehiculo->id;
     $vehiculos->tipo = $vehiculo->tipo;
-    $vehiculos->marca = $vehiculo->marca;
+    $vehiculos->marca = $vehiculo->marca_object != null ? $vehiculo->marca_object->valor : $vehiculo->marca;
     $vehiculos->modelo = $vehiculo->modelo;
     $vehiculos->placa = $vehiculo->placa;
     $vehiculos->año = $vehiculo->año;
@@ -342,12 +342,12 @@ class VehiculoTools
     $res = new \stdClass;
     $res->rows = [];
     //$res->rows[]=[]; this fails is no data is returned...
-    foreach (Vehiculo::All() as $dmp) {
+    foreach (Vehiculo::with('marca_object')->get() as $dmp) {
       $row = new \stdClass;
       $row->id = $dmp->id;
       $row->placa = $dmp->placa;
       $row->tipo = $dmp->tipo;
-      $row->marca = $dmp->marca;
+      $row->marca = $dmp->marca_object != null ? $dmp->marca_object->valor : $dmp->marca;
       $row->modelo = $dmp->modelo;
       $row->fecha_registro = date('Y/m/d',strtotime($dmp->fecha_registro));
       $row->estado = $dmp->estado;
