@@ -24,7 +24,7 @@ phases:
       - ./write.sh
       - cat Dockerrun.aws.json
       - mkdir proxy
-      - cp -R laradock-rii-mp/nginx/sites proxy/
+      - cp -R laradock-rii-ss/nginx/sites proxy/
       - rsync -av --exclude='application/' -r * application
 
 
