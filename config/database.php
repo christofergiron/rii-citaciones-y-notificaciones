@@ -1,5 +1,6 @@
 <?php
-
+$urlEnv = env('DATABASE_URL', 'mysql://user:password@host:3306/db');
+$url = parse_url($urlEnv);
 return [
 
     /*
@@ -52,6 +53,16 @@ return [
             'prefix' => '',
             'strict' => true,
             'engine' => null,
+        ],
+        'mysql-ci' => [
+            'driver' => 'mysql',
+            'host' => $url["host"],
+            'database' => substr($url["path"], 1),
+            'username' => $url["user"],
+            'password' => $url["pass"],
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
         ],
 
         'pgsql' => [

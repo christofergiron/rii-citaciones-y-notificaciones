@@ -1,0 +1,54 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "essential": true,
+      "image": "452374431805.dkr.ecr.us-west-2.amazonaws.com/rii-expedientes/php-fpm:develop.latest",
+      "memory": 256,
+      "mountPoints": [
+        {
+          "containerPath": "/var/www",
+          "sourceVolume": "application"
+        },
+        {
+          "containerPath": "/usr/local/var/log",
+          "sourceVolume": "awseb-logs-php-fpm"
+        }
+      ],
+      "name": "php-fpm"
+    },
+    {
+      "essential": true,
+      "image": "452374431805.dkr.ecr.us-west-2.amazonaws.com/rii-expedientes/nginx:develop.latest",
+      "links": [
+        "php-fpm"
+      ],
+      "memory": 512,
+      "mountPoints": [
+        {
+          "containerPath": "/var/www",
+          "sourceVolume": "application"
+        },
+        {
+          "containerPath": "/var/log/nginx",
+          "sourceVolume": "awseb-logs-nginx"
+        }
+      ],
+      "name": "nginx",
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 80
+        }
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "host": {
+        "sourcePath": "/var/app/current/application"
+      },
+      "name": "application"
+    }
+  ]
+}

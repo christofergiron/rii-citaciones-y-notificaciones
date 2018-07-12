@@ -1,0 +1,40 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - echo branch $CODEBUILD_SOURCE_VERSION
+      - echo repo $CODEBUILD_SOURCE_REPO_URL
+      - aws --version
+      - $(aws ecr get-login --region us-west-2 --no-include-email)
+      - IMAGE_TAG=$RII_ENV.$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - docker pull $REPOSITORY_URI/workspace:$RII_ENV.latest || true
+      - docker pull $REPOSITORY_URI/nginx:$RII_ENV.latest || true
+      - docker pull $REPOSITORY_URI/php-fpm:$RII_ENV.latest || true
+
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker workflow-api image...
+      - cd laradock-rii-ss
+      - cp env-example .env
+      - docker-compose -f rii-develop.yml build nginx php-fpm workspace
+      - docker tag rii-expedientes_nginx:latest $REPOSITORY_URI/nginx:$IMAGE_TAG
+      - docker tag rii-expedientes_nginx:latest $REPOSITORY_URI/nginx:$RII_ENV.latest
+      - docker tag rii-expedientes_php-fpm:latest $REPOSITORY_URI/php-fpm:$IMAGE_TAG
+      - docker tag rii-expedientes_php-fpm:latest $REPOSITORY_URI/php-fpm:$RII_ENV.latest
+      - docker tag rii-expedientes_workspace:latest $REPOSITORY_URI/workspace:$IMAGE_TAG
+      - docker tag rii-expedientes_workspace:latest $REPOSITORY_URI/workspace:$RII_ENV.latest
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI/php-fpm:$IMAGE_TAG
+      - docker push $REPOSITORY_URI/php-fpm:$RII_ENV.latest
+      - docker push $REPOSITORY_URI/nginx:$IMAGE_TAG
+      - docker push $REPOSITORY_URI/nginx:$RII_ENV.latest
+      - docker push $REPOSITORY_URI/workspace:$IMAGE_TAG
+      - docker push $REPOSITORY_URI/workspace:$RII_ENV.latest
+

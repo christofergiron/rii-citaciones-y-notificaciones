@@ -1,0 +1,37 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - chmod +x  write.sh
+      - IMAGE_TAG=$RII_ENV.$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - php -v
+      - composer -v
+
+
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building code ...
+      - composer install
+      - echo Mirating databases
+      - echo migrando secretaria de seguridad $DATABASE_URL
+      - php  artisan migrate --database=mysql-ci
+      - echo Build completed on `date`
+      - echo Writing image definitions file...
+      - ./write.sh
+      - cat Dockerrun.aws.json
+      - mkdir proxy
+      - cp -R laradock-rii-mp/nginx/sites proxy/
+      - rsync -av --exclude='application/' -r * application
+
+
+
+artifacts:
+    files:
+      - Dockerrun.aws.json
+      - application/**/*
+      - proxy/**/*
+      - .ebextensions/**/*
