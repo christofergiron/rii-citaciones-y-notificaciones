@@ -18,7 +18,7 @@ phases:
       - composer install
       - echo Mirating databases
       - echo migrando secretaria de seguridad $DATABASE_URL
-      - php  artisan migrate --database=mysql-ci
+#      - php  artisan migrate --database=mysql-ci
       - echo Build completed on `date`
       - echo Writing image definitions file...
       - ./write.sh
