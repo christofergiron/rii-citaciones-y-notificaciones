@@ -52,6 +52,24 @@ class NotificacionTools
     return $persona_natural;
   }
 
+  private function audiencia($id) {
+      $audiencia;
+      $catalogo = DetalleListaValorRelacional::find($id);
+      if (is_null($catalogo)) {return null;}
+      $audiencia = $catalogo->valor;
+
+        return $audiencia;
+  }
+
+  private function etapa($id) {
+      $etapa;
+      $catalogo = DetalleListaValorRelacional::find($id);
+      if (is_null($catalogo)) {return null;}
+      $etapa = $catalogo->valor;
+
+        return $etapa;
+  }
+
   private function notificaciones($id) {
     $notificacion_arr;
     //$tipo  "App\SolicitudOrdenCaptura";
@@ -61,8 +79,8 @@ class NotificacionTools
     $notificaciones->id_notificacion = $notificacion->id;
     $notificaciones->organo_juridiccional = $notificacion->organo_juridiccional;
     $notificaciones->fecha_creacion = date('Y/m/d',strtotime($notificacion->fecha_creacion));
-    $notificaciones->audiencia = $notificacion->audiencia;
-    $notificaciones->etapa = $notificacion->etapa;
+    $notificaciones->audiencia = $this->audiencia($notificacion->audiencia);
+    $notificaciones->etapa = $this->etapa($notificacion->etapa);
     $notificaciones->asunto = $notificacion->asunto;
     $notificaciones->objeto_proceso = $notificacion->objeto_proceso;
     $notificaciones->observaciones = $notificacion->observaciones;
@@ -148,6 +166,7 @@ class NotificacionTools
         $canal->id = $cn->id;
         $canal->canal_envio = $cn->canal_envio;
         $canal->medios_envio = $cn->medios_envio;
+        $canal->observaciones = $cn->observaciones;
 
         $notificacion_arr[] = $canal;
         unset($canal);
@@ -480,6 +499,10 @@ class NotificacionTools
     $hdr->label = "Numero Notificacion";
     $res->headers[] = $hdr;
     $hdr = new \stdClass;
+    $hdr->name = "numero_expediente";
+    $hdr->label = "Numero Expediente";
+    $res->headers[] = $hdr;
+    $hdr = new \stdClass;
     $hdr->name = "organo_juridiccional";
     $hdr->label = "Organo Juridiccional";
     $res->headers[] = $hdr;
@@ -490,18 +513,38 @@ class NotificacionTools
     return $res->headers;
   }
 
+  private function expediente_pj($id) {
+
+    $notificacion = Notificacion::find($id);
+
+    $expediente = $notificacion->expediente()->first();
+    if (is_null($expediente)) { return null; }
+
+    $expedientepj = $expediente->numero_expediente;
+
+    return $expedientepj;
+  }
+
   private function rows($token) {
     $res = new \stdClass;
     //$res->rows[]=[]; this fails is no data is returned...
-    foreach (Notificacion::All() as $dmp) {
-      $row = new \stdClass;
-      $row->numero_notificacion = $dmp->id;
-      $row->organo_juridiccional = $dmp->organo_juridiccional;
-      $row->fecha_notificacion = date('Y/m/d',strtotime($dmp->fecha_notificacion));
-      $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
-      $res->rows[] = $row;
+    try {
+      $noti = Notificacion::where('notificado', 0)->get();
+      foreach ($noti as $dmp) {
+        $row = new \stdClass;
+        $row->numero_notificacion = $dmp->id;
+        $row->numero_expediente = $this->expediente_pj($dmp->id);
+        $row->organo_juridiccional = $dmp->organo_juridiccional;
+        $row->fecha_notificacion = date('Y/m/d',strtotime($dmp->fecha_notificacion));
+        $row->updated_at = date('Y/m/d',strtotime($dmp->updated_at));
+        $res->rows[] = $row;
+        }
+        return $res->rows;
+
+    } catch (\Exception $e) {
+         return null;
     }
-    return $res->rows;
+
   }
 
   public function pj_list_notificaciones($token) {

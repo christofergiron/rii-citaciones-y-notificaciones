@@ -67,11 +67,12 @@ class StoreEmplazamiento
          "token" => "required",
          "id_funcionario" => "required",
          "emplazamientos" => "required",
-         "emplazamientos.id_expediente" => "required|integer",
+         "emplazamientos.id_expediente" => "required|numeric",
          "emplazamientos.organo_juridiccional" => "required",
          "emplazamientos.fecha_creacion" => "required",
          //"emplazamientos.proceso_judicial" => "required",
          "emplazamientos.parte_solicitante" => "required",
+         "emplazamientos.tipo_acto_procesal" => "required|numeric",
          "emplazamientos.asunto" => "required",
          "emplazamientos.tipo_acto_procesal" => "required",
          "emplazamientos.lugar_citacion" => "required",
@@ -79,10 +80,7 @@ class StoreEmplazamiento
          "emplazamientos.persona_natural" => "required",
          "emplazamientos.tipo" => "required",
          "documento" => "required",
-         "documento.hora_creacion" => "required",
-         "envio" => "required|array|min:1",
-         "envio.*.canal_envio" => "required",
-         "envio.*.medios_envio" => "required"
+         "documento.hora_creacion" => "required"
        ]);
 
        if ($validator->fails()) {
@@ -122,8 +120,6 @@ class StoreEmplazamiento
        try {
             $emplazamiento = $this->set_emplazamiento($arr);
             $this->log::alert(json_encode($emplazamiento));
-            $medios_emplazamiento = $this->set_emplazamientos_medios($arr, $this->idemplazamiento);
-            $this->log::alert(json_encode($medios_emplazamiento));
             $documento = $this->set_documento($arr, $this->idemplazamiento);
             $this->log::alert(json_encode($documento));
             //$documento_digital = $this->set_documento_digital($this->response->payload->id = $documento->id);
@@ -208,6 +204,7 @@ class StoreEmplazamiento
       //}
 
       $emplazamiento->parte_solicitante = $arr["emplazamientos"]["parte_solicitante"];
+      $emplazamiento->tipo_parte_solicitante = $arr["emplazamientos"]["tipo_parte_solicitante"];
       $emplazamiento->asunto = $arr["emplazamientos"]["asunto"];
       $emplazamiento->tipo_acto_procesal = $arr["emplazamientos"]["tipo_acto_procesal"];
 
@@ -223,26 +220,12 @@ class StoreEmplazamiento
       }
 
       $emplazamiento->tipo = $arr["emplazamientos"]["tipo"];
+      $emplazamiento->notificado = 0;
 
       $emplazamiento->save();
       $temp = $emplazamiento;
       $this->idemplazamiento = $temp->id;
       return $emplazamiento;
-    }
-
-    public function set_emplazamientos_medios($arr, $idemplazamiento) {
-
-     foreach($arr["envio"] as $e) {
-
-       $canales_envio = new CanalEnvioCN;
-
-         $canales_envio->id_emplazamiento = $idemplazamiento;
-         $canales_envio->canal_envio = $e["canal_envio"];
-         $canales_envio->medios_envio = $e["medios_envio"];
-
-           $canales_envio->save();
-           //return $orden_delito;
-         }
     }
 
     public function set_rol($user, $persona) {

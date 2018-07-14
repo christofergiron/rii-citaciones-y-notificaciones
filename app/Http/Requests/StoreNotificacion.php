@@ -128,8 +128,8 @@ class StoreNotificacion
       //  $this->log::alert(json_encode($res));
 
        try {
-            $citacion = $this->set_notificacion($arr);
-            $this->log::alert(json_encode($citacion));
+            $notificacion = $this->set_notificacion($arr);
+            $this->log::alert(json_encode($notificacion));
             $notificacion_imputados = $this->set_notificacion_imputados($arr, $this->idnotificacion);
             $this->log::alert(json_encode($notificacion_imputados));
             $notificacion_testigos = $this->set_notificacion_testigos($arr, $this->idnotificacion);
@@ -138,8 +138,6 @@ class StoreNotificacion
             $this->log::alert(json_encode($notificacion_victimas));
             $notificacion_otros = $this->set_notificacion_otros($arr, $this->idnotificacion);
             $this->log::alert(json_encode($notificacion_otros));
-            $medios_notificacion = $this->set_notificacion_medios($arr, $this->idnotificacion);
-            $this->log::alert(json_encode($medios_notificacion));
             $delitos_notificacion = $this->set_notificacion_delitos($arr, $this->idnotificacion);
             $this->log::alert(json_encode($delitos_notificacion));
 
@@ -213,6 +211,7 @@ class StoreNotificacion
       $notificacion->id_funcionario = $arr["id_funcionario"];
       $notificacion->organo_juridiccional = $arr["notificaciones"]["organo_juridiccional"];
       $notificacion->fecha_creacion = $arr["notificaciones"]["fecha_creacion"];
+      $notificacion->notificado = 0;
 
       if (!is_null($arr["notificaciones"]["audiencia"])) {
           $notificacion->audiencia = $arr["notificaciones"]["audiencia"];
@@ -242,21 +241,6 @@ class StoreNotificacion
       $temp = $notificacion;
       $this->idnotificacion = $temp->id;
       return $notificacion;
-    }
-
-    public function set_notificacion_medios($arr, $idnotificacion) {
-
-     foreach($arr["envio"] as $e) {
-
-       $canales_envio = new CanalEnvioCN;
-
-         $canales_envio->id_notificacion = $idnotificacion;
-         $canales_envio->canal_envio = $e["canal_envio"];
-         $canales_envio->medios_envio = $e["medios_envio"];
-
-           $canales_envio->save();
-           //return $orden_delito;
-         }
     }
 
     public function set_notificacion_imputados($arr, $idnotificacion) {

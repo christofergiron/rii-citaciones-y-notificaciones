@@ -100,9 +100,8 @@ Route::group(['middleware' => ["authAPI"]], function(){
   Route::post('/pj/notificacion/{id}', 'API\NotificacionController@show');
   Route::post('/pj/tabla_notificacion', 'API\NotificacionController@index');
 
-  Route::post('/pj/new/emplazamiento', 'API\EmplazamientoController@store');
-  Route::post('/pj/emplazamiento/{id}', 'API\EmplazamientoController@show');
-  Route::post('/pj/tabla_emplazamiento', 'API\EmplazamientoController@index');
+  Route::post('/pj/notificar', 'API\NotificarController@store');
+  Route::post('/pj/catalgo_cita_noti/{id}', 'API\CatalogosCitaNotiPJController@show');
 
   Route::post('/ss/new/sospechoso_investigacion_solicitud', 'API\SospechosoInvestigacionSSController@store');
   Route::post('/ss/show/sospechoso_investigacion/{id}', 'API\SospechosoInvestigacionSSController@show');
@@ -112,7 +111,7 @@ Route::group(['middleware' => ["authAPI"]], function(){
   Route::post('/ss/new/arma', 'API\ArmaSSController@store');
   Route::post('/ss/show/arma/{id}', 'API\ArmaSSController@show');
   Route::post('/ss/tabla_arma', "API\ArmaSSController@index");
-  
+
   Route::post('/ss/new/arma_informe', 'API\ArmaSSInformeController@store');
 
   Route::post('/ss/tabla_tipo_arma', "API\TipoArmaSSController@index");

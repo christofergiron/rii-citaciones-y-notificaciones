@@ -67,22 +67,20 @@ class StoreCitacion
          "token" => "required",
          "id_funcionario" => "required",
          "citaciones" => "required",
-         "citaciones.id_expediente" => "required|integer",
+         "citaciones.id_expediente" => "required|numeric",
          "citaciones.organo_juridiccional" => "required",
          "citaciones.fecha_creacion" => "required",
          //"citaciones.proceso_judicial" => "required",
          "citaciones.parte_solicitante" => "required",
+         "citaciones.tipo_parte_solicitante" => "required",
          "citaciones.asunto" => "required",
-         "citaciones.tipo_acto_procesal" => "required",
+         "citaciones.tipo_acto_procesal" => "required|numeric",
          "citaciones.lugar_citacion" => "required",
          "citaciones.fecha_citacion" => "required",
          "citaciones.persona_natural" => "required",
          "citaciones.tipo" => "required",
          "documento" => "required",
-         "documento.hora_creacion" => "required",
-         "envio" => "required|array|min:1",
-         "envio.*.canal_envio" => "required",
-         "envio.*.medios_envio" => "required"
+         "documento.hora_creacion" => "required"
        ]);
 
        if ($validator->fails()) {
@@ -122,8 +120,6 @@ class StoreCitacion
        try {
             $citacion = $this->set_citacion($arr);
             $this->log::alert(json_encode($citacion));
-            $medios_citacion = $this->set_citacion_medios($arr, $this->idcitacion);
-            $this->log::alert(json_encode($medios_citacion));
             $documento = $this->set_documento($arr, $this->idcitacion);
             $this->log::alert(json_encode($documento));
             //$documento_digital = $this->set_documento_digital($this->response->payload->id = $documento->id);
@@ -208,6 +204,7 @@ class StoreCitacion
       //}
 
       $citacion->parte_solicitante = $arr["citaciones"]["parte_solicitante"];
+      $citacion->tipo_parte_solicitante = $arr["citaciones"]["tipo_parte_solicitante"];
       $citacion->asunto = $arr["citaciones"]["asunto"];
       $citacion->tipo_acto_procesal = $arr["citaciones"]["tipo_acto_procesal"];
 
@@ -223,26 +220,12 @@ class StoreCitacion
       }
 
       $citacion->tipo = $arr["citaciones"]["tipo"];
+      $citacion->notificado = 0;
 
       $citacion->save();
       $temp = $citacion;
       $this->idcitacion = $temp->id;
       return $citacion;
-    }
-
-    public function set_citacion_medios($arr, $idcitacion) {
-
-     foreach($arr["envio"] as $e) {
-
-       $canales_envio = new CanalEnvioCN;
-
-         $canales_envio->id_citacion = $idcitacion;
-         $canales_envio->canal_envio = $e["canal_envio"];
-         $canales_envio->medios_envio = $e["medios_envio"];
-
-           $canales_envio->save();
-           //return $orden_delito;
-         }
     }
 
     public function set_rol($user, $persona) {
